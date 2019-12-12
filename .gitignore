@@ -1,0 +1,52 @@
+## Project
+
+log.txt
+/lib
+
+## Java
+
+*.class
+*.war
+*.ear
+hs_err_pid*
+
+## IntelliJ
+
+.idea/
+*.ipr
+*.iws
+*.iml
+
+## Eclipse
+
+.classpath
+.project
+.metadata/
+/bin/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.settings/
+.loadpath
+.externalToolBuilders/
+*.launch
+
+## NetBeans
+
+/nbproject/private/
+
+
+/nbbuild/
+/dist/
+/nbdist/
+
+nbactions.xml
+nb-configuration.xml
+
+## Maven
+/target/
+
+## OS Specific
+.DS_Store
+Thumbs.db
