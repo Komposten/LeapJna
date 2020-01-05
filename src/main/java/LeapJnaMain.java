@@ -1,8 +1,9 @@
-package komposten.leapjna;
+
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.LongByReference;
 
+import komposten.leapjna.LeapC;
 import komposten.leapjna.LeapC.LEAP_CONNECTION;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_INFO;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
@@ -37,7 +38,7 @@ public class LeapJnaMain
 			if (result == eLeapRS.Success)
 			{
 				printHeader("Polling connection");
-				LEAP_CONNECTION_MESSAGE.ByReference messageRef = new LEAP_CONNECTION_MESSAGE.ByReference();
+				LEAP_CONNECTION_MESSAGE messageRef = new LEAP_CONNECTION_MESSAGE();
 				result = LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500,
 						messageRef);
 				
@@ -74,7 +75,7 @@ public class LeapJnaMain
 					
 					if (messageRef.type == eLeapEventType.Tracking.getShortValue())
 					{
-						LEAP_TRACKING_EVENT event = messageRef.union.tracking_event;
+						LEAP_TRACKING_EVENT event = new LEAP_TRACKING_EVENT(messageRef.union.tracking_event);
 					}
 //					leapTime = LeapC.INSTANCE.LeapGetNow();
 //					result = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.getValue(), leapTime, size);
