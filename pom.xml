@@ -30,8 +30,8 @@
     </dependency>
     
 		<dependency>
-			<groupId>com.github.Komposten</groupId>
-			<artifactId>Utilities</artifactId>
+			<groupId>com.github.komposten</groupId>
+			<artifactId>utilities</artifactId>
 			<version>master-SNAPSHOT</version>
 		</dependency>
 
