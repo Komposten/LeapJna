@@ -5,12 +5,12 @@ import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.LeapC;
 import komposten.leapjna.LeapC.LEAP_CONNECTION;
-import komposten.leapjna.LeapC.LEAP_CONNECTION_INFO;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
-import komposten.leapjna.LeapC.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 
 public class LeapJnaMain
 {
