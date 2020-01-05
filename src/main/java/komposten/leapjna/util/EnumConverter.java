@@ -21,9 +21,6 @@ public class EnumConverter implements TypeConverter
 			throw new RuntimeException("Could not convert type; no valid values assigned!");
 		}
 
-		System.out.format("enum: %s, value: %s (%s)%n", targetClass.getSimpleName(),
-				Integer.toHexString(value), ((JnaEnum<?>)enums[0]).getForValue(value));
-		
 		JnaEnum<?> instance = (JnaEnum<?>) enums[0];
 		return instance.getForValue(value);
 	}
