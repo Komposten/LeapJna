@@ -13,7 +13,6 @@ import com.sun.jna.ptr.PointerByReference;
 
 import komposten.leapjna.leapc.eLeapConnectionStatus;
 import komposten.leapjna.leapc.eLeapEventType;
-import komposten.leapjna.leapc.eLeapHandType;
 import komposten.leapjna.leapc.eLeapRS;
 import komposten.leapjna.util.LeapTypeMapper;
 
@@ -31,15 +30,17 @@ public interface LeapC extends Library
 	public long LeapGetNow();
 
 
+	//TODO Maybe replace all eLeapRS returns with ints?
+	//	Might improve performance a tiny bit.
 	public eLeapRS LeapCreateConnection(LEAP_CONNECTION_CONFIG pConfig,
-			PointerByReference phConnection);
+			LEAP_CONNECTION phConnection);
 
 
 	public eLeapRS LeapOpenConnection(Pointer hConnection);
 
 
 	public eLeapRS LeapPollConnection(Pointer hConnection, int timeout,
-			LEAP_CONNECTION_MESSAGE.ByReference message);
+			LEAP_CONNECTION_MESSAGE message);
 
 
 	public eLeapRS LeapGetConnectionInfo(Pointer hConnection,
@@ -88,6 +89,8 @@ public interface LeapC extends Library
 	@FieldOrder({ "size", "type", "union" })
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
+		//TODO Add getters for the different event types (or something like that).
+		//			Can probably collapse the union into a single Pointer field.
 		public static class EventUnion extends Union
 		{
 			public Pointer pointer;
@@ -97,7 +100,7 @@ public interface LeapC extends Library
 			public Pointer device_status_change_event;
 			public Pointer policy_event;
 			public Pointer device_failure_event;
-			public LEAP_TRACKING_EVENT.ByReference tracking_event;
+			public Pointer tracking_event;
 			public Pointer log_event;
 			public Pointer log_events;
 			public Pointer config_response_event;
@@ -110,12 +113,21 @@ public interface LeapC extends Library
 
 
 		public int size;
-		//public IntByReference type;
 		public short type;
-		//CURRENT Trying to create a ShortEnum type. If it doesn't work, settle for
-		// using short straight up.
-		private eLeapEventType typeE;
 		public EventUnion union;
+		
+		private eLeapEventType typeE;
+		
+		public LEAP_CONNECTION_MESSAGE()
+		{
+		}
+		
+		
+		public LEAP_CONNECTION_MESSAGE(Pointer pointer)
+		{
+			super(pointer);
+			read();
+		}
 		
 		@Override
 		public void read()
@@ -128,11 +140,6 @@ public interface LeapC extends Library
 			{
 				typeE = eLeapEventType.None;
 			}
-			
-//			if (type == null)
-//			{
-//				type = eLeapEventType.None;
-//			}
 			
 			
 			switch (typeE)
@@ -197,15 +204,7 @@ public interface LeapC extends Library
 					break;
 			}
 			
-			System.out.println("Union type: " + typeE);
-			
 			union.read();
-		}
-
-
-		public static class ByReference extends LEAP_CONNECTION_MESSAGE
-				implements Structure.ByReference
-		{
 		}
 	}
 	
@@ -216,11 +215,28 @@ public interface LeapC extends Library
 		public LEAP_FRAME_HEADER info;
 		public long tracking_frame_id;
 		public int nHands;
+
 		public Pointer pHands;
-		//public LEAP_HAND pHands[] = new LEAP_HAND[1];
 		public float framerate;
 		
 		private LEAP_HAND[] hands;
+		
+		public LEAP_TRACKING_EVENT()
+		{
+			super(ALIGN_NONE);
+		}
+		
+		public LEAP_TRACKING_EVENT(Pointer pointer)
+		{
+			super(pointer, ALIGN_NONE);
+			read();
+		}
+		
+		
+		public LEAP_HAND[] getHands()
+		{
+			return hands;
+		}
 		
 		
 		@Override
@@ -228,32 +244,15 @@ public interface LeapC extends Library
 		{
 			super.read();
 			
-			/*
-			 * CURRENT
-			 * - info, tracking_frame_id and nHands are all read correctly.
-			 * - The hands and framerate are incorrect. BUT! The hand info does seem to come
-			 * soon after the nHands variable in memory since the current setup has palm Z change
-			 * depending on hand position (but not accurate by any means)!
-			 */
-			System.out.println("======================");
-			System.out.println("ID: " + tracking_frame_id);
-			System.out.println("Hands: " + nHands);
-			
+			hands = new LEAP_HAND[nHands];
 			if (nHands > 0)
 			{
-				LEAP_HAND hand = new LEAP_HAND(pHands);
-				
-				System.out.println("Hi");
+				for (int i = 0; i < nHands; i++)
+				{
+					int offset = i * LEAP_HAND.SIZE;
+					hands[i] = new LEAP_HAND(pHands.share(offset));
+				}
 			}
-//			System.out.println("===");
-//			System.out.println(pHands[0].id);
-//			System.out.println(pHands[0].flags);
-//			System.out.println(pHands[0].confidence);
-//			System.out.println(pHands[0].type);
-//			System.out.println(pHands[0].palm.position.union.struct.z);
-//			System.out.println("===");
-			System.out.println("Framerate: " + framerate);
-			System.out.println("======================");
 		}
 
 
@@ -277,6 +276,9 @@ public interface LeapC extends Library
 			"grab_angle", "pinch_strength", "grab_strength", "palm", "digitUnion", "arm" })
 	public static class LEAP_HAND extends Structure
 	{
+		//FIXME Calculate this size dynamically. Is a must to work on
+		// e.g. 32-bit systems (pointers are 4 bytes instead of 8).
+		static final int SIZE = 1084;
 		@FieldOrder({ "thumb", "index", "middle", "ring", "pinky" })
 		public static class DigitStruct extends Structure
 		{
@@ -298,7 +300,6 @@ public interface LeapC extends Library
 
 		public int id;
 		public int flags;
-		//public eLeapHandType type; //Commented out since we only have 0 and 1 as values so int is probably too large.
 		public byte type;
 		public float confidence;
 		public long visible_time;
@@ -314,12 +315,14 @@ public interface LeapC extends Library
 		public LEAP_HAND()
 		{
 			super();
+			read();
 		}
 		
 		
 		public LEAP_HAND(Pointer pointer)
 		{
 			super(pointer);
+			read();
 		}
 		
 		@Override
