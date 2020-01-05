@@ -86,36 +86,38 @@ public interface LeapC extends Library
 	}
 
 
-	@FieldOrder({ "size", "type", "union" })
+	@FieldOrder({ "size", "type", "pEvent" })
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
-		//TODO Add getters for the different event types (or something like that).
-		//			Can probably collapse the union into a single Pointer field.
-		public static class EventUnion extends Union
-		{
-			public Pointer pointer;
-			public Pointer connection_event;
-			public Pointer connection_lost_event;
-			public Pointer device_event;
-			public Pointer device_status_change_event;
-			public Pointer policy_event;
-			public Pointer device_failure_event;
-			public Pointer tracking_event;
-			public Pointer log_event;
-			public Pointer log_events;
-			public Pointer config_response_event;
-			public Pointer config_change_event;
-			public Pointer dropped_frame_event;
-			public Pointer image_event;
-			public Pointer point_mapping_change_event;
-			public Pointer head_pose_event;
-		}
-
+//		public static class EventUnion extends Union
+//		{
+//			public Pointer pointer;
+//			public Pointer connection_event;
+//			public Pointer connection_lost_event;
+//			public Pointer device_event;
+//			public Pointer device_status_change_event;
+//			public Pointer policy_event;
+//			public Pointer device_failure_event;
+//			public Pointer tracking_event;
+//			public Pointer log_event;
+//			public Pointer log_events;
+//			public Pointer config_response_event;
+//			public Pointer config_change_event;
+//			public Pointer dropped_frame_event;
+//			public Pointer image_event;
+//			public Pointer point_mapping_change_event;
+//			public Pointer head_pose_event;
+//		}
 
 		public int size;
 		public short type;
-		public EventUnion union;
+		/**
+		 * A pointer to the event data. Check the event type using <code>type</code>
+		 * and then call the getter for that event type to get the event data.
+		 */
+		public Pointer pEvent;
 		
+		private Structure event;
 		private eLeapEventType typeE;
 		
 		public LEAP_CONNECTION_MESSAGE()
@@ -129,6 +131,28 @@ public interface LeapC extends Library
 			read();
 		}
 		
+		
+		public LEAP_TRACKING_EVENT getTrackingEvent()
+		{
+			checkType(eLeapEventType.Tracking);
+			
+			if (event == null)
+				event = new LEAP_TRACKING_EVENT(pEvent);
+			
+			return (LEAP_TRACKING_EVENT) event;
+		}
+		
+		
+		private void checkType(eLeapEventType eventType)
+		{
+			if (typeE != eventType)
+			{
+				throw new IllegalStateException(
+						"Incorrect event type: " + typeE + " != " + eventType);
+			}
+		}
+
+
 		@Override
 		public void read()
 		{
@@ -140,71 +164,6 @@ public interface LeapC extends Library
 			{
 				typeE = eLeapEventType.None;
 			}
-			
-			
-			switch (typeE)
-			{
-				case ConfigChange :
-					union.setType("config_change_event");
-					break;
-				case ConfigResponse :
-					union.setType("config_response_event");
-					break;
-				case Connection :
-					union.setType("connection_event");
-					break;
-				case ConnectionLost :
-					union.setType("connection_lost_event");
-					break;
-				case Device :
-					union.setType("device_event");
-					break;
-				case DeviceFailure :
-					union.setType("device_failure_event");
-					break;
-				case DeviceLost :
-					union.setType("device_event");
-					break;
-				case DeviceStatusChange :
-					union.setType("device_status_change_event");
-					break;
-				case DroppedFrame :
-					union.setType("dropped_frame_event");
-					break;
-				case HeadPose :
-					union.setType("head_pose_event");
-					break;
-				case Image :
-					union.setType("image_event");
-					break;
-				case ImageComplete :
-					break;
-				case ImageRequestError :
-					break;
-				case LogEvent :
-					union.setType("log_event");
-					break;
-				case LogEvents :
-					union.setType("log_events");
-					break;
-				case None :
-					union.setType("pointer");
-					break;
-				case PointMappingChange :
-					union.setType("point_mapping_change_event");
-					break;
-				case Policy :
-					union.setType("policy_event");
-					break;
-				case Tracking :
-					union.setType("tracking_event");
-					break;
-				default :
-					System.out.println("Unknown message type: " + typeE);
-					break;
-			}
-			
-			union.read();
 		}
 	}
 	
@@ -273,7 +232,7 @@ public interface LeapC extends Library
 
 
 	@FieldOrder({ "id", "flags", "type", "confidence", "visible_time", "pinch_distance",
-			"grab_angle", "pinch_strength", "grab_strength", "palm", "digitUnion", "arm" })
+			"grab_angle", "pinch_strength", "grab_strength", "palm", "digits", "arm" })
 	public static class LEAP_HAND extends Structure
 	{
 		//FIXME Calculate this size dynamically. Is a must to work on
@@ -287,16 +246,15 @@ public interface LeapC extends Library
 			public LEAP_DIGIT middle;
 			public LEAP_DIGIT ring;
 			public LEAP_DIGIT pinky;
+			
+			/**
+			 * @return All digits as an array in the order: thumb, index, middle, ring, pinky.
+			 */
+			public LEAP_DIGIT[] asArray()
+			{
+				return new LEAP_DIGIT[] { thumb, index, middle, ring, pinky };
+			}
 		}
-
-
-		@FieldOrder({ "struct", "digits" })
-		public static class DigitUnion extends Union
-		{
-			public DigitStruct digitStruct;
-			public LEAP_DIGIT[] digits = new LEAP_DIGIT[5];
-		}
-
 
 		public int id;
 		public int flags;
@@ -308,7 +266,7 @@ public interface LeapC extends Library
 		public float pinch_strength;
 		public float grab_strength;
 		public LEAP_PALM palm;
-		public DigitUnion digitUnion;
+		public DigitStruct digits;
 		public LEAP_BONE arm;
 		
 		
@@ -323,14 +281,6 @@ public interface LeapC extends Library
 		{
 			super(pointer);
 			read();
-		}
-		
-		@Override
-		public void read()
-		{
-			super.read();
-			digitUnion.setType(DigitStruct.class);
-			digitUnion.read();
 		}
 
 		public static class ByReference extends LEAP_HAND implements Structure.ByReference
@@ -363,99 +313,41 @@ public interface LeapC extends Library
 	}
 
 
-	@FieldOrder({ "finger_id", "boneUnion", "is_extended" })
+	@FieldOrder({ "finger_id", "metacarpal", "proximal", "intermediate", "distal", "is_extended" })
 	public static class LEAP_DIGIT extends Structure
 	{
-		@FieldOrder({ "metacarpal", "proximal", "intermediate", "distal" })
-		public static class BoneStruct extends Structure
-		{
-			public LEAP_BONE metacarpal;
-			public LEAP_BONE proximal;
-			public LEAP_BONE intermediate;
-			public LEAP_BONE distal;
-		}
-
-
-		@FieldOrder({ "bones", "struct" })
-		public static class BoneUnion extends Union
-		{
-			public LEAP_BONE[] bones = new LEAP_BONE[4];
-			public BoneStruct boneStruct;
-		}
-
 		public int finger_id;
-		public BoneUnion boneUnion;
+		public LEAP_BONE metacarpal;
+		public LEAP_BONE proximal;
+		public LEAP_BONE intermediate;
+		public LEAP_BONE distal;
 		public int is_extended;
-		
-		@Override
-		public void read()
+
+		/**
+		 * @return The digit's bones as an array in the order: metacarpal, proximal, intermediate, distal.
+		 */
+		public LEAP_BONE[] boneArray()
 		{
-			super.read();
-			boneUnion.setType(BoneStruct.class);
-			boneUnion.read();
+			return new LEAP_BONE[] { metacarpal, proximal, intermediate, distal };
 		}
 	}
 
 
-	@FieldOrder({ "union" })
+	@FieldOrder({ "x", "y", "z" })
 	public static class LEAP_VECTOR extends Structure
 	{
-		@FieldOrder({ "x", "y", "z" })
-		public static class VectorStruct extends Structure
-		{
-			public float x;
-			public float y;
-			public float z;
-		}
-
-
-		@FieldOrder({ "v", "struct" })
-		public static class VectorUnion extends Union
-		{
-			public float[] v = new float[3];
-			public VectorStruct struct;
-		}
-
-		public VectorUnion union;
-		
-		@Override
-		public void read()
-		{
-			super.read();
-			union.setType(VectorStruct.class);
-			union.read();
-		}
+		public float x;
+		public float y;
+		public float z;
 	}
 
 
-	@FieldOrder({ "union" })
+	@FieldOrder({ "x", "y", "z", "w" })
 	public static class LEAP_QUATERNION extends Structure
 	{
-		@FieldOrder({ "x", "y", "z", "w" })
-		public static class QuaternionStruct extends Structure
-		{
-			public float x;
-			public float y;
-			public float z;
-			public float w;
-		}
-
-
-		@FieldOrder({ "v", "struct" })
-		public static class QuaternionUnion extends Union
-		{
-			public float[] v = new float[4];
-			public QuaternionStruct struct;
-		}
-
-		public QuaternionUnion union;
-		
-		@Override
-		public void read()
-		{
-			super.read();
-			union.setType(QuaternionStruct.class);
-			union.read();
-		}
+		public float x;
+		public float y;
+		public float z;
+		public float w;
 	}
 }

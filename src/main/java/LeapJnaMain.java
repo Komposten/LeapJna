@@ -50,7 +50,6 @@ public class LeapJnaMain
 				}
 
 				System.out.println("Message type: " + messageRef.type);
-				System.out.println("Message value: " + messageRef.union);
 				System.out.println("Message size: " + messageRef.size);
 				
 				printStatus(leapConnection);
@@ -75,7 +74,7 @@ public class LeapJnaMain
 					
 					if (messageRef.type == eLeapEventType.Tracking.getShortValue())
 					{
-						LEAP_TRACKING_EVENT event = new LEAP_TRACKING_EVENT(messageRef.union.tracking_event);
+						LEAP_TRACKING_EVENT event = new LEAP_TRACKING_EVENT(messageRef.pEvent);
 					}
 //					leapTime = LeapC.INSTANCE.LeapGetNow();
 //					result = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.getValue(), leapTime, size);

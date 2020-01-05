@@ -15,7 +15,6 @@ import komposten.leapjna.LeapC.LEAP_CONNECTION;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_INFO;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.LeapC.LEAP_DIGIT;
-import komposten.leapjna.LeapC.LEAP_DIGIT.BoneStruct;
 import komposten.leapjna.LeapC.LEAP_HAND;
 import komposten.leapjna.LeapC.LEAP_TRACKING_EVENT;
 import komposten.leapjna.LeapC.LEAP_VECTOR;
@@ -165,9 +164,7 @@ public class LeapTestGui extends JFrame
 
 				if (timer > 16)
 				{
-					LEAP_TRACKING_EVENT event = new LEAP_TRACKING_EVENT(
-							message.union.tracking_event);
-					renderPanel.setFrameData(event);
+					renderPanel.setFrameData(message.getTrackingEvent());
 					timer = 0;
 				}
 			}
@@ -265,46 +262,45 @@ class RenderPanel extends JPanel
 		drawPosition(hand.palm.position, 1, g2d, offsetX, offsetY);
 
 		g2d.setColor(Color.BLUE);
-		drawFinger(hand.digitUnion.digitStruct.thumb, g2d, offsetX, offsetY);
-		drawFinger(hand.digitUnion.digitStruct.index, g2d, offsetX, offsetY);
-		drawFinger(hand.digitUnion.digitStruct.middle, g2d, offsetX, offsetY);
-		drawFinger(hand.digitUnion.digitStruct.ring, g2d, offsetX, offsetY);
-		drawFinger(hand.digitUnion.digitStruct.pinky, g2d, offsetX, offsetY);
+		drawFinger(hand.digits.thumb, g2d, offsetX, offsetY);
+		drawFinger(hand.digits.index, g2d, offsetX, offsetY);
+		drawFinger(hand.digits.middle, g2d, offsetX, offsetY);
+		drawFinger(hand.digits.ring, g2d, offsetX, offsetY);
+		drawFinger(hand.digits.pinky, g2d, offsetX, offsetY);
 	}
 
 
 	private void drawFinger(LEAP_DIGIT finger, Graphics2D g2d, int offsetX,
 			int offsetY)
 	{
-		BoneStruct bones = finger.boneUnion.boneStruct;
 		g2d.setStroke(
 				new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		g2d.drawLine((int) bones.metacarpal.prev_joint.union.struct.x + offsetX,
-				(int) -bones.metacarpal.prev_joint.union.struct.y + offsetY,
-				(int) bones.metacarpal.next_joint.union.struct.x + offsetX,
-				(int) -bones.metacarpal.next_joint.union.struct.y + offsetY);
-		g2d.drawLine((int) bones.proximal.prev_joint.union.struct.x + offsetX,
-				(int) -bones.proximal.prev_joint.union.struct.y + offsetY,
-				(int) bones.proximal.next_joint.union.struct.x + offsetX,
-				(int) -bones.proximal.next_joint.union.struct.y + offsetY);
-		g2d.drawLine((int) bones.intermediate.prev_joint.union.struct.x + offsetX,
-				(int) -bones.intermediate.prev_joint.union.struct.y + offsetY,
-				(int) bones.intermediate.next_joint.union.struct.x + offsetX,
-				(int) -bones.intermediate.next_joint.union.struct.y + offsetY);
-		g2d.drawLine((int) bones.distal.prev_joint.union.struct.x + offsetX,
-				(int) -bones.distal.prev_joint.union.struct.y + offsetY,
-				(int) bones.distal.next_joint.union.struct.x + offsetX,
-				(int) -bones.distal.next_joint.union.struct.y + offsetY);
-		drawPosition(bones.distal.next_joint, 0.5f, g2d, offsetX, offsetY);
+		g2d.drawLine((int) finger.metacarpal.prev_joint.x + offsetX,
+				(int) -finger.metacarpal.prev_joint.y + offsetY,
+				(int) finger.metacarpal.next_joint.x + offsetX,
+				(int) -finger.metacarpal.next_joint.y + offsetY);
+		g2d.drawLine((int) finger.proximal.prev_joint.x + offsetX,
+				(int) -finger.proximal.prev_joint.y + offsetY,
+				(int) finger.proximal.next_joint.x + offsetX,
+				(int) -finger.proximal.next_joint.y + offsetY);
+		g2d.drawLine((int) finger.intermediate.prev_joint.x + offsetX,
+				(int) -finger.intermediate.prev_joint.y + offsetY,
+				(int) finger.intermediate.next_joint.x + offsetX,
+				(int) -finger.intermediate.next_joint.y + offsetY);
+		g2d.drawLine((int) finger.distal.prev_joint.x + offsetX,
+				(int) -finger.distal.prev_joint.y + offsetY,
+				(int) finger.distal.next_joint.x + offsetX,
+				(int) -finger.distal.next_joint.y + offsetY);
+		drawPosition(finger.distal.next_joint, 0.5f, g2d, offsetX, offsetY);
 	}
 
 
 	private void drawPosition(LEAP_VECTOR position, float scale, Graphics2D g2d,
 			int offsetX, int offsetY)
 	{
-		int size = (int) ((position.union.struct.z + 200) / 400 * 20 * scale + 5);
-		g2d.fillRect((int) (position.union.struct.x + offsetX - size/2f),
-				(int) (-position.union.struct.y + offsetY - size/2),
+		int size = (int) ((position.z + 200) / 400 * 20 * scale + 5);
+		g2d.fillRect((int) (position.x + offsetX - size/2f),
+				(int) (-position.y + offsetY - size/2),
 				size, size);
 	}
 }
