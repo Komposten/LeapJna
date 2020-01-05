@@ -156,7 +156,7 @@ public class LeapTestGui extends JFrame
 			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500,
 					message);
 
-			if (message.type == eLeapEventType.Tracking.getShortValue())
+			if (message.type == eLeapEventType.Tracking.value)
 			{
 				long currentTime = System.nanoTime();
 				timer += (currentTime - lastTime) / 1E6;

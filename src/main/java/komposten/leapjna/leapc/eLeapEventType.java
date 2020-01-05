@@ -1,12 +1,10 @@
 package komposten.leapjna.leapc;
 
-import komposten.leapjna.util.JnaShortEnum;
-
 /**
  * @author Jakob Hjelm
- * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e
+ * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga04f93b375f7c8040178ec5be2bf658ec
  */
-public enum eLeapEventType implements JnaShortEnum<eLeapEventType>
+public enum eLeapEventType
 {
 	None(0x000),
 	Connection(0x001),
@@ -28,32 +26,24 @@ public enum eLeapEventType implements JnaShortEnum<eLeapEventType>
 	LogEvents(0x10B),
 	HeadPose(0x10C);
 	
-	private final short value;
+	public final short value;
 
 	private eLeapEventType(int value)
 	{
 		this.value = (short)value;
 	}
-
-
-	@Override
-	public short getShortValue()
-	{
-		return value;
-	}
-
-
-	@Override
-	public eLeapEventType getForValue(short value)
+	
+	
+	public static eLeapEventType parse(short value, eLeapEventType defaultValue)
 	{
 		for (eLeapEventType o : eLeapEventType.values())
 		{
-			if (o.getShortValue() == value)
+			if (o.value == value)
 			{
 				return o;
 			}
 		}
 		
-		return null;
+		return defaultValue;
 	}
 }

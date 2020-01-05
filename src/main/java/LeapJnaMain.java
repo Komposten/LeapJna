@@ -72,7 +72,7 @@ public class LeapJnaMain
 				{
 					LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500, messageRef);
 					
-					if (messageRef.type == eLeapEventType.Tracking.getShortValue())
+					if (messageRef.type == eLeapEventType.Tracking.value)
 					{
 						LEAP_TRACKING_EVENT event = new LEAP_TRACKING_EVENT(messageRef.pEvent);
 					}

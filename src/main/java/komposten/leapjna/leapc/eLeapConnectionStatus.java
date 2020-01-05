@@ -1,44 +1,39 @@
 package komposten.leapjna.leapc;
 
-import komposten.leapjna.util.JnaEnum;
-
 /**
  * @author Jakob Hjelm
- * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e
  */
-public enum eLeapConnectionStatus implements JnaEnum<eLeapConnectionStatus>
+public enum eLeapConnectionStatus
 {
 	NotConnected(0),
 	Connected(1),
 	HandshakeIncomplete(2),
-	NotRunning(0xE7030004);
+	NotRunning(0xE7030004),
+	Unknown(-1);
 	
-	private final int value;
+	public final int value;
 
 	private eLeapConnectionStatus(int value)
 	{
 		this.value = value;
 	}
+	
 
-
-	@Override
-	public int getIntValue()
+	public static eLeapConnectionStatus parse(int value,
+			eLeapConnectionStatus defaultStatus)
 	{
-		return value;
-	}
-
-
-	@Override
-	public eLeapConnectionStatus getForValue(int value)
-	{
-		for (eLeapConnectionStatus o : eLeapConnectionStatus.values())
+		switch (value)
 		{
-			if (o.getIntValue() == value)
-			{
-				return o;
-			}
+			case 0 :
+				return NotConnected;
+			case 1 :
+				return Connected;
+			case 2 :
+				return HandshakeIncomplete;
+			case 0xE7030004 :
+				return NotRunning;
+			default :
+				return defaultStatus;
 		}
-		
-		return null;
 	}
 }

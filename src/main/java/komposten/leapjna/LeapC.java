@@ -7,12 +7,12 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
-import com.sun.jna.Union;
 import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 import komposten.leapjna.leapc.eLeapConnectionStatus;
 import komposten.leapjna.leapc.eLeapEventType;
+import komposten.leapjna.leapc.eLeapHandType;
 import komposten.leapjna.leapc.eLeapRS;
 import komposten.leapjna.util.LeapTypeMapper;
 
@@ -77,7 +77,24 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_INFO extends Structure
 	{
 		public int size;
-		public eLeapConnectionStatus status;
+		/**
+		 * The connection status as an int. Use {@link #getStatus()} to get the
+		 * status as a {@link eLeapConnectionStatus} value.
+		 */
+		public int status;
+		
+		private eLeapConnectionStatus statusE;
+		
+		
+		public eLeapConnectionStatus getStatus()
+		{
+			if (statusE == null)
+			{
+				statusE = eLeapConnectionStatus.parse(status, eLeapConnectionStatus.Unknown);
+			}
+			
+			return statusE;
+		}
 		
 		public static class ByReference extends LEAP_CONNECTION_INFO
 				implements Structure.ByReference
@@ -110,6 +127,10 @@ public interface LeapC extends Library
 //		}
 
 		public int size;
+		/**
+		 * The event type. Use {@link #getType()} to get the type as a
+		 * {@link eLeapEventType} value.
+		 */
 		public short type;
 		/**
 		 * A pointer to the event data. Check the event type using <code>type</code>
@@ -132,6 +153,17 @@ public interface LeapC extends Library
 		}
 		
 		
+		public eLeapEventType getType()
+		{
+			if (typeE == null)
+			{
+				typeE = eLeapEventType.parse(type, eLeapEventType.None);
+			}
+			
+			return typeE;
+		}
+		
+		
 		public LEAP_TRACKING_EVENT getTrackingEvent()
 		{
 			checkType(eLeapEventType.Tracking);
@@ -145,24 +177,10 @@ public interface LeapC extends Library
 		
 		private void checkType(eLeapEventType eventType)
 		{
-			if (typeE != eventType)
+			if (type != eventType.value)
 			{
 				throw new IllegalStateException(
 						"Incorrect event type: " + typeE + " != " + eventType);
-			}
-		}
-
-
-		@Override
-		public void read()
-		{
-			super.read();
-
-			typeE = eLeapEventType.None.getForValue(type);
-			
-			if (typeE == null)
-			{
-				typeE = eLeapEventType.None;
 			}
 		}
 	}
@@ -258,6 +276,10 @@ public interface LeapC extends Library
 
 		public int id;
 		public int flags;
+		/**
+		 * The hand type as a byte. Either 0 (left) or 1 (right).
+		 * Use {@link #getType()} to get the type as a {@link eLeapHandType} value. 
+		 */
 		public byte type;
 		public float confidence;
 		public long visible_time;
@@ -268,6 +290,8 @@ public interface LeapC extends Library
 		public LEAP_PALM palm;
 		public DigitStruct digits;
 		public LEAP_BONE arm;
+		
+		private eLeapHandType typeE;
 		
 		
 		public LEAP_HAND()
@@ -281,6 +305,17 @@ public interface LeapC extends Library
 		{
 			super(pointer);
 			read();
+		}
+		
+		
+		public eLeapHandType getType()
+		{
+			if (typeE == null)
+			{
+				typeE = eLeapHandType.parse(type, eLeapHandType.Unknown);
+			}
+			
+			return typeE;
 		}
 
 		public static class ByReference extends LEAP_HAND implements Structure.ByReference

@@ -1,42 +1,33 @@
 package komposten.leapjna.leapc;
 
-import komposten.leapjna.util.JnaEnum;
-
 /**
  * @author Jakob Hjelm
- * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e
+ * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga6d751aedb178355c21ec1cac4706e044
  */
-public enum eLeapHandType implements JnaEnum<eLeapHandType>
+public enum eLeapHandType
 {
-	Left(0x000),
-	Right(0x001);
+	Left((byte) 0x000),
+	Right((byte) 0x001),
+	Unknown((byte) -0x001);
 	
-	private final int value;
+	public final byte value;
 
-	private eLeapHandType(int value)
+	private eLeapHandType(byte value)
 	{
 		this.value = value;
 	}
-
-
-	@Override
-	public int getIntValue()
+	
+	
+	public static eLeapHandType parse(byte value, eLeapHandType defaultType)
 	{
-		return value;
-	}
-
-
-	@Override
-	public eLeapHandType getForValue(int value)
-	{
-		for (eLeapHandType o : eLeapHandType.values())
+		switch (value)
 		{
-			if (o.getIntValue() == value)
-			{
-				return o;
-			}
+			case 0x000 :
+				return Left;
+			case 0x001 :
+				return Left;
+			default :
+				return defaultType;
 		}
-		
-		return null;
 	}
 }
