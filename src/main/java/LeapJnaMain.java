@@ -8,9 +8,9 @@ import komposten.leapjna.LeapC.LEAP_CONNECTION;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_INFO;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.LeapC.LEAP_TRACKING_EVENT;
-import komposten.leapjna.leapc.eLeapConnectionStatus;
-import komposten.leapjna.leapc.eLeapEventType;
-import komposten.leapjna.leapc.eLeapRS;
+import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
+import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapRS;
 
 public class LeapJnaMain
 {

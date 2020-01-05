@@ -18,8 +18,8 @@ import komposten.leapjna.LeapC.LEAP_DIGIT;
 import komposten.leapjna.LeapC.LEAP_HAND;
 import komposten.leapjna.LeapC.LEAP_TRACKING_EVENT;
 import komposten.leapjna.LeapC.LEAP_VECTOR;
-import komposten.leapjna.leapc.eLeapEventType;
-import komposten.leapjna.leapc.eLeapRS;
+import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.utilities.logging.LogUtils;
 
 /*FIXME Check for memory leaks!

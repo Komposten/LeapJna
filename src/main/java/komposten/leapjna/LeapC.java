@@ -10,10 +10,10 @@ import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-import komposten.leapjna.leapc.eLeapConnectionStatus;
-import komposten.leapjna.leapc.eLeapEventType;
-import komposten.leapjna.leapc.eLeapHandType;
-import komposten.leapjna.leapc.eLeapRS;
+import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
+import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapHandType;
+import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.util.LeapTypeMapper;
 
 

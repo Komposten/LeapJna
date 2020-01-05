@@ -1,4 +1,4 @@
-package komposten.leapjna.leapc;
+package komposten.leapjna.leapc.enums;
 
 /**
  * @author Jakob Hjelm

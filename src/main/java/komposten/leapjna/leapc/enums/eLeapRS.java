@@ -1,4 +1,4 @@
-package komposten.leapjna.leapc;
+package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.util.JnaEnum;
 
