@@ -48,7 +48,7 @@ public class LeapTestGui extends JFrame
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				if (e.getKeyCode() == KeyEvent.VK_ENTER && leapJnaThread == null)
 				{
 					leapJnaThread = new Thread(LeapTestGui.this::startLoop,
 							"LeapJna Thread");
@@ -86,6 +86,7 @@ public class LeapTestGui extends JFrame
 	private void startLoop()
 	{
 		printHeader("Creating connection");
+		renderPanel.setStage(RenderPanel.Stage.Connecting);
 		LEAP_CONNECTION leapConnection = new LEAP_CONNECTION();
 		eLeapRS result = LeapC.INSTANCE.LeapCreateConnection(null, leapConnection);
 
@@ -98,6 +99,7 @@ public class LeapTestGui extends JFrame
 
 			if (result == eLeapRS.Success)
 			{
+				renderPanel.setStage(RenderPanel.Stage.Running);
 				printHeader("Polling connection");
 
 //				doInterpolateLoop(leapConnection);
@@ -149,25 +151,39 @@ public class LeapTestGui extends JFrame
 	{
 		double timer = 0;
 		long lastTime = System.nanoTime();
+		double frameTimer = 0;
+		int framerate = 0;
 
 		while (true)
 		{
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500,
+			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30,
 					message);
+			
+			long currentTime = System.nanoTime();
+			double deltaTime = (currentTime - lastTime) / 1E6;
+			timer += deltaTime;
+			frameTimer += deltaTime;
+			lastTime = currentTime;
 
-			if (message.type == eLeapEventType.Tracking.value)
+			if (timer > 16)
 			{
-				long currentTime = System.nanoTime();
-				timer += (currentTime - lastTime) / 1E6;
-				lastTime = currentTime;
-
-				if (timer > 16)
+				if (message.type == eLeapEventType.Tracking.value)
 				{
 					renderPanel.setFrameData(message.getTrackingEvent());
-					timer = 0;
 				}
+				
+				timer = 0;
+				framerate++;
 			}
+			
+			if (frameTimer > 1000)
+			{
+				frameTimer -= 1000;
+				renderPanel.setFramerate(framerate);
+				framerate = 0;
+			}
+			
 			
 			if (Thread.interrupted())
 			{
@@ -219,13 +235,34 @@ public class LeapTestGui extends JFrame
 
 class RenderPanel extends JPanel
 {
-	private LEAP_TRACKING_EVENT data;
+	public enum Stage
+	{
+		Startup,
+		Connecting,
+		Running;
+	}
 
-	void setFrameData(LEAP_TRACKING_EVENT data)
+	private Stage stage = Stage.Startup;
+	private LEAP_TRACKING_EVENT data;
+	private int framerate;
+	
+	public void setStage(Stage stage)
+	{
+		this.stage = stage;
+		repaint();
+	}
+
+	public void setFrameData(LEAP_TRACKING_EVENT data)
 	{
 		this.data = data;
 		repaint();
 		data.clear();
+	}
+
+
+	public void setFramerate(int framerate)
+	{
+		this.framerate = framerate;
 	}
 
 
@@ -241,15 +278,48 @@ class RenderPanel extends JPanel
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 
-		if (data != null)
+		g2d.setColor(Color.BLACK);
+		g2d.drawString("Press ESC to exit", 10, getHeight() - 10);
+		
+		if (stage == Stage.Startup)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString(String.format("Tracking FPS: %.02f", data.framerate), 10,
+			g2d.drawString("Press ENTER to start tracking", 10, 10);
+		}
+		else if (stage == Stage.Connecting)
+		{
+			g2d.setColor(Color.BLACK);
+			g2d.drawString("Connecting...", 10, 10);
+		}
+		else if (stage == Stage.Running)
+		{
+			g2d.setColor(Color.BLACK);
+			g2d.drawString(String.format("Drawing FPS: %d", framerate), 10,
 					10);
-
-			for (int i = 0; i < data.getHands().length; i++)
+			
+			if (data != null)
 			{
-				drawHand(data.getHands()[i], g2d, offsetX, offsetY);
+				g2d.drawString(String.format("Tracking FPS: %.02f", data.framerate), 10,
+						30);
+
+				if (data.nHands > 0)
+				{
+					float roll = data.getHands()[0].palm.orientation.getRoll();
+					float pitch = data.getHands()[0].palm.orientation.getPitch();
+					float yaw = data.getHands()[0].palm.orientation.getYaw();
+					
+					g2d.drawString(String.format("Roll (x): %.02f",
+							Math.toDegrees(roll)), 10, 50);
+					g2d.drawString(String.format("Pitch (z): %.02f",
+							Math.toDegrees(pitch)), 10, 70);
+					g2d.drawString(String.format("Yaw (y): %.02f",
+							Math.toDegrees(yaw)), 10, 90);
+				}
+	
+				for (int i = 0; i < data.getHands().length; i++)
+				{
+					drawHand(data.getHands()[i], g2d, offsetX, offsetY);
+				}
 			}
 		}
 	}
