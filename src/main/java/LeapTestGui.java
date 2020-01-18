@@ -299,27 +299,13 @@ class RenderPanel extends JPanel
 			
 			if (data != null)
 			{
-				g2d.drawString(String.format("Tracking FPS: %.02f", data.framerate), 10,
-						30);
-
-				if (data.nHands > 0)
-				{
-					float roll = data.getHands()[0].palm.orientation.getRoll();
-					float pitch = data.getHands()[0].palm.orientation.getPitch();
-					float yaw = data.getHands()[0].palm.orientation.getYaw();
-					
-					g2d.drawString(String.format("Roll (x): %.02f",
-							Math.toDegrees(roll)), 10, 50);
-					g2d.drawString(String.format("Pitch (z): %.02f",
-							Math.toDegrees(pitch)), 10, 70);
-					g2d.drawString(String.format("Yaw (y): %.02f",
-							Math.toDegrees(yaw)), 10, 90);
-				}
-	
 				for (int i = 0; i < data.getHands().length; i++)
 				{
 					drawHand(data.getHands()[i], g2d, offsetX, offsetY);
 				}
+				
+				g2d.setColor(Color.BLACK);
+				drawTrackingInfo(g2d);
 			}
 		}
 	}
@@ -372,5 +358,35 @@ class RenderPanel extends JPanel
 		g2d.fillRect((int) (position.x + offsetX - size/2f),
 				(int) (-position.y + offsetY - size/2),
 				size, size);
+	}
+
+	private void drawTrackingInfo(Graphics2D g2d)
+	{
+		g2d.drawString(String.format("Tracking FPS: %.02f", data.framerate), 10,
+				30);
+
+		float y = 60;
+		for (int i = 0; i < data.nHands; i++)
+		{
+			LEAP_HAND hand = data.getHands()[i];
+			
+			float roll = hand.palm.orientation.getRoll();
+			float pitch = hand.palm.orientation.getPitch();
+			float yaw = hand.palm.orientation.getYaw();
+			float lineHeight = 20;
+			
+			g2d.drawString(String.format("Hand %d: %s",
+					i, hand.getType()), 10, y);
+			y += lineHeight;
+			g2d.drawString(String.format("Roll (x): %.02f",
+					Math.toDegrees(roll)), 10, y);
+			y += lineHeight;
+			g2d.drawString(String.format("Pitch (z): %.02f",
+					Math.toDegrees(pitch)), 10, y);
+			y += lineHeight;
+			g2d.drawString(String.format("Yaw (y): %.02f",
+					Math.toDegrees(yaw)), 10, y);
+			y += lineHeight * 2;
+		}
 	}
 }
