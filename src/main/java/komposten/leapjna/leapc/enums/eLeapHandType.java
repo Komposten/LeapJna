@@ -25,7 +25,7 @@ public enum eLeapHandType
 			case 0x000 :
 				return Left;
 			case 0x001 :
-				return Left;
+				return Right;
 			default :
 				return defaultType;
 		}
