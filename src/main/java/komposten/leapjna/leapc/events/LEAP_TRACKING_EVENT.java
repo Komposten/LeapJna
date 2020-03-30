@@ -24,6 +24,12 @@ public class LEAP_TRACKING_EVENT extends Structure
 		super(ALIGN_NONE);
 	}
 	
+	public LEAP_TRACKING_EVENT(int size)
+	{
+		super(ALIGN_NONE);
+		allocateMemory(size);
+	}
+	
 	public LEAP_TRACKING_EVENT(Pointer pointer)
 	{
 		super(pointer, ALIGN_NONE);
@@ -57,5 +63,12 @@ public class LEAP_TRACKING_EVENT extends Structure
 	public static class ByReference extends LEAP_TRACKING_EVENT
 			implements Structure.ByReference
 	{
+		public ByReference()
+		{}
+		
+		public ByReference(int size)
+		{
+			super(size);
+		}
 	}
 }

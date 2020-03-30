@@ -51,6 +51,15 @@ public interface LeapC extends Library
 			LongByReference pncbEvent);
 
 
+	/**
+	 * @param hConnection
+	 * @param timestamp
+	 * @param pEvent A LEAP_TRACKING_EVENT pointer with enough allocated space to fit the
+	 *          frame data. Use {@link LEAP_TRACKING_EVENT.ByReference#ByReference(int)}
+	 *          to set it up.
+	 * @param ncbEvent
+	 * @return
+	 */
 	public eLeapRS LeapInterpolateFrame(Pointer hConnection, long timestamp,
 			LEAP_TRACKING_EVENT.ByReference pEvent, long ncbEvent);
 
