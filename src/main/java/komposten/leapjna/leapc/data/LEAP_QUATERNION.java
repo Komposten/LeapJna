@@ -4,13 +4,37 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 
+/**
+ * <p>
+ * A four-element, floating-point quaternion.
+ * </p>
+ * 
+ * @see <a href=
+ *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___q_u_a_t_e_r_n_i_o_n">LeapC
+ *      API - LEAP_QUATERNION</a>
+ */
 @FieldOrder({ "w", "x", "y", "z" })
 public class LEAP_QUATERNION extends Structure
 {
+	/** The scalar position of the quaternion. */
 	public float w;
+
+	/** The x-coefficient of the vector portion of the quaternion. */
 	public float x;
+
+	/** The y-coefficient of the vector portion of the quaternion. */
 	public float y;
+
+	/** The z-coefficient of the vector portion of the quaternion. */
 	public float z;
+
+	/**
+	 * @return The quaternion's values as an array in the order: w, x, y, z.
+	 */
+	public float[] asArray()
+	{
+		return new float[] { w, x, y, z };
+	}
 
 
 	/**
@@ -47,9 +71,8 @@ public class LEAP_QUATERNION extends Structure
 
 
 	/**
-	 * @return This rotation represented as Euler angles in radians, ordered: roll
-	 *         (x-axis rotation), yaw (y-axis rotation) and pitch (z-axis
-	 *         rotation).
+	 * @return This rotation represented as Euler angles in radians, ordered: roll (x-axis
+	 *         rotation), yaw (y-axis rotation) and pitch (z-axis rotation).
 	 */
 	public float[] getEuler()
 	{

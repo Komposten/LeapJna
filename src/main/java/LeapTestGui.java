@@ -233,7 +233,6 @@ public class LeapTestGui extends JFrame
 		printHeader("Connection status");
 
 		connectionStatus = new LEAP_CONNECTION_INFO.ByReference();
-		connectionStatus.size = 1024;
 
 		result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.getValue(),
 				connectionStatus);

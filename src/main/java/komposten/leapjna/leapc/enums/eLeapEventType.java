@@ -1,8 +1,15 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.LeapC;
+
+
 /**
- * @author Jakob Hjelm
- * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga04f93b375f7c8040178ec5be2bf658ec
+ * The types of event messages resulting from calling
+ * {@link LeapC#LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}.
+ * 
+ * @see <a href=
+ *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga04f93b375f7c8040178ec5be2bf658ec">LeapC
+ *      API - eLeapEventType</a>
  */
 public enum eLeapEventType
 {

@@ -3,18 +3,57 @@ package komposten.leapjna.leapc.data;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
-@FieldOrder({ "finger_id", "metacarpal", "proximal", "intermediate", "distal", "is_extended" })
+
+/**
+ * <p>
+ * Describes a digit of a hand.
+ * </p>
+ * <p>
+ * Digits are members of the {@link LEAP_HAND} struct.
+ * </p>
+ * 
+ * @see <a href=
+ *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___d_i_g_i_t">LeapC
+ *      API - LEAP_DIGIT</a>
+ */
+@FieldOrder({ "finger_id", "metacarpal", "proximal", "intermediate", "distal",
+		"is_extended" })
 public class LEAP_DIGIT extends Structure
 {
+	/** The Leap identifier of this finger. */
 	public int finger_id;
+
+	/**
+	 * <p>
+	 * The finger bone wholly inside the hand.
+	 * </p>
+	 * <p>
+	 * For thumbs, this bone is set to have zero length and width, an identity basis matrix,
+	 * and its joint positions are equal. Note that this is anatomically incorrect; in
+	 * anatomical terms, the intermediate phalange is absent in a real thumb, rather than
+	 * the metacarpal bone. In the Leap Motion model, however, we use a "zero" metacarpal
+	 * bone instead for ease of programming.
+	 * </p>
+	 */
 	public LEAP_BONE metacarpal;
+
+	/** The phalange extending from the knuckle. */
 	public LEAP_BONE proximal;
+
+	/** The bone between the proximal phalange and the distal phalange. */
 	public LEAP_BONE intermediate;
+
+	/** The distal phalange terminating at the finger tip. */
 	public LEAP_BONE distal;
+
+	/** Reports whether the finger is more or less straight. */
 	public int is_extended;
 
 	/**
-	 * @return The digit's bones as an array in the order: metacarpal, proximal, intermediate, distal.
+	 * Bundles the bones in an array to facilitate iteration over them.
+	 * 
+	 * @return The digit's bones as an array in the order: metacarpal, proximal,
+	 *         intermediate, distal.
 	 */
 	public LEAP_BONE[] boneArray()
 	{

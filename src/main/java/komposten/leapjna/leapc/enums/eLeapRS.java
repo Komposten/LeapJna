@@ -2,9 +2,13 @@ package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.util.JnaEnum;
 
+
 /**
- * @author Jakob Hjelm
- * @see https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e
+ * Codes returned by all LeapC functions.
+ * 
+ * @see <a href=
+ *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e">LeapC
+ *      API - eLeapRS</a>
  */
 public enum eLeapRS implements JnaEnum<eLeapRS>
 {
