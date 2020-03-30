@@ -36,6 +36,8 @@ import komposten.utilities.logging.LogUtils;
 
 public class LeapTestGui extends JFrame
 {
+	private static final int FRAME_RATE = 60;
+	private static final float FRAME_TIME = 1000f/FRAME_RATE;
 	private RenderPanel renderPanel;
 	private Thread leapJnaThread;
 
@@ -102,8 +104,8 @@ public class LeapTestGui extends JFrame
 				renderPanel.setStage(RenderPanel.Stage.Running);
 				printHeader("Polling connection");
 
-//				doInterpolateLoop(leapConnection);
-				 doPollLoop(leapConnection);
+				doInterpolateLoop(leapConnection);
+//			  doPollLoop(leapConnection);
 			}
 		}
 	}
@@ -111,32 +113,62 @@ public class LeapTestGui extends JFrame
 
 	private void doInterpolateLoop(LEAP_CONNECTION leapConnection)
 	{
-		// Poll once to open a connection.
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500, message);
-
+		double timer = 0;
+		long lastTime = System.nanoTime();
+		double frameTimer = 0;
+		int framerate = 0;
+		
 		while (true)
 		{
-			//FIXME Try using the clock rebaser stuff from the tutorial here.
-			long timestamp = LeapC.INSTANCE.LeapGetNow();
-			LEAP_TRACKING_EVENT.ByReference pEvent = new LEAP_TRACKING_EVENT.ByReference();
-			LongByReference pFrameSize = new LongByReference();
-			LeapC.INSTANCE.LeapGetFrameSize(leapConnection.getValue(), timestamp,
-					pFrameSize);
-			LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.getValue(), timestamp,
-					pEvent, pFrameSize.getValue());
+			// Actively poll the connection to keep up to date with the frames.
+			// This is required for interpolation to work.
+			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30, message);
 
-			renderPanel.setFrameData(pEvent);
+			long currentTime = System.nanoTime();
+			double deltaTime = (currentTime - lastTime) / 1E6;
+			timer += deltaTime;
+			frameTimer += deltaTime;
+			lastTime = currentTime;
 			
-			//TODO Release the memory used by the frame after rendering?
-
-			try
+			LongByReference pFrameSize = new LongByReference();
+			
+			// Get an interpolated frame at a certain rate.
+			if (timer > FRAME_TIME)
 			{
-				Thread.sleep(100);
+				framerate++;
+				timer -= FRAME_TIME;
+				
+				long timestamp = LeapC.INSTANCE.LeapGetNow();
+				eLeapRS frameSizeResult = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.getValue(), timestamp,
+						pFrameSize);
+				
+				if (frameSizeResult == eLeapRS.Success)
+				{
+					LEAP_TRACKING_EVENT.ByReference pEvent = new LEAP_TRACKING_EVENT.ByReference((int)pFrameSize.getValue());
+					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.getValue(), timestamp,
+							pEvent, pFrameSize.getValue());
+					
+					if (frameResult == eLeapRS.Success)
+					{
+						renderPanel.setFrameData(pEvent);
+					}
+					else
+					{
+						System.out.println("Failed to interpolate frame: " + frameResult);
+					}
+				}
+				else
+				{
+					System.out.println("Failed to get frame size: " + frameSizeResult);
+				}
 			}
-			catch (InterruptedException e)
+			
+			if (frameTimer > 1000)
 			{
-				Thread.currentThread().interrupt();
+				frameTimer -= 1000;
+				renderPanel.setFramerate(framerate);
+				framerate = 0;
 			}
 			
 			if (Thread.interrupted())
@@ -166,7 +198,7 @@ public class LeapTestGui extends JFrame
 			frameTimer += deltaTime;
 			lastTime = currentTime;
 
-			if (timer > 16)
+			if (timer > FRAME_TIME)
 			{
 				if (message.type == eLeapEventType.Tracking.value)
 				{
@@ -223,8 +255,8 @@ public class LeapTestGui extends JFrame
 		{
 		}
 	}
-
-
+	
+	
 	public static void main(String[] args)
 	{
 		new LeapTestGui();
