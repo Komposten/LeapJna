@@ -13,6 +13,10 @@ import com.sun.jna.ptr.PointerByReference;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
+import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.util.LeapTypeMapper;
 
@@ -257,9 +261,8 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: connection_event; connection_lost_event;
-		 * device_event; device_status_change_event; policy_event; device_failure_event;
-		 * tracking_event; log_event; log_events; config_response_event; config_change_event;
+		 * TODO Add remaining event types: policy_event; device_failure_event; tracking_event;
+		 * log_event; log_events; config_response_event; config_change_event;
 		 * dropped_frame_event; image_event; point_mapping_change_event; head_pose_event;
 		 */
 
@@ -310,6 +313,70 @@ public interface LeapC extends Library
 			}
 
 			return typeE;
+		}
+
+
+		/**
+		 * @return The event data as a connection event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#Connection} event.
+		 */
+		public LEAP_CONNECTION_EVENT getConnectionEvent()
+		{
+			checkType(eLeapEventType.Connection);
+
+			if (event == null)
+				event = new LEAP_CONNECTION_EVENT(pEvent);
+
+			return (LEAP_CONNECTION_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a connection lost event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#ConnectionLost} event.
+		 */
+		public LEAP_CONNECTION_LOST_EVENT getConnectionLostEvent()
+		{
+			checkType(eLeapEventType.ConnectionLost);
+
+			if (event == null)
+				event = new LEAP_CONNECTION_LOST_EVENT(pEvent);
+
+			return (LEAP_CONNECTION_LOST_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a device event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#Device} event.
+		 */
+		public LEAP_DEVICE_EVENT getDeviceEvent()
+		{
+			checkType(eLeapEventType.Device);
+
+			if (event == null)
+				event = new LEAP_DEVICE_EVENT(pEvent);
+
+			return (LEAP_DEVICE_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a device status change event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#DeviceStatusChange} event.
+		 */
+		public LEAP_DEVICE_STATUS_CHANGE_EVENT getDeviceStatusChangeEvent()
+		{
+			checkType(eLeapEventType.DeviceStatusChange);
+
+			if (event == null)
+				event = new LEAP_DEVICE_STATUS_CHANGE_EVENT(pEvent);
+
+			return (LEAP_DEVICE_STATUS_CHANGE_EVENT) event;
 		}
 
 

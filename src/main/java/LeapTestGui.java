@@ -19,6 +19,8 @@ import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.utilities.logging.LogUtils;
 
@@ -34,10 +36,11 @@ import komposten.utilities.logging.LogUtils;
  *   
  */
 
+
 public class LeapTestGui extends JFrame
 {
 	private static final int FRAME_RATE = 60;
-	private static final float FRAME_TIME = 1000f/FRAME_RATE;
+	private static final float FRAME_TIME = 1000f / FRAME_RATE;
 	private RenderPanel renderPanel;
 	private Thread leapJnaThread;
 
@@ -52,8 +55,7 @@ public class LeapTestGui extends JFrame
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && leapJnaThread == null)
 				{
-					leapJnaThread = new Thread(LeapTestGui.this::startLoop,
-							"LeapJna Thread");
+					leapJnaThread = new Thread(LeapTestGui.this::startLoop, "LeapJna Thread");
 					leapJnaThread.start();
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
@@ -62,7 +64,7 @@ public class LeapTestGui extends JFrame
 					{
 						leapJnaThread.interrupt();
 					}
-					
+
 					setVisible(false);
 					dispose();
 				}
@@ -104,8 +106,8 @@ public class LeapTestGui extends JFrame
 				renderPanel.setStage(RenderPanel.Stage.Running);
 				printHeader("Polling connection");
 
-				doInterpolateLoop(leapConnection);
-//			  doPollLoop(leapConnection);
+				// doInterpolateLoop(leapConnection);
+				doPollLoop(leapConnection);
 			}
 		}
 	}
@@ -117,7 +119,7 @@ public class LeapTestGui extends JFrame
 		long lastTime = System.nanoTime();
 		double frameTimer = 0;
 		int framerate = 0;
-		
+
 		while (true)
 		{
 			// Actively poll the connection to keep up to date with the frames.
@@ -130,25 +132,26 @@ public class LeapTestGui extends JFrame
 			timer += deltaTime;
 			frameTimer += deltaTime;
 			lastTime = currentTime;
-			
+
 			LongByReference pFrameSize = new LongByReference();
-			
+
 			// Get an interpolated frame at a certain rate.
 			if (timer > FRAME_TIME)
 			{
 				framerate++;
 				timer -= FRAME_TIME;
-				
+
 				long timestamp = LeapC.INSTANCE.LeapGetNow();
-				eLeapRS frameSizeResult = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.getValue(), timestamp,
-						pFrameSize);
-				
+				eLeapRS frameSizeResult = LeapC.INSTANCE
+						.LeapGetFrameSize(leapConnection.getValue(), timestamp, pFrameSize);
+
 				if (frameSizeResult == eLeapRS.Success)
 				{
-					LEAP_TRACKING_EVENT.ByReference pEvent = new LEAP_TRACKING_EVENT.ByReference((int)pFrameSize.getValue());
-					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.getValue(), timestamp,
-							pEvent, pFrameSize.getValue());
-					
+					LEAP_TRACKING_EVENT.ByReference pEvent = new LEAP_TRACKING_EVENT.ByReference(
+							(int) pFrameSize.getValue());
+					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(
+							leapConnection.getValue(), timestamp, pEvent, pFrameSize.getValue());
+
 					if (frameResult == eLeapRS.Success)
 					{
 						renderPanel.setFrameData(pEvent);
@@ -163,14 +166,14 @@ public class LeapTestGui extends JFrame
 					System.out.println("Failed to get frame size: " + frameSizeResult);
 				}
 			}
-			
+
 			if (frameTimer > 1000)
 			{
 				frameTimer -= 1000;
 				renderPanel.setFramerate(framerate);
 				framerate = 0;
 			}
-			
+
 			if (Thread.interrupted())
 			{
 				break;
@@ -189,14 +192,36 @@ public class LeapTestGui extends JFrame
 		while (true)
 		{
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30,
-					message);
-			
+			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30, message);
+
 			long currentTime = System.nanoTime();
 			double deltaTime = (currentTime - lastTime) / 1E6;
 			timer += deltaTime;
 			frameTimer += deltaTime;
 			lastTime = currentTime;
+
+			if (message.type == eLeapEventType.Connection.value)
+			{
+				System.out.println("Connection flags: " + message.getConnectionEvent().flags);
+			}
+			else if (message.type == eLeapEventType.ConnectionLost.value)
+			{
+				System.out.println("Connection lost!");
+			}
+			else if (message.type == eLeapEventType.Device.value)
+			{
+				LEAP_DEVICE_EVENT deviceEvent = message.getDeviceEvent();
+				System.out.format("Device detected: %d | %s (%x)%n", deviceEvent.device.id,
+						deviceEvent.getStatus(), deviceEvent.status);
+			}
+			else if (message.type == eLeapEventType.DeviceStatusChange.value)
+			{
+				LEAP_DEVICE_STATUS_CHANGE_EVENT deviceEvent = message
+						.getDeviceStatusChangeEvent();
+				System.out.format("Device changed: %d | From %s (%x) to %s (%x)%n",
+						deviceEvent.device.id, deviceEvent.getLastStatus(), deviceEvent.last_status,
+						deviceEvent.getStatus(), deviceEvent.status);
+			}
 
 			if (timer > FRAME_TIME)
 			{
@@ -204,19 +229,19 @@ public class LeapTestGui extends JFrame
 				{
 					renderPanel.setFrameData(message.getTrackingEvent());
 				}
-				
+
 				timer = 0;
 				framerate++;
 			}
-			
+
 			if (frameTimer > 1000)
 			{
 				frameTimer -= 1000;
 				renderPanel.setFramerate(framerate);
 				framerate = 0;
 			}
-			
-			
+
+
 			if (Thread.interrupted())
 			{
 				break;
@@ -254,8 +279,8 @@ public class LeapTestGui extends JFrame
 		{
 		}
 	}
-	
-	
+
+
 	public static void main(String[] args)
 	{
 		new LeapTestGui();
@@ -268,20 +293,19 @@ class RenderPanel extends JPanel
 {
 	public enum Stage
 	{
-		Startup,
-		Connecting,
-		Running;
+		Startup, Connecting, Running;
 	}
 
 	private Stage stage = Stage.Startup;
 	private LEAP_TRACKING_EVENT data;
 	private int framerate;
-	
+
 	public void setStage(Stage stage)
 	{
 		this.stage = stage;
 		repaint();
 	}
+
 
 	public void setFrameData(LEAP_TRACKING_EVENT data)
 	{
@@ -311,7 +335,7 @@ class RenderPanel extends JPanel
 
 		g2d.setColor(Color.BLACK);
 		g2d.drawString("Press ESC to exit", 10, getHeight() - 10);
-		
+
 		if (stage == Stage.Startup)
 		{
 			g2d.setColor(Color.BLACK);
@@ -325,16 +349,15 @@ class RenderPanel extends JPanel
 		else if (stage == Stage.Running)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString(String.format("Drawing FPS: %d", framerate), 10,
-					10);
-			
+			g2d.drawString(String.format("Drawing FPS: %d", framerate), 10, 10);
+
 			if (data != null)
 			{
 				for (int i = 0; i < data.getHands().length; i++)
 				{
 					drawHand(data.getHands()[i], g2d, offsetX, offsetY);
 				}
-				
+
 				g2d.setColor(Color.BLACK);
 				drawTrackingInfo(g2d);
 			}
@@ -342,8 +365,7 @@ class RenderPanel extends JPanel
 	}
 
 
-	private void drawHand(LEAP_HAND hand, Graphics2D g2d, int offsetX,
-			int offsetY)
+	private void drawHand(LEAP_HAND hand, Graphics2D g2d, int offsetX, int offsetY)
 	{
 		g2d.setColor(Color.RED);
 		drawPosition(hand.palm.position, 1, g2d, offsetX, offsetY);
@@ -357,11 +379,9 @@ class RenderPanel extends JPanel
 	}
 
 
-	private void drawFinger(LEAP_DIGIT finger, Graphics2D g2d, int offsetX,
-			int offsetY)
+	private void drawFinger(LEAP_DIGIT finger, Graphics2D g2d, int offsetX, int offsetY)
 	{
-		g2d.setStroke(
-				new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g2d.drawLine((int) finger.metacarpal.prev_joint.x + offsetX,
 				(int) -finger.metacarpal.prev_joint.y + offsetY,
 				(int) finger.metacarpal.next_joint.x + offsetX,
@@ -386,37 +406,32 @@ class RenderPanel extends JPanel
 			int offsetX, int offsetY)
 	{
 		int size = (int) ((position.z + 200) / 400 * 20 * scale + 5);
-		g2d.fillRect((int) (position.x + offsetX - size/2f),
-				(int) (-position.y + offsetY - size/2),
-				size, size);
+		g2d.fillRect((int) (position.x + offsetX - size / 2f),
+				(int) (-position.y + offsetY - size / 2), size, size);
 	}
+
 
 	private void drawTrackingInfo(Graphics2D g2d)
 	{
-		g2d.drawString(String.format("Tracking FPS: %.02f", data.framerate), 10,
-				30);
+		g2d.drawString(String.format("Tracking FPS: %.02f", data.framerate), 10, 30);
 
 		float y = 60;
 		for (int i = 0; i < data.nHands; i++)
 		{
 			LEAP_HAND hand = data.getHands()[i];
-			
+
 			float roll = hand.palm.orientation.getRoll();
 			float pitch = hand.palm.orientation.getPitch();
 			float yaw = hand.palm.orientation.getYaw();
 			float lineHeight = 20;
-			
-			g2d.drawString(String.format("Hand %d: %s",
-					i, hand.getType()), 10, y);
+
+			g2d.drawString(String.format("Hand %d: %s", i, hand.getType()), 10, y);
 			y += lineHeight;
-			g2d.drawString(String.format("Roll (x): %.02f",
-					Math.toDegrees(roll)), 10, y);
+			g2d.drawString(String.format("Roll (x): %.02f", Math.toDegrees(roll)), 10, y);
 			y += lineHeight;
-			g2d.drawString(String.format("Pitch (z): %.02f",
-					Math.toDegrees(pitch)), 10, y);
+			g2d.drawString(String.format("Pitch (z): %.02f", Math.toDegrees(pitch)), 10, y);
 			y += lineHeight;
-			g2d.drawString(String.format("Yaw (y): %.02f",
-					Math.toDegrees(yaw)), 10, y);
+			g2d.drawString(String.format("Yaw (y): %.02f", Math.toDegrees(yaw)), 10, y);
 			y += lineHeight * 2;
 		}
 	}
