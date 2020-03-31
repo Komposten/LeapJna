@@ -9,3 +9,15 @@ LeapJna is a library that provides Java bindings for the [Leap Motion](https://w
 * Read current frame time
 * Poll the device for events
 * Read full tracking data from tracking events
+* Frame interpolation
+
+## Using LeapJNA
+1. Add LeapJNA to your classpath.
+    * If you don't use Maven/Gradle you will need to add JNA as well.
+2. Download the Leap Motion SDK, put LeapC.dll and LeapC.lib in a folder "win32-x86-64" and add that folder to your classpath.
+    * If you want to use a different location for the DLL, or if you're using a different operating system than 64-bit Windows, refer to [JNA's documentation for library loading](http://java-native-access.github.io/jna/5.5.0/javadoc/com/sun/jna/NativeLibrary.html) for options.
+3. Import LeapC in your Java class: `import komposten.leapjna.LeapC;`
+4. Obtain an instance of LeapC using `LeapC.INSTANCE`.
+    * Use this instance to access the LeapC API's functions.
+    * All related data structures can be found in the `komposten.leapjna.leapc` packages.
+5. Refer to the official SDK guide for the basics of using the LeapC API.
