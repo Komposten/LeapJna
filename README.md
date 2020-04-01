@@ -11,6 +11,9 @@ LeapJna is a library that provides Java bindings for the [Leap Motion](https://w
 * Read full tracking data from tracking events
 * Frame interpolation
 
+### Untested API features
+* Device failure events
+
 ## Using LeapJNA
 1. Add LeapJNA to your classpath.
     * If you don't use Maven/Gradle you will need to add JNA as well.

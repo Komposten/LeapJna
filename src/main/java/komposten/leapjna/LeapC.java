@@ -305,8 +305,9 @@ public interface LeapC extends Library
 		 * A pointer to the event data for the current type of message.
 		 * </p>
 		 * <p>
-		 * Check the event type using {@link #type} and then call the getter for that event
-		 * type to get the event data.
+		 * Check the event type using {@link #type} or {@link #getType()} and then call the
+		 * relevant <code>get***Event()</code> method for that event type to get the event
+		 * data.
 		 * </p>
 		 */
 		public Pointer pEvent;
