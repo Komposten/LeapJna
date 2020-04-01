@@ -6,6 +6,7 @@ import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 
 
@@ -40,6 +41,8 @@ public class LEAP_DEVICE_FAILURE_EVENT extends Structure
 	 * <p>
 	 * You are not responsible for closing this handle.
 	 * </p>
+	 * TODO Maybe replace this with a {@link LEAP_DEVICE}, is possible (determine when
+	 * testing).
 	 */
 	public Pointer hDevice;
 

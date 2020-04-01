@@ -12,8 +12,8 @@ import javax.swing.JPanel;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.LeapC;
-import komposten.leapjna.LeapC.LEAP_CONNECTION;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
@@ -101,7 +101,7 @@ public class LeapTestGui extends JFrame
 		if (result == eLeapRS.Success)
 		{
 			printHeader("Opening connection");
-			result = LeapC.INSTANCE.LeapOpenConnection(leapConnection.getValue());
+			result = LeapC.INSTANCE.LeapOpenConnection(leapConnection.handle);
 			printStatus(leapConnection);
 
 			if (result == eLeapRS.Success)
@@ -128,7 +128,7 @@ public class LeapTestGui extends JFrame
 			// Actively poll the connection to keep up to date with the frames.
 			// This is required for interpolation to work.
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30, message);
+			LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
 
 			long currentTime = System.nanoTime();
 			double deltaTime = (currentTime - lastTime) / 1E6;
@@ -145,15 +145,15 @@ public class LeapTestGui extends JFrame
 				timer -= FRAME_TIME;
 
 				long timestamp = LeapC.INSTANCE.LeapGetNow();
-				eLeapRS frameSizeResult = LeapC.INSTANCE
-						.LeapGetFrameSize(leapConnection.getValue(), timestamp, pFrameSize);
+				eLeapRS frameSizeResult = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.handle,
+						timestamp, pFrameSize);
 
 				if (frameSizeResult == eLeapRS.Success)
 				{
 					LEAP_TRACKING_EVENT.ByReference pEvent = new LEAP_TRACKING_EVENT.ByReference(
 							(int) pFrameSize.getValue());
-					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(
-							leapConnection.getValue(), timestamp, pEvent, pFrameSize.getValue());
+					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.handle,
+							timestamp, pEvent, pFrameSize.getValue());
 
 					if (frameResult == eLeapRS.Success)
 					{
@@ -197,11 +197,11 @@ public class LeapTestGui extends JFrame
 		while (true)
 		{
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30, message);
+			LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
 
 			if (firstIteration)
 			{
-				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.getValue(), eLeapPolicyFlag
+				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle, eLeapPolicyFlag
 						.createMask(eLeapPolicyFlag.AllowPauseResume, eLeapPolicyFlag.OptimiseHMD),
 						0);
 			}
@@ -287,7 +287,7 @@ public class LeapTestGui extends JFrame
 
 		connectionStatus = new LEAP_CONNECTION_INFO.ByReference();
 
-		result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.getValue(),
+		result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.handle,
 				connectionStatus);
 		System.out.println("Size: " + connectionStatus.size);
 		return result;

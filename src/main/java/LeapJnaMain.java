@@ -1,13 +1,11 @@
 
 
-import com.sun.jna.Pointer;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.LeapC;
-import komposten.leapjna.LeapC.LEAP_CONNECTION;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
-import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
@@ -32,20 +30,20 @@ public class LeapJnaMain
 		if (result == eLeapRS.Success)
 		{
 			printHeader("Opening connection");
-			result = LeapC.INSTANCE.LeapOpenConnection(leapConnection.getValue());
+			result = LeapC.INSTANCE.LeapOpenConnection(leapConnection.handle);
 			printStatus(leapConnection);
 			
 			if (result == eLeapRS.Success)
 			{
 				printHeader("Polling connection");
 				LEAP_CONNECTION_MESSAGE messageRef = new LEAP_CONNECTION_MESSAGE();
-				result = LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500,
+				result = LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 500,
 						messageRef);
 				
 				for (int i = 0; i < 15; i++)
 				{
 					System.out.format("Message type: %s%n", messageRef.type);
-					result = LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500,
+					result = LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 500,
 							messageRef);
 				}
 
@@ -57,20 +55,20 @@ public class LeapJnaMain
 				printHeader("Checking frame size");
 				leapTime = LeapC.INSTANCE.LeapGetNow();
 				LongByReference size = new LongByReference();
-				result = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.getValue(), leapTime, size);
+				result = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.handle, leapTime, size);
 
 				System.out.println(size.getValue());
 
 				printHeader("Checking frame data");
 				LEAP_TRACKING_EVENT.ByReference trackingEvent = new LEAP_TRACKING_EVENT.ByReference();
-				result = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.getValue(), leapTime,
+				result = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.handle, leapTime,
 						trackingEvent, size.getValue());
 				
 				System.out.println("Tracking event: " + trackingEvent);
 				
 				while (true)
 				{
-					LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 500, messageRef);
+					LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 500, messageRef);
 					
 					if (messageRef.type == eLeapEventType.Tracking.value)
 					{
@@ -104,7 +102,7 @@ public class LeapJnaMain
 		connectionStatus = new LEAP_CONNECTION_INFO.ByReference();
 		connectionStatus.size = 1024;
 		
-		result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.getValue(), connectionStatus);
+		result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.handle, connectionStatus);
 		System.out.println("Size: " + connectionStatus.size);
 		return result;
 	}

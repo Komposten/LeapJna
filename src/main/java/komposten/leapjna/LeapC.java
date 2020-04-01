@@ -8,8 +8,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.LongByReference;
-import com.sun.jna.ptr.PointerByReference;
 
+import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
@@ -89,7 +89,7 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection A handle to the connection object, created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#getValue()} to obtain
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
 	 *          the handle from the connection object.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
@@ -119,7 +119,7 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#getValue()} to obtain
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
 	 *          the handle from the connection object.
 	 * @param timeout The maximum amount of time to wait, in milliseconds. If this value is
 	 *          zero, the <code>message</code> pointer references the next queued message,
@@ -151,7 +151,7 @@ public interface LeapC extends Library
 	 * </p>
 	 * 
 	 * @param hConnection The handle of the connection of interest. Created by
-	 *          <code>LeapCreateConnection()</code>. Use {@link LEAP_CONNECTION#getValue()}
+	 *          <code>LeapCreateConnection()</code>. Use {@link LEAP_CONNECTION#handle}
 	 *          to obtain the handle from the connection object.
 	 * @param pInfo A pointer to a structure that receives additional connection
 	 *          information. On input, the size field of <code>pInfo</code> is the size of
@@ -179,7 +179,7 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#getValue()} to obtain
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
 	 *          the handle from the connection object.
 	 * @param timestamp The timestamp of the frame whose size is to be queried.
 	 * @param pncbEvent A pointer that receives the number of bytes required to store the
@@ -196,7 +196,7 @@ public interface LeapC extends Library
 	/**
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#getValue()} to obtain
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
 	 *          the handle from the connection object.
 	 * @param timestamp The timestamp at which to interpolate the frame data.
 	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> pointer with enough allocated memory
@@ -233,7 +233,7 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#getValue()} to obtain
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
 	 *          the handle from the connection object.
 	 * @param set A bitwise combination of flags to be set. Set to 0 if not setting any
 	 *          flags.
@@ -246,19 +246,6 @@ public interface LeapC extends Library
 	 * @see {@link eLeapPolicyFlag#createMask(eLeapPolicyFlag...)}
 	 */
 	public eLeapRS LeapSetPolicyFlags(Pointer hConnection, long set, long clear);
-
-
-	/**
-	 * A handle to the Leap connection object. Use {@link #getValue()} when passing the
-	 * handle to the Leap API methods.
-	 * 
-	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_n_e_c_t_i_o_n">LeapC
-	 *      API - LEAP_CONNECTION</a>
-	 */
-	public static class LEAP_CONNECTION extends PointerByReference
-	{
-	}
 
 
 	/**
@@ -431,7 +418,7 @@ public interface LeapC extends Library
 
 			return (LEAP_POLICY_EVENT) event;
 		}
-		
+
 
 		/**
 		 * @return The event data as a device failure event.
@@ -441,10 +428,10 @@ public interface LeapC extends Library
 		public LEAP_DEVICE_FAILURE_EVENT getDeviceFailureEvent()
 		{
 			checkType(eLeapEventType.DeviceFailure);
-			
+
 			if (event == null)
 				event = new LEAP_DEVICE_FAILURE_EVENT(pEvent);
-			
+
 			return (LEAP_DEVICE_FAILURE_EVENT) event;
 		}
 
