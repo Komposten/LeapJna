@@ -12,11 +12,13 @@ import com.sun.jna.ptr.PointerByReference;
 
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.util.LeapTypeMapper;
 
@@ -212,6 +214,39 @@ public interface LeapC extends Library
 
 
 	/**
+	 * <p>
+	 * Sets or clears one or more policy flags.
+	 * </p>
+	 * <p>
+	 * Changing policies is asynchronous. After you call this function, a subsequent call to
+	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
+	 * </p>
+	 * To get the current policies without changes, specify zero for both the set and clear
+	 * parameters. When ready, <code>LeapPollConnection()</code> provides the a
+	 * <code>LEAP_POLICY_EVENT</code> containing the current settings.
+	 * <p>
+	 * The {@link eLeapPolicyFlag} enumeration defines the policy flags.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#getValue()} to obtain
+	 *          the handle from the connection object.
+	 * @param set A bitwise combination of flags to be set. Set to 0 if not setting any
+	 *          flags.
+	 * @param clear A bitwise combination of flags to be cleared. Set to 0 if not clearing
+	 *          any flags.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab57050814a0763ec07ed088e3d2de7f2">LeapC
+	 *      API - LeapSetPolicyFlags</a>
+	 * @see {@link eLeapPolicyFlag#createMask(eLeapPolicyFlag...)}
+	 */
+	public eLeapRS LeapSetPolicyFlags(Pointer hConnection, long set, long clear);
+
+
+	/**
 	 * A handle to the Leap connection object. Use {@link #getValue()} when passing the
 	 * handle to the Leap API methods.
 	 * 
@@ -261,9 +296,9 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: policy_event; device_failure_event; tracking_event;
-		 * log_event; log_events; config_response_event; config_change_event;
-		 * dropped_frame_event; image_event; point_mapping_change_event; head_pose_event;
+		 * TODO Add remaining event types: device_failure_event; tracking_event; log_event;
+		 * log_events; config_response_event; config_change_event; dropped_frame_event;
+		 * image_event; point_mapping_change_event; head_pose_event;
 		 */
 
 
@@ -377,6 +412,17 @@ public interface LeapC extends Library
 				event = new LEAP_DEVICE_STATUS_CHANGE_EVENT(pEvent);
 
 			return (LEAP_DEVICE_STATUS_CHANGE_EVENT) event;
+		}
+
+
+		public LEAP_POLICY_EVENT getPolicyEvent()
+		{
+			checkType(eLeapEventType.Policy);
+
+			if (event == null)
+				event = new LEAP_POLICY_EVENT(pEvent);
+
+			return (LEAP_POLICY_EVENT) event;
 		}
 
 

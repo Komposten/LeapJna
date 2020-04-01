@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,6 +19,7 @@ import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
@@ -189,10 +191,19 @@ public class LeapTestGui extends JFrame
 		double frameTimer = 0;
 		int framerate = 0;
 
+		boolean firstIteration = true;
+
 		while (true)
 		{
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
 			LeapC.INSTANCE.LeapPollConnection(leapConnection.getValue(), 30, message);
+
+			if (firstIteration)
+			{
+				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.getValue(), eLeapPolicyFlag
+						.createMask(eLeapPolicyFlag.AllowPauseResume, eLeapPolicyFlag.OptimiseHMD),
+						0);
+			}
 
 			long currentTime = System.nanoTime();
 			double deltaTime = (currentTime - lastTime) / 1E6;
@@ -222,6 +233,11 @@ public class LeapTestGui extends JFrame
 						deviceEvent.device.id, deviceEvent.getLastStatus(), deviceEvent.last_status,
 						deviceEvent.getStatus(), deviceEvent.status);
 			}
+			else if (message.type == eLeapEventType.Policy.value)
+			{
+				System.out.println(
+						"Policies: " + Arrays.toString(message.getPolicyEvent().getCurrentPolicy()));
+			}
 
 			if (timer > FRAME_TIME)
 			{
@@ -246,6 +262,8 @@ public class LeapTestGui extends JFrame
 			{
 				break;
 			}
+
+			firstIteration = false;
 		}
 	}
 
