@@ -17,7 +17,9 @@ import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.util.LeapTypeMapper;
@@ -296,9 +298,9 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: device_failure_event; tracking_event; log_event;
-		 * log_events; config_response_event; config_change_event; dropped_frame_event;
-		 * image_event; point_mapping_change_event; head_pose_event;
+		 * TODO Add remaining event types: log_events; config_response_event;
+		 * config_change_event; dropped_frame_event; image_event; point_mapping_change_event;
+		 * head_pose_event;
 		 */
 
 
@@ -415,6 +417,11 @@ public interface LeapC extends Library
 		}
 
 
+		/**
+		 * @return The event data as a policy event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#Policy} event.
+		 */
 		public LEAP_POLICY_EVENT getPolicyEvent()
 		{
 			checkType(eLeapEventType.Policy);
@@ -423,6 +430,22 @@ public interface LeapC extends Library
 				event = new LEAP_POLICY_EVENT(pEvent);
 
 			return (LEAP_POLICY_EVENT) event;
+		}
+		
+
+		/**
+		 * @return The event data as a device failure event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#DeviceFailure} event.
+		 */
+		public LEAP_DEVICE_FAILURE_EVENT getDeviceFailureEvent()
+		{
+			checkType(eLeapEventType.DeviceFailure);
+			
+			if (event == null)
+				event = new LEAP_DEVICE_FAILURE_EVENT(pEvent);
+			
+			return (LEAP_DEVICE_FAILURE_EVENT) event;
 		}
 
 
@@ -439,6 +462,22 @@ public interface LeapC extends Library
 				event = new LEAP_TRACKING_EVENT(pEvent);
 
 			return (LEAP_TRACKING_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a tracking event.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#LogEvent} event.
+		 */
+		public LEAP_LOG_EVENT getLogEvent()
+		{
+			checkType(eLeapEventType.LogEvent);
+
+			if (event == null)
+				event = new LEAP_LOG_EVENT(pEvent);
+
+			return (LEAP_LOG_EVENT) event;
 		}
 
 

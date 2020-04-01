@@ -23,6 +23,7 @@ import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.utilities.logging.LogUtils;
 
@@ -237,6 +238,15 @@ public class LeapTestGui extends JFrame
 			{
 				System.out.println(
 						"Policies: " + Arrays.toString(message.getPolicyEvent().getCurrentPolicy()));
+			}
+			else if (message.type == eLeapEventType.LogEvent.value)
+			{
+				LEAP_LOG_EVENT logEvent = message.getLogEvent();
+				System.out.println(logEvent.getSeverity() + ": " + logEvent.message);
+			}
+			else if (message.type == eLeapEventType.DeviceFailure.value)
+			{
+				System.out.println(message.getDeviceFailureEvent().status);
 			}
 
 			if (timer > FRAME_TIME)
