@@ -20,6 +20,7 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
+import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.util.LeapTypeMapper;
@@ -89,8 +90,8 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection A handle to the connection object, created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
-	 *          the handle from the connection object.
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga49a90e9ca6d880d59fa3f1813689f7fd">LeapC
@@ -119,8 +120,8 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
-	 *          the handle from the connection object.
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
 	 * @param timeout The maximum amount of time to wait, in milliseconds. If this value is
 	 *          zero, the <code>message</code> pointer references the next queued message,
 	 *          if there is one, and returns immediately.
@@ -151,8 +152,8 @@ public interface LeapC extends Library
 	 * </p>
 	 * 
 	 * @param hConnection The handle of the connection of interest. Created by
-	 *          <code>LeapCreateConnection()</code>. Use {@link LEAP_CONNECTION#handle}
-	 *          to obtain the handle from the connection object.
+	 *          <code>LeapCreateConnection()</code>. Use {@link LEAP_CONNECTION#handle} to
+	 *          obtain the handle from the connection object.
 	 * @param pInfo A pointer to a structure that receives additional connection
 	 *          information. On input, the size field of <code>pInfo</code> is the size of
 	 *          the buffer (i.e. the size of a {@link LEAP_CONNECTION_INFO} struct); On
@@ -179,8 +180,8 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
-	 *          the handle from the connection object.
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
 	 * @param timestamp The timestamp of the frame whose size is to be queried.
 	 * @param pncbEvent A pointer that receives the number of bytes required to store the
 	 *          specified frame.
@@ -196,8 +197,8 @@ public interface LeapC extends Library
 	/**
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
-	 *          the handle from the connection object.
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
 	 * @param timestamp The timestamp at which to interpolate the frame data.
 	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> pointer with enough allocated memory
 	 *          to fit the frame data. Use
@@ -233,8 +234,8 @@ public interface LeapC extends Library
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
-	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain
-	 *          the handle from the connection object.
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
 	 * @param set A bitwise combination of flags to be set. Set to 0 if not setting any
 	 *          flags.
 	 * @param clear A bitwise combination of flags to be cleared. Set to 0 if not clearing
@@ -285,9 +286,8 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: log_events; config_response_event;
-		 * config_change_event; dropped_frame_event; image_event; point_mapping_change_event;
-		 * head_pose_event;
+		 * TODO Add remaining event types: config_response_event; config_change_event;
+		 * dropped_frame_event; image_event; point_mapping_change_event; head_pose_event;
 		 */
 
 
@@ -453,7 +453,7 @@ public interface LeapC extends Library
 
 
 		/**
-		 * @return The event data as a tracking event.
+		 * @return The event data as a log event.
 		 * @throws IllegalStateException If this event message is not a
 		 *           {@link eLeapEventType#LogEvent} event.
 		 */
@@ -465,6 +465,22 @@ public interface LeapC extends Library
 				event = new LEAP_LOG_EVENT(pEvent);
 
 			return (LEAP_LOG_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as multiple log events.
+		 * @throws IllegalStateException If this event message is not a
+		 *           {@link eLeapEventType#LogEvents} event.
+		 */
+		public LEAP_LOG_EVENTS getLogEvents()
+		{
+			checkType(eLeapEventType.LogEvents);
+
+			if (event == null)
+				event = new LEAP_LOG_EVENTS(pEvent);
+
+			return (LEAP_LOG_EVENTS) event;
 		}
 
 

@@ -24,6 +24,7 @@ import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
+import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.utilities.logging.LogUtils;
 
@@ -243,6 +244,16 @@ public class LeapTestGui extends JFrame
 			{
 				LEAP_LOG_EVENT logEvent = message.getLogEvent();
 				System.out.println(logEvent.getSeverity() + ": " + logEvent.message);
+			}
+			else if (message.type == eLeapEventType.LogEvents.value)
+			{
+				LEAP_LOG_EVENTS logEvents = message.getLogEvents();
+
+				System.out.println("Multiple log events: " + logEvents.nEvents);
+				for (LEAP_LOG_EVENT logEvent : logEvents.getEvents())
+				{
+					System.out.println(logEvent.getSeverity() + ": " + logEvent.message);
+				}
 			}
 			else if (message.type == eLeapEventType.DeviceFailure.value)
 			{
