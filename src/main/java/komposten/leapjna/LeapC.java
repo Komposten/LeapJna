@@ -11,9 +11,12 @@ import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
+import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
@@ -23,6 +26,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.util.Configurations;
 import komposten.leapjna.util.LeapTypeMapper;
 
 
@@ -251,6 +255,65 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Requests the current value of a service configuration setting.
+	 * </p>
+	 * <p>
+	 * The value is fetched asynchronously since it requires a service transaction.
+	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} returns a
+	 * {@link LEAP_CONFIG_RESPONSE_EVENT} structure when the request has been processed. Use
+	 * the <code>pRequestID</code> value to correlate the response to the originating
+	 * request.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param key The key of the configuration to request. See {@link Configurations} for a
+	 *          list of keys.
+	 * @param pRequestID A pointer to a memory location to which the id for this request is
+	 *          written.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga6fdd92015369e64bc8d09d1cbc77fb46">LeapC
+	 *      API - LeapRequestConfigValue</a>
+	 */
+	public eLeapRS LeapRequestConfigValue(Pointer hConnection, String key,
+			LongByReference pRequestID);
+
+
+	/**
+	 * <p>
+	 * Causes the client to commit a configuration change to the Leap Motion service.
+	 * </p>
+	 * <p>
+	 * The change is performed asynchronously – and may fail.
+	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} returns a
+	 * {@link LEAP_CONFIG_CHANGE_EVENT} structure when the request has been processed. Use
+	 * the <code>pRequestID</code> value to correlate the response to the originating
+	 * request.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param key The key of the configuration to commit. See {@link Configurations} for a
+	 *          list of keys.
+	 * @param value The value of the configuration to commit.
+	 * @param pRequestID A pointer to a memory location to which the id for this request is
+	 *          written, or a null pointer if this value is not needed.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga8f80709d76bd235949e295055cd3bf9d">LeapC
+	 *      API - LeapSaveConfigValue</a>
+	 */
+	public eLeapRS LeapSaveConfigValue(Pointer hConnection, String key, LEAP_VARIANT value,
+			LongByReference pRequestID);
+
+
+	/**
+	 * <p>
 	 * Specifies the configuration for a connection.
 	 * </p>
 	 * <p>
@@ -286,8 +349,8 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: config_response_event; config_change_event;
-		 * dropped_frame_event; image_event; point_mapping_change_event; head_pose_event;
+		 * TODO Add remaining event types: dropped_frame_event; image_event;
+		 * point_mapping_change_event; head_pose_event;
 		 */
 
 
@@ -343,7 +406,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a connection event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#Connection} event.
 		 */
 		public LEAP_CONNECTION_EVENT getConnectionEvent()
@@ -359,7 +422,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a connection lost event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#ConnectionLost} event.
 		 */
 		public LEAP_CONNECTION_LOST_EVENT getConnectionLostEvent()
@@ -375,7 +438,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a device event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#Device} event.
 		 */
 		public LEAP_DEVICE_EVENT getDeviceEvent()
@@ -391,7 +454,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a device status change event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#DeviceStatusChange} event.
 		 */
 		public LEAP_DEVICE_STATUS_CHANGE_EVENT getDeviceStatusChangeEvent()
@@ -407,7 +470,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a policy event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#Policy} event.
 		 */
 		public LEAP_POLICY_EVENT getPolicyEvent()
@@ -423,7 +486,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a device failure event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#DeviceFailure} event.
 		 */
 		public LEAP_DEVICE_FAILURE_EVENT getDeviceFailureEvent()
@@ -439,7 +502,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a tracking event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#Tracking} event.
 		 */
 		public LEAP_TRACKING_EVENT getTrackingEvent()
@@ -455,7 +518,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as a log event.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#LogEvent} event.
 		 */
 		public LEAP_LOG_EVENT getLogEvent()
@@ -471,7 +534,7 @@ public interface LeapC extends Library
 
 		/**
 		 * @return The event data as multiple log events.
-		 * @throws IllegalStateException If this event message is not a
+		 * @throws IllegalStateException If this event message is not an
 		 *           {@link eLeapEventType#LogEvents} event.
 		 */
 		public LEAP_LOG_EVENTS getLogEvents()
@@ -482,6 +545,38 @@ public interface LeapC extends Library
 				event = new LEAP_LOG_EVENTS(pEvent);
 
 			return (LEAP_LOG_EVENTS) event;
+		}
+
+
+		/**
+		 * @return The event data as a config response event.
+		 * @throws IllegalStateException If this event message is not an
+		 *           {@link eLeapEventType#ConfigResponse} event.
+		 */
+		public LEAP_CONFIG_RESPONSE_EVENT getConfigResponseEvent()
+		{
+			checkType(eLeapEventType.ConfigResponse);
+
+			if (event == null)
+				event = new LEAP_CONFIG_RESPONSE_EVENT(pEvent);
+
+			return (LEAP_CONFIG_RESPONSE_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a config change event.
+		 * @throws IllegalStateException If this event message is not an
+		 *           {@link eLeapEventType#ConfigChange} event.
+		 */
+		public LEAP_CONFIG_CHANGE_EVENT getConfigChangeEvent()
+		{
+			checkType(eLeapEventType.ConfigChange);
+
+			if (event == null)
+				event = new LEAP_CONFIG_CHANGE_EVENT(pEvent);
+
+			return (LEAP_CONFIG_CHANGE_EVENT) event;
 		}
 
 

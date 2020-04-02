@@ -17,10 +17,13 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
+import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
@@ -194,6 +197,7 @@ public class LeapTestGui extends JFrame
 		int framerate = 0;
 
 		boolean firstIteration = true;
+		LongByReference pRequestID = new LongByReference();
 
 		while (true)
 		{
@@ -205,6 +209,13 @@ public class LeapTestGui extends JFrame
 				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle, eLeapPolicyFlag
 						.createMask(eLeapPolicyFlag.AllowPauseResume, eLeapPolicyFlag.OptimiseHMD),
 						0);
+
+				LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle, "images_mode",
+						pRequestID);
+				System.out.println("Images mode get request: " + pRequestID.getValue());
+				LeapC.INSTANCE.LeapSaveConfigValue(leapConnection.handle, "images_mode",
+						new LEAP_VARIANT(0), pRequestID);
+				System.out.println("Images mode change request: " + pRequestID.getValue());
 			}
 
 			long currentTime = System.nanoTime();
@@ -258,6 +269,26 @@ public class LeapTestGui extends JFrame
 			else if (message.type == eLeapEventType.DeviceFailure.value)
 			{
 				System.out.println(message.getDeviceFailureEvent().status);
+			}
+			else if (message.type == eLeapEventType.ConfigResponse.value)
+			{
+				LEAP_CONFIG_RESPONSE_EVENT responseEvent = message.getConfigResponseEvent();
+				System.out.println("Config response: " + responseEvent.requestID + " | "
+						+ responseEvent.value.getValue() + " (" + responseEvent.value.getType()
+						+ ")");
+			}
+			else if (message.type == eLeapEventType.ConfigChange.value)
+			{
+				LEAP_CONFIG_CHANGE_EVENT changeEvent = message.getConfigChangeEvent();
+				System.out.println(
+						"Config change: " + changeEvent.requestID + " | " + changeEvent.value);
+
+				if (changeEvent.requestID == pRequestID.getValue())
+				{
+					LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle, "images_mode",
+							pRequestID);
+					System.out.println("Images mode get request: " + pRequestID.getValue());
+				}
 			}
 
 			if (timer > FRAME_TIME)
