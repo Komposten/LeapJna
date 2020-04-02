@@ -154,7 +154,7 @@ public class LeapTestGui extends JFrame
 
 				if (frameSizeResult == eLeapRS.Success)
 				{
-					LEAP_TRACKING_EVENT.ByReference pEvent = new LEAP_TRACKING_EVENT.ByReference(
+					LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT(
 							(int) pFrameSize.getValue());
 					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.handle,
 							timestamp, pEvent, pFrameSize.getValue());

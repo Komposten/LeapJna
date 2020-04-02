@@ -217,7 +217,7 @@ public interface LeapC extends Library
 	 *      API - LeapGetFrameSize</a>
 	 */
 	public eLeapRS LeapInterpolateFrame(Pointer hConnection, long timestamp,
-			LEAP_TRACKING_EVENT.ByReference pEvent, long ncbEvent);
+			LEAP_TRACKING_EVENT pEvent, long ncbEvent);
 
 
 	/**

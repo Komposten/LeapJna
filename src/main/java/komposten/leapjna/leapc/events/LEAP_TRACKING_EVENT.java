@@ -117,18 +117,4 @@ public class LEAP_TRACKING_EVENT extends Structure
 			}
 		}
 	}
-
-
-	public static class ByReference extends LEAP_TRACKING_EVENT
-			implements Structure.ByReference
-	{
-		public ByReference()
-		{}
-
-
-		public ByReference(int size)
-		{
-			super(size);
-		}
-	}
 }

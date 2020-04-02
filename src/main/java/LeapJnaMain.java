@@ -60,7 +60,7 @@ public class LeapJnaMain
 				System.out.println(size.getValue());
 
 				printHeader("Checking frame data");
-				LEAP_TRACKING_EVENT.ByReference trackingEvent = new LEAP_TRACKING_EVENT.ByReference();
+				LEAP_TRACKING_EVENT trackingEvent = new LEAP_TRACKING_EVENT();
 				result = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.handle, leapTime,
 						trackingEvent, size.getValue());
 				
