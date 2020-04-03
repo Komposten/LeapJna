@@ -1,6 +1,7 @@
 package komposten.leapjna;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -23,6 +24,7 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
+import komposten.leapjna.leapc.events.LEAP_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
@@ -425,7 +427,7 @@ public interface LeapC extends Library
 		 */
 		public Pointer pEvent;
 
-		private Structure event;
+		private LEAP_EVENT event;
 		private eLeapEventType typeE;
 
 		public LEAP_CONNECTION_MESSAGE()
@@ -462,11 +464,7 @@ public interface LeapC extends Library
 		public LEAP_CONNECTION_EVENT getConnectionEvent()
 		{
 			checkType(eLeapEventType.Connection);
-
-			if (event == null)
-				event = new LEAP_CONNECTION_EVENT(pEvent);
-
-			return (LEAP_CONNECTION_EVENT) event;
+			return getOrCreateEvent(LEAP_CONNECTION_EVENT::new);
 		}
 
 
@@ -478,11 +476,7 @@ public interface LeapC extends Library
 		public LEAP_CONNECTION_LOST_EVENT getConnectionLostEvent()
 		{
 			checkType(eLeapEventType.ConnectionLost);
-
-			if (event == null)
-				event = new LEAP_CONNECTION_LOST_EVENT(pEvent);
-
-			return (LEAP_CONNECTION_LOST_EVENT) event;
+			return getOrCreateEvent(LEAP_CONNECTION_LOST_EVENT::new);
 		}
 
 
@@ -494,11 +488,7 @@ public interface LeapC extends Library
 		public LEAP_DEVICE_EVENT getDeviceEvent()
 		{
 			checkType(eLeapEventType.Device);
-
-			if (event == null)
-				event = new LEAP_DEVICE_EVENT(pEvent);
-
-			return (LEAP_DEVICE_EVENT) event;
+			return getOrCreateEvent(LEAP_DEVICE_EVENT::new);
 		}
 
 
@@ -510,11 +500,7 @@ public interface LeapC extends Library
 		public LEAP_DEVICE_STATUS_CHANGE_EVENT getDeviceStatusChangeEvent()
 		{
 			checkType(eLeapEventType.DeviceStatusChange);
-
-			if (event == null)
-				event = new LEAP_DEVICE_STATUS_CHANGE_EVENT(pEvent);
-
-			return (LEAP_DEVICE_STATUS_CHANGE_EVENT) event;
+			return getOrCreateEvent(LEAP_DEVICE_STATUS_CHANGE_EVENT::new);
 		}
 
 
@@ -526,11 +512,7 @@ public interface LeapC extends Library
 		public LEAP_POLICY_EVENT getPolicyEvent()
 		{
 			checkType(eLeapEventType.Policy);
-
-			if (event == null)
-				event = new LEAP_POLICY_EVENT(pEvent);
-
-			return (LEAP_POLICY_EVENT) event;
+			return getOrCreateEvent(LEAP_POLICY_EVENT::new);
 		}
 
 
@@ -542,11 +524,7 @@ public interface LeapC extends Library
 		public LEAP_DEVICE_FAILURE_EVENT getDeviceFailureEvent()
 		{
 			checkType(eLeapEventType.DeviceFailure);
-
-			if (event == null)
-				event = new LEAP_DEVICE_FAILURE_EVENT(pEvent);
-
-			return (LEAP_DEVICE_FAILURE_EVENT) event;
+			return getOrCreateEvent(LEAP_DEVICE_FAILURE_EVENT::new);
 		}
 
 
@@ -558,11 +536,7 @@ public interface LeapC extends Library
 		public LEAP_TRACKING_EVENT getTrackingEvent()
 		{
 			checkType(eLeapEventType.Tracking);
-
-			if (event == null)
-				event = new LEAP_TRACKING_EVENT(pEvent);
-
-			return (LEAP_TRACKING_EVENT) event;
+			return getOrCreateEvent(LEAP_TRACKING_EVENT::new);
 		}
 
 
@@ -574,11 +548,7 @@ public interface LeapC extends Library
 		public LEAP_LOG_EVENT getLogEvent()
 		{
 			checkType(eLeapEventType.LogEvent);
-
-			if (event == null)
-				event = new LEAP_LOG_EVENT(pEvent);
-
-			return (LEAP_LOG_EVENT) event;
+			return getOrCreateEvent(LEAP_LOG_EVENT::new);
 		}
 
 
@@ -590,11 +560,7 @@ public interface LeapC extends Library
 		public LEAP_LOG_EVENTS getLogEvents()
 		{
 			checkType(eLeapEventType.LogEvents);
-
-			if (event == null)
-				event = new LEAP_LOG_EVENTS(pEvent);
-
-			return (LEAP_LOG_EVENTS) event;
+			return getOrCreateEvent(LEAP_LOG_EVENTS::new);
 		}
 
 
@@ -606,11 +572,7 @@ public interface LeapC extends Library
 		public LEAP_CONFIG_RESPONSE_EVENT getConfigResponseEvent()
 		{
 			checkType(eLeapEventType.ConfigResponse);
-
-			if (event == null)
-				event = new LEAP_CONFIG_RESPONSE_EVENT(pEvent);
-
-			return (LEAP_CONFIG_RESPONSE_EVENT) event;
+			return getOrCreateEvent(LEAP_CONFIG_RESPONSE_EVENT::new);
 		}
 
 
@@ -622,11 +584,7 @@ public interface LeapC extends Library
 		public LEAP_CONFIG_CHANGE_EVENT getConfigChangeEvent()
 		{
 			checkType(eLeapEventType.ConfigChange);
-
-			if (event == null)
-				event = new LEAP_CONFIG_CHANGE_EVENT(pEvent);
-
-			return (LEAP_CONFIG_CHANGE_EVENT) event;
+			return getOrCreateEvent(LEAP_CONFIG_CHANGE_EVENT::new);
 		}
 
 
@@ -638,11 +596,7 @@ public interface LeapC extends Library
 		public LEAP_DROPPED_FRAME_EVENT getDroppedFrameEvent()
 		{
 			checkType(eLeapEventType.DroppedFrame);
-
-			if (event == null)
-				event = new LEAP_DROPPED_FRAME_EVENT(pEvent);
-
-			return (LEAP_DROPPED_FRAME_EVENT) event;
+			return getOrCreateEvent(LEAP_DROPPED_FRAME_EVENT::new);
 		}
 
 
@@ -654,11 +608,7 @@ public interface LeapC extends Library
 		public LEAP_HEAD_POSE_EVENT getHeadPoseEvent()
 		{
 			checkType(eLeapEventType.HeadPose);
-
-			if (event == null)
-				event = new LEAP_HEAD_POSE_EVENT(pEvent);
-
-			return (LEAP_HEAD_POSE_EVENT) event;
+			return getOrCreateEvent(LEAP_HEAD_POSE_EVENT::new);
 		}
 
 
@@ -669,6 +619,16 @@ public interface LeapC extends Library
 				throw new IllegalStateException(
 						"Incorrect event type: " + typeE + " != " + eventType);
 			}
+		}
+
+
+		@SuppressWarnings("unchecked")
+		private <T extends LEAP_EVENT> T getOrCreateEvent(Function<Pointer, T> createFunction)
+		{
+			if (event == null)
+				event = createFunction.apply(pEvent);
+
+			return (T) event;
 		}
 	}
 }
