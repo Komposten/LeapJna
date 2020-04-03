@@ -601,9 +601,9 @@ public interface LeapC extends Library
 
 
 		/**
-		 * @return The event data as a dropped frame event.
+		 * @return The event data as a head pose event.
 		 * @throws IllegalStateException If this event message is not an
-		 *           {@link eLeapEventType#DroppedFrame} event;
+		 *           {@link eLeapEventType#HeadPose} event;
 		 */
 		public LEAP_HEAD_POSE_EVENT getHeadPoseEvent()
 		{
