@@ -26,6 +26,8 @@ import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
+import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
@@ -289,6 +291,19 @@ public class LeapTestGui extends JFrame
 							pRequestID);
 					System.out.println("Images mode get request: " + pRequestID.getValue());
 				}
+			}
+			else if (message.type == eLeapEventType.DroppedFrame.value)
+			{
+				LEAP_DROPPED_FRAME_EVENT droppedEvent = message.getDroppedFrameEvent();
+				System.out.format("Dropped frame: %d (%s)%n", droppedEvent.frame_id,
+						droppedEvent.getType());
+			}
+			else if (message.type == eLeapEventType.HeadPose.value)
+			{
+				LEAP_HEAD_POSE_EVENT headEvent = message.getHeadPoseEvent();
+				System.out.format("Head pose: %d, %s, %s%n", headEvent.timestamp,
+						Arrays.toString(headEvent.head_position.asArray()),
+						Arrays.toString(headEvent.head_orientation.asArray()));
 			}
 
 			if (timer > FRAME_TIME)

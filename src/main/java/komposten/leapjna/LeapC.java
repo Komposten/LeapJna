@@ -22,6 +22,8 @@ import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
+import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
@@ -222,6 +224,35 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Gets the head tracking pose at the specified timestamp by interpolating between
+	 * measured frames.
+	 * </p>
+	 * <p>
+	 * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
+	 * synchronize time measurements in the application with time measurements in the Leap
+	 * Motion service. This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * TODO Test this to make sure everything is working. <br/>
+	 * TODO Update method references when rebasing has been added.
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param timestamp The timestamp at which to interpolate the frame data.
+	 * @param pEvent A pointer to a flat buffer which is filled with an interpolated frame.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab756331205d6ee0cd61708d77d968536">LeapC
+	 *      API - LeapInterpolateHeadPose</a>
+	 */
+	public eLeapRS LeapInterpolateHeadPose(Pointer hConnection, long timestamp,
+			LEAP_HEAD_POSE_EVENT pEvent);
+
+
+	/**
+	 * <p>
 	 * Sets or clears one or more policy flags.
 	 * </p>
 	 * <p>
@@ -349,8 +380,13 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: dropped_frame_event; image_event;
-		 * point_mapping_change_event; head_pose_event;
+		 * TODO Add remaining event types: image_event; point_mapping_change_event;
+		 * head_pose_event;
+		 * 
+		 * For head pose: - LEAP_HEAD_POSE_EVENT - LeapInterpolateHeadPose
+		 * 
+		 * For point mappings: - LEAP_POINT_MAPPING_EVENT - LEAP_POINT_MAPPING -
+		 * LeapGetPointMappingSize - LeapGetPointMapping
 		 */
 
 
@@ -577,6 +613,38 @@ public interface LeapC extends Library
 				event = new LEAP_CONFIG_CHANGE_EVENT(pEvent);
 
 			return (LEAP_CONFIG_CHANGE_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a dropped frame event.
+		 * @throws IllegalStateException If this event message is not an
+		 *           {@link eLeapEventType#DroppedFrame} event;
+		 */
+		public LEAP_DROPPED_FRAME_EVENT getDroppedFrameEvent()
+		{
+			checkType(eLeapEventType.DroppedFrame);
+
+			if (event == null)
+				event = new LEAP_DROPPED_FRAME_EVENT(pEvent);
+
+			return (LEAP_DROPPED_FRAME_EVENT) event;
+		}
+
+
+		/**
+		 * @return The event data as a dropped frame event.
+		 * @throws IllegalStateException If this event message is not an
+		 *           {@link eLeapEventType#DroppedFrame} event;
+		 */
+		public LEAP_HEAD_POSE_EVENT getHeadPoseEvent()
+		{
+			checkType(eLeapEventType.HeadPose);
+
+			if (event == null)
+				event = new LEAP_HEAD_POSE_EVENT(pEvent);
+
+			return (LEAP_HEAD_POSE_EVENT) event;
 		}
 
 
