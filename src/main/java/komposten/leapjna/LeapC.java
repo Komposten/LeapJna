@@ -226,10 +226,10 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param timestamp The timestamp at which to interpolate the frame data.
-	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> pointer with enough allocated memory
-	 *          to fit the frame data. Use <code>LeapGetFrameSize</code> to get the required
-	 *          size, and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to
-	 *          create the struct and allocate memory.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapGetFrameSize</code> to get the required size,
+	 *          and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to create the
+	 *          struct and allocate memory.
 	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
@@ -259,7 +259,6 @@ public interface LeapC extends Library
 	 *          handle from the connection object.
 	 * @param timestamp The timestamp at which to interpolate the frame data.
 	 * @param pEvent A pointer to a flat buffer which is filled with an interpolated frame.
-	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab756331205d6ee0cd61708d77d968536">LeapC

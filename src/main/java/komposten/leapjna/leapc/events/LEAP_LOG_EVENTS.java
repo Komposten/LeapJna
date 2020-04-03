@@ -42,14 +42,11 @@ public class LEAP_LOG_EVENTS extends Structure implements LEAP_EVENT
 
 		logEvents = new LEAP_LOG_EVENT[nEvents];
 
-		if (nEvents > 0)
+		int offset = 0;
+		for (int i = 0; i < nEvents; i++)
 		{
-			int offset = 0;
-			for (int i = 0; i < nEvents; i++)
-			{
-				logEvents[i] = new LEAP_LOG_EVENT(events.share(offset));
-				offset += logEvents[i].size();
-			}
+			logEvents[i] = new LEAP_LOG_EVENT(events.share(offset));
+			offset += logEvents[i].size();
 		}
 	}
 }

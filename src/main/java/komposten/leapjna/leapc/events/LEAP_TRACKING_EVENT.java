@@ -108,13 +108,10 @@ public class LEAP_TRACKING_EVENT extends Structure implements LEAP_EVENT
 		super.read();
 
 		hands = new LEAP_HAND[nHands];
-		if (nHands > 0)
+		for (int i = 0; i < nHands; i++)
 		{
-			for (int i = 0; i < nHands; i++)
-			{
-				int offset = i * LEAP_HAND.SIZE;
-				hands[i] = new LEAP_HAND(pHands.share(offset));
-			}
+			int offset = i * LEAP_HAND.SIZE;
+			hands[i] = new LEAP_HAND(pHands.share(offset));
 		}
 	}
 }
