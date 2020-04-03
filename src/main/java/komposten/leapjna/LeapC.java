@@ -181,7 +181,7 @@ public interface LeapC extends Library
 	 * </p>
 	 * <p>
 	 * Use this function to determine the size of the buffer to allocate when calling
-	 * {@link #LeapInterpolateFrame(Pointer, long, LEAP_TRACKING_EVENT.ByReference, long)}.
+	 * {@link #LeapInterpolateFrame(Pointer, long, LEAP_TRACKING_EVENT, long)}.
 	 * </p>
 	 * 
 	 * @param hConnection The connection handle created by
@@ -201,22 +201,36 @@ public interface LeapC extends Library
 
 
 	/**
+	 * <p>
+	 * Constructs a frame at the specified timestamp by interpolating between measured
+	 * frames.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapGetFrameSize(Pointer, long, LongByReference)} to calculate the
+	 * minimum size of this buffer.
+	 * </p>
+	 * <p>
+	 * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
+	 * synchronize time measurements in the application with time measurements in the Leap
+	 * Motion service. This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * TODO Update method references when rebasing has been added.
+	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param timestamp The timestamp at which to interpolate the frame data.
 	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> pointer with enough allocated memory
-	 *          to fit the frame data. Use
-	 *          {@link #LeapGetFrameSize(Pointer, long, LongByReference)} to get the
-	 *          required size, and then
-	 *          {@link LEAP_TRACKING_EVENT.ByReference#ByReference(int)} to create the
-	 *          struct and allocate memory.
+	 *          to fit the frame data. Use <code>LeapGetFrameSize</code> to get the required
+	 *          size, and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to
+	 *          create the struct and allocate memory.
 	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga7cbdc29069fbcd6aca1a16989722e85c">LeapC
-	 *      API - LeapGetFrameSize</a>
+	 *      API - LeapInterpolateFrame</a>
 	 */
 	public eLeapRS LeapInterpolateFrame(Pointer hConnection, long timestamp,
 			LEAP_TRACKING_EVENT pEvent, long ncbEvent);
