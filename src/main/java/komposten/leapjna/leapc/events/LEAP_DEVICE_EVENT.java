@@ -25,7 +25,7 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
  *      API - LEAP_DEVICE_EVENT</a>
  */
 @FieldOrder({ "flags", "device", "status" })
-public class LEAP_DEVICE_EVENT extends Structure
+public class LEAP_DEVICE_EVENT extends Structure implements LEAP_EVENT
 {
 	/** Reserved for future use. */
 	public int flags;

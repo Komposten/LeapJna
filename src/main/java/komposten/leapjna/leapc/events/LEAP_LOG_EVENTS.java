@@ -9,7 +9,7 @@ import com.sun.jna.Structure.FieldOrder;
  * A group of system log messages.
  */
 @FieldOrder({ "nEvents", "events" })
-public class LEAP_LOG_EVENTS extends Structure
+public class LEAP_LOG_EVENTS extends Structure implements LEAP_EVENT
 {
 	/** The number of log events being pointed to by the <code>events</code> field. */
 	public int nEvents;

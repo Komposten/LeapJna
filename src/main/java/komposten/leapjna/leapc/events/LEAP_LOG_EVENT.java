@@ -16,7 +16,7 @@ import komposten.leapjna.leapc.enums.eLeapLogSeverity;
  *      API - LEAP_LOG_EVENT</a>
  */
 @FieldOrder({ "severity", "timestamp", "message" })
-public class LEAP_LOG_EVENT extends Structure
+public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
 {
 	/**
 	 * The type of message. Use {@link #getSeverity()} to get the severity as an

@@ -18,7 +18,7 @@ import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
  *      API - LEAP_CONNECTION_EVENT</a>
  */
 @FieldOrder({ "flags" })
-public class LEAP_CONNECTION_EVENT extends Structure
+public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 {
 	/**
 	 * A combination of {@link eLeapServiceDisposition} flags. Use {@link #getFlags()} to get

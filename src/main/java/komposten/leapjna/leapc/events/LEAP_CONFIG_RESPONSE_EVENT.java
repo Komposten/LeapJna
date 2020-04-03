@@ -27,7 +27,7 @@ import komposten.leapjna.leapc.data.LEAP_VARIANT;
  *      API - LEAP_CONFIG_RESPONSE_EVENT</a>
  */
 @FieldOrder({ "requestID", "value" })
-public class LEAP_CONFIG_RESPONSE_EVENT extends Structure
+public class LEAP_CONFIG_RESPONSE_EVENT extends Structure implements LEAP_EVENT
 {
 	/** An identifier for correlating the request and response. */
 	public int requestID;

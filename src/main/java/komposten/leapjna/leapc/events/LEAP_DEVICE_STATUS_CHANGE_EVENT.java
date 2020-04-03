@@ -22,7 +22,7 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
  *      API - LEAP_DEVICE_STATUS_CHANGE_EVENT</a>
  */
 @FieldOrder({ "device", "last_status", "status" })
-public class LEAP_DEVICE_STATUS_CHANGE_EVENT extends Structure
+public class LEAP_DEVICE_STATUS_CHANGE_EVENT extends Structure implements LEAP_EVENT
 {
 	/** The handle reference of the newly attached device. */
 	public LEAP_DEVICE_REF device;

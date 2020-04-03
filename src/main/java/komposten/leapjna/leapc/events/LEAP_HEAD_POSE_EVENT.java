@@ -13,7 +13,7 @@ import komposten.leapjna.leapc.data.LEAP_VECTOR;
  * TODO Test this mapping!
  */
 @FieldOrder({ "timestamp", "head_position", "head_orientation" })
-public class LEAP_HEAD_POSE_EVENT extends Structure
+public class LEAP_HEAD_POSE_EVENT extends Structure implements LEAP_EVENT
 {
 	/**
 	 * The timestamp for this head pose, in microseconds, referenced against

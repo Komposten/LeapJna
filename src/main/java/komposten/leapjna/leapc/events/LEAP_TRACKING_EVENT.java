@@ -16,7 +16,7 @@ import komposten.leapjna.leapc.data.LEAP_HAND;
  *      API - LEAP_TRACKING_EVENT</a>
  */
 @FieldOrder({ "info", "tracking_frame_id", "nHands", "pHands", "framerate" })
-public class LEAP_TRACKING_EVENT extends Structure
+public class LEAP_TRACKING_EVENT extends Structure implements LEAP_EVENT
 {
 	/** A universal frame identification header. */
 	public LEAP_FRAME_HEADER info;

@@ -23,7 +23,7 @@ import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
  *      API - LEAP_POLICY_EVENT</a>
  */
 @FieldOrder({ "reserved", "current_policy" })
-public class LEAP_POLICY_EVENT extends Structure
+public class LEAP_POLICY_EVENT extends Structure implements LEAP_EVENT
 {
 	/** Reserved for future use. */
 	public int reserved;

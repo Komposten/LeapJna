@@ -25,7 +25,7 @@ import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
  *      API - LEAP_CONNECTION_LOST_EVENT</a>
  */
 @FieldOrder({ "flags" })
-public class LEAP_CONNECTION_LOST_EVENT extends Structure
+public class LEAP_CONNECTION_LOST_EVENT extends Structure implements LEAP_EVENT
 {
 	/** Reserved for future use. */
 	public int flags;

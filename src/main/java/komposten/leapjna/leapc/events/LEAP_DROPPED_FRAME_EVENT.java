@@ -12,7 +12,7 @@ import komposten.leapjna.leapc.enums.eLeapLogSeverity;
  * A dropped frame event.
  */
 @FieldOrder({ "frame_id", "type" })
-public class LEAP_DROPPED_FRAME_EVENT extends Structure
+public class LEAP_DROPPED_FRAME_EVENT extends Structure implements LEAP_EVENT
 {
 	/**
 	 * The type of message. Use {@link #getSeverity()} to get the severity as an

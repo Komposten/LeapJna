@@ -28,7 +28,7 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
  *      API - LEAP_DEVICE_FAILURE_EVENT</a>
  */
 @FieldOrder({ "status", "hDevice" })
-public class LEAP_DEVICE_FAILURE_EVENT extends Structure
+public class LEAP_DEVICE_FAILURE_EVENT extends Structure implements LEAP_EVENT
 {
 	/** The status of this failure event. */
 	public int status;
