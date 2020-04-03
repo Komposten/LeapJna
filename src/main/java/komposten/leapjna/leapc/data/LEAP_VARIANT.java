@@ -91,7 +91,6 @@ public class LEAP_VARIANT extends Structure
 	public void read()
 	{
 		super.read();
-		System.out.println(getPointer().dump(0, 8));
 	}
 
 
