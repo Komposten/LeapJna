@@ -17,6 +17,7 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
+import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
@@ -30,6 +31,7 @@ import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
+import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.utilities.logging.LogUtils;
 
@@ -209,7 +211,7 @@ public class LeapTestGui extends JFrame
 			if (firstIteration)
 			{
 				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle, eLeapPolicyFlag
-						.createMask(eLeapPolicyFlag.AllowPauseResume, eLeapPolicyFlag.OptimiseHMD),
+						.createMask(eLeapPolicyFlag.AllowPauseResume),
 						0);
 
 				LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle, "images_mode",
@@ -218,6 +220,38 @@ public class LeapTestGui extends JFrame
 				LeapC.INSTANCE.LeapSaveConfigValue(leapConnection.handle, "images_mode",
 						new LEAP_VARIANT(0), pRequestID);
 				System.out.println("Images mode change request: " + pRequestID.getValue());
+
+				LongByReference pSize = new LongByReference();
+				eLeapRS result = LeapC.INSTANCE.LeapGetPointMappingSize(leapConnection.handle,
+						pSize);
+				if (result == eLeapRS.Success)
+				{
+					System.out.println("Point mapping size: " + pSize.getValue());
+					LEAP_POINT_MAPPING pointMapping = new LEAP_POINT_MAPPING(
+							(int) pSize.getValue());
+					result = LeapC.INSTANCE.LeapGetPointMapping(leapConnection.handle, pointMapping,
+							pSize);
+
+					if (result == eLeapRS.Success)
+					{
+						System.out.format("Point mapping: Frame %d at time %d with %d points:%n",
+								pointMapping.frame_id, pointMapping.timestamp, pointMapping.nPoints);
+						System.out.print("  Points:");
+						for (LEAP_VECTOR point : pointMapping.getPoints())
+							System.out.format(" [%.02f, %.02f, %.02f]", point.x, point.y, point.z);
+						System.out.print("  IDs:");
+						for (int id : pointMapping.getIds())
+							System.out.format(" %d", id);
+					}
+					else
+					{
+						System.out.println("Failed to retrieve point mapping: " + result);
+					}
+				}
+				else
+				{
+					System.out.println("Failed to retrieve point mapping size " + result);
+				}
 			}
 
 			long currentTime = System.nanoTime();
@@ -304,6 +338,13 @@ public class LeapTestGui extends JFrame
 				System.out.format("Head pose: %d, %s, %s%n", headEvent.timestamp,
 						Arrays.toString(headEvent.head_position.asArray()),
 						Arrays.toString(headEvent.head_orientation.asArray()));
+			}
+			else if (message.type == eLeapEventType.PointMappingChange.value)
+			{
+				LEAP_POINT_MAPPING_CHANGE_EVENT mappingEvent = message
+						.getPointMappingChangeEvent();
+				System.out.format("Point mapping change: Frame %d at time %d, %d points%n",
+						mappingEvent.frame_id, mappingEvent.timestamp, mappingEvent.nPoints);
 			}
 
 			if (timer > FRAME_TIME)

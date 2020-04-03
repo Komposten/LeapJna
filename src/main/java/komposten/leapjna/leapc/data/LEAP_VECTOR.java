@@ -1,5 +1,6 @@
 package komposten.leapjna.leapc.data;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
@@ -19,6 +20,17 @@ public class LEAP_VECTOR extends Structure
 	public float x;
 	public float y;
 	public float z;
+
+	public LEAP_VECTOR()
+	{}
+
+
+	public LEAP_VECTOR(Pointer pointer)
+	{
+		super(pointer);
+		read();
+	}
+
 
 	/**
 	 * @return The vector's values as an array in the order: x, y, z.

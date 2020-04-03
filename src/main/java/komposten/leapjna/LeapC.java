@@ -12,6 +12,7 @@ import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
+import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
@@ -28,6 +29,7 @@ import komposten.leapjna.leapc.events.LEAP_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
+import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.Configurations;
@@ -360,6 +362,34 @@ public interface LeapC extends Library
 
 
 	/**
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param pSize A pointer that receives the number of bytes required to store the point
+	 *          mapping.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 */
+	public eLeapRS LeapGetPointMappingSize(Pointer hConnection, LongByReference pSize);
+
+
+	/**
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param pointMapping A <code>LEAP_POINT_MAPPING</code> with enough allocated memory to
+	 *          fit the frame data. Use
+	 *          {@link #LeapGetPointMappingSize(Pointer, LongByReference)} to get the
+	 *          required size, and then {@link LEAP_POINT_MAPPING#LEAP_POINT_MAPPING(int)}
+	 *          to create the struct and allocate memory.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 */
+	public eLeapRS LeapGetPointMapping(Pointer hConnection, LEAP_POINT_MAPPING pointMapping,
+			LongByReference pSize);
+
+
+	/**
 	 * <p>
 	 * Specifies the configuration for a connection.
 	 * </p>
@@ -396,13 +426,7 @@ public interface LeapC extends Library
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		/**
-		 * TODO Add remaining event types: image_event; point_mapping_change_event;
-		 * head_pose_event;
-		 * 
-		 * For head pose: - LEAP_HEAD_POSE_EVENT - LeapInterpolateHeadPose
-		 * 
-		 * For point mappings: - LEAP_POINT_MAPPING_EVENT - LEAP_POINT_MAPPING -
-		 * LeapGetPointMappingSize - LeapGetPointMapping
+		 * TODO Add remaining event types: image_event;
 		 */
 
 
@@ -609,6 +633,18 @@ public interface LeapC extends Library
 		{
 			checkType(eLeapEventType.HeadPose);
 			return getOrCreateEvent(LEAP_HEAD_POSE_EVENT::new);
+		}
+
+
+		/**
+		 * @return The event data as a point mapping change event.
+		 * @throws IllegalStateException If this event message is not an
+		 *           {@link eLeapEventType#PointMappingChange} event;
+		 */
+		public LEAP_POINT_MAPPING_CHANGE_EVENT getPointMappingChangeEvent()
+		{
+			checkType(eLeapEventType.PointMappingChange);
+			return getOrCreateEvent(LEAP_POINT_MAPPING_CHANGE_EVENT::new);
 		}
 
 
