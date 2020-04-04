@@ -4,10 +4,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import com.sun.jna.ptr.LongByReference;
 
@@ -17,10 +20,12 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
+import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
@@ -29,6 +34,7 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -195,7 +201,8 @@ public class LeapTestGui extends JFrame
 
 	private void doPollLoop(LEAP_CONNECTION leapConnection)
 	{
-		double timer = 0;
+		double trackingTimer = 0;
+		double imageTimer = 0;
 		long lastTime = System.nanoTime();
 		double frameTimer = 0;
 		int framerate = 0;
@@ -210,15 +217,16 @@ public class LeapTestGui extends JFrame
 
 			if (firstIteration)
 			{
-				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle, eLeapPolicyFlag
-						.createMask(eLeapPolicyFlag.AllowPauseResume),
+				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle,
+						eLeapPolicyFlag.createMask(eLeapPolicyFlag.AllowPauseResume,
+								eLeapPolicyFlag.Images, eLeapPolicyFlag.MapPoints),
 						0);
 
 				LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle, "images_mode",
 						pRequestID);
 				System.out.println("Images mode get request: " + pRequestID.getValue());
 				LeapC.INSTANCE.LeapSaveConfigValue(leapConnection.handle, "images_mode",
-						new LEAP_VARIANT(0), pRequestID);
+						new LEAP_VARIANT(2), pRequestID);
 				System.out.println("Images mode change request: " + pRequestID.getValue());
 
 				LongByReference pSize = new LongByReference();
@@ -256,7 +264,8 @@ public class LeapTestGui extends JFrame
 
 			long currentTime = System.nanoTime();
 			double deltaTime = (currentTime - lastTime) / 1E6;
-			timer += deltaTime;
+			trackingTimer += deltaTime;
+			imageTimer += deltaTime;
 			frameTimer += deltaTime;
 			lastTime = currentTime;
 
@@ -347,15 +356,19 @@ public class LeapTestGui extends JFrame
 						mappingEvent.frame_id, mappingEvent.timestamp, mappingEvent.nPoints);
 			}
 
-			if (timer > FRAME_TIME)
+			if (trackingTimer > FRAME_TIME && message.type == eLeapEventType.Tracking.value)
 			{
-				if (message.type == eLeapEventType.Tracking.value)
-				{
-					renderPanel.setFrameData(message.getTrackingEvent());
-				}
+				renderPanel.setFrameData(message.getTrackingEvent());
 
-				timer = 0;
+				trackingTimer = 0;
 				framerate++;
+			}
+
+			if (imageTimer > FRAME_TIME && message.type == eLeapEventType.Image.value)
+			{
+				renderPanel.setImageData(message.getImageEvent());
+
+				imageTimer = 0;
 			}
 
 			if (frameTimer > 1000)
@@ -424,6 +437,8 @@ class RenderPanel extends JPanel
 
 	private Stage stage = Stage.Startup;
 	private LEAP_TRACKING_EVENT data;
+	private LEAP_IMAGE image;
+	private BufferedImage texture;
 	private int framerate;
 
 	public void setStage(Stage stage)
@@ -438,6 +453,37 @@ class RenderPanel extends JPanel
 		this.data = data;
 		repaint();
 		data.clear();
+	}
+
+
+	public void setImageData(LEAP_IMAGE_EVENT data)
+	{
+		this.image = data.image[0];
+		createTexture(image);
+		SwingUtilities.invokeLater(this::repaint);
+		data.clear();
+	}
+
+
+	private void createTexture(LEAP_IMAGE image)
+	{
+		boolean newTexture = (texture == null || texture.getWidth() != image.properties.width
+				|| texture.getHeight() != image.properties.height);
+
+		byte[] imageData = image.getData();
+
+		if (image.properties.getFormat() == eLeapImageFormat.IR)
+		{
+			if (newTexture)
+			{
+				texture = new BufferedImage(image.properties.width, image.properties.height,
+						BufferedImage.TYPE_BYTE_GRAY);
+			}
+
+			byte[] textureData = ((DataBufferByte) texture.getRaster().getDataBuffer())
+					.getData();
+			System.arraycopy(imageData, 0, textureData, 0, imageData.length);
+		}
 	}
 
 
@@ -458,6 +504,8 @@ class RenderPanel extends JPanel
 
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
+
+		drawImage(g2d);
 
 		g2d.setColor(Color.BLACK);
 		g2d.drawString("Press ESC to exit", 10, getHeight() - 10);
@@ -487,6 +535,20 @@ class RenderPanel extends JPanel
 				g2d.setColor(Color.BLACK);
 				drawTrackingInfo(g2d);
 			}
+		}
+	}
+
+
+	private void drawImage(Graphics2D g2d)
+	{
+		if (texture != null)
+		{
+			float ratio = texture.getWidth() / (float) texture.getHeight();
+			int width = getWidth();
+			int height = (int) (getHeight() / ratio);
+			int y = (int) (getHeight() / 2f - height / 2f);
+
+			g2d.drawImage(texture, 0, y, width, height, null);
 		}
 	}
 

@@ -27,6 +27,7 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
 import komposten.leapjna.leapc.events.LEAP_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -424,11 +425,6 @@ public interface LeapC extends Library
 	@FieldOrder({ "size", "type", "pEvent" })
 	public static class LEAP_CONNECTION_MESSAGE extends Structure
 	{
-		/**
-		 * TODO Add remaining event types: image_event;
-		 */
-
-
 		/** The size of this message struct. */
 		public int size;
 
@@ -644,6 +640,13 @@ public interface LeapC extends Library
 		{
 			checkType(eLeapEventType.PointMappingChange);
 			return getOrCreateEvent(LEAP_POINT_MAPPING_CHANGE_EVENT::new);
+		}
+
+
+		public LEAP_IMAGE_EVENT getImageEvent()
+		{
+			checkType(eLeapEventType.Image);
+			return getOrCreateEvent(LEAP_IMAGE_EVENT::new);
 		}
 
 
