@@ -15,9 +15,9 @@ import javax.swing.SwingUtilities;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.LeapC;
-import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;

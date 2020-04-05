@@ -5,7 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
-import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 

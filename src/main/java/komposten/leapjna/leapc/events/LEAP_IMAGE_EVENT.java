@@ -5,9 +5,9 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
-import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
 import komposten.leapjna.leapc.data.LEAP_CALIBRATION;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_FRAME_HEADER;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
 
