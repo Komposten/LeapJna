@@ -10,6 +10,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.LongByReference;
 
+import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
@@ -177,6 +178,30 @@ public interface LeapC extends Library
 	 */
 	public eLeapRS LeapGetConnectionInfo(Pointer hConnection,
 			LEAP_CONNECTION_INFO.ByReference pInfo);
+
+
+	/**
+	 * <p>
+	 * Sets the allocator functions to use for a particular connection.
+	 * </p>
+	 * <p>
+	 * If user-supplied allocator functions are not supplied, the functions that require
+	 * dynamic memory allocation will not be available.
+	 * </p>
+	 * <p>
+	 * <b>Note:</b> Not required for e.g. {@link LEAP_IMAGE_EVENT}s even though their
+	 * documentation says otherwise.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param allocator A {@link LEAP_ALLOCATOR} structure containing the allocator
+	 *          functions to be called as needed by the library.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 */
+	public eLeapRS LeapSetAllocator(Pointer hConnection, LEAP_ALLOCATOR allocator);
 
 
 	/**

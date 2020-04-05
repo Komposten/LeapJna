@@ -6,6 +6,7 @@ import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
 import komposten.leapjna.LeapC.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
 import komposten.leapjna.leapc.data.LEAP_CALIBRATION;
 import komposten.leapjna.leapc.data.LEAP_FRAME_HEADER;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
@@ -20,9 +21,8 @@ import komposten.leapjna.leapc.data.LEAP_IMAGE;
  * message when an image is available. The struct contains image properties, the
  * distortion grid, and a pointer to the buffer containing the image data – which was
  * allocated using the allocator function passed to LeapC using the
- * {@link LeapC#LeapSetAllocator}.
+ * {@link LeapC#LeapSetAllocator(Pointer, LEAP_ALLOCATOR)}.
  * </p>
- * TODO Fix method references when LeapSetAllocator has been added.
  * 
  * @see <a href=
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___i_m_a_g_e___e_v_e_n_t">LeapC
