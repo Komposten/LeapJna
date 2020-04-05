@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.Arrays;
@@ -77,14 +79,17 @@ public class LeapTestGui extends JFrame
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 				{
-					if (leapJnaThread != null)
-					{
-						leapJnaThread.interrupt();
-					}
-
-					setVisible(false);
-					dispose();
+					terminate();
 				}
+			}
+		});
+
+		addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				terminate();
 			}
 		});
 	}
@@ -93,7 +98,7 @@ public class LeapTestGui extends JFrame
 	private void buildUi()
 	{
 		setTitle("LeapJna - 2D visualiser");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setSize(500, 500);
 		setLocationRelativeTo(null);
 
@@ -386,6 +391,11 @@ public class LeapTestGui extends JFrame
 
 			firstIteration = false;
 		}
+
+		System.out.println("Closing connection!");
+		LeapC.INSTANCE.LeapCloseConnection(leapConnection.handle);
+		printStatus(leapConnection);
+		LeapC.INSTANCE.LeapDestroyConnection(leapConnection.handle);
 	}
 
 
@@ -421,6 +431,18 @@ public class LeapTestGui extends JFrame
 		catch (InterruptedException e)
 		{
 		}
+	}
+
+
+	private void terminate()
+	{
+		if (leapJnaThread != null)
+		{
+			leapJnaThread.interrupt();
+		}
+
+		setVisible(false);
+		dispose();
 	}
 
 

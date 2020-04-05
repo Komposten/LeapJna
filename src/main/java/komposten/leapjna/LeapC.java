@@ -63,6 +63,33 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Destroys a previously opened connection.
+	 * </p>
+	 * <p>
+	 * This method closes the specified connection object if it is opened, destroys the
+	 * underlying object, and releases all resources associated with it.
+	 * </p>
+	 * <p>
+	 * This method never fails.
+	 * </p>
+	 * <p>
+	 * Be sure that no other functions are accessing the connection when this function is
+	 * called.
+	 * </p>
+	 * 
+	 * @param hConnection A handle to the connection object to be destroyed, created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga06fc1079537dde473bf37cc2fb0220ee">LeapC
+	 *      API - LeapDestroyConnection</a>
+	 */
+	public void LeapDestroyConnection(Pointer hConnection);
+
+
+	/**
+	 * <p>
 	 * Opens a connection to the Leap Motion service.
 	 * </p>
 	 * <p>
@@ -81,6 +108,28 @@ public interface LeapC extends Library
 	 *      API - LeapOpenConnection</a>
 	 */
 	public eLeapRS LeapOpenConnection(Pointer hConnection);
+
+
+	/**
+	 * <p>
+	 * Closes a previously opened connection.
+	 * </p>
+	 * <p>
+	 * This method closes the specified connection object if it is opened
+	 * </p>
+	 * <p>
+	 * This method never fails.
+	 * </p>
+	 * 
+	 * @param hConnection A handle to the connection object, created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga1d71e3d5a42c884bcfa981c7ccf11ddb">LeapC
+	 *      API - LeapCloseConnection</a>
+	 */
+	public void LeapCloseConnection(Pointer hConnection);
 
 
 	/**
@@ -147,8 +196,7 @@ public interface LeapC extends Library
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga5225116e8e8fad45d0e21e0ec7e3af76">LeapC
 	 *      API - LeapGetConnectionInfo</a>
 	 */
-	public eLeapRS LeapGetConnectionInfo(Pointer hConnection,
-			LEAP_CONNECTION_INFO pInfo);
+	public eLeapRS LeapGetConnectionInfo(Pointer hConnection, LEAP_CONNECTION_INFO pInfo);
 
 
 	/**
