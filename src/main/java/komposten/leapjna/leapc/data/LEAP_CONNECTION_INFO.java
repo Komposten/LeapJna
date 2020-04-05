@@ -13,7 +13,7 @@ import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
  * </p>
  * <p>
  * Instances of this struct are created by
- * {@link LeapC#LeapGetConnectionInfo(Pointer, LEAP_CONNECTION_INFO.ByReference)}.
+ * {@link LeapC#LeapGetConnectionInfo(Pointer, LEAP_CONNECTION_INFO)}.
  * </p>
  * 
  * @see <a href=
@@ -27,15 +27,22 @@ public class LEAP_CONNECTION_INFO extends Structure
 	public int size;
 
 	/**
+	 * <p>
 	 * The current status of this connection. Use {@link #getStatus()} to get the status as
 	 * a {@link eLeapConnectionStatus} value.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: This appears to <em>always</em> be
+	 * {@link eLeapConnectionStatus#NotConnected}.
+	 * </p>
 	 */
-	public int status;
+	public long status;
 
 	private eLeapConnectionStatus statusE;
 
 	public LEAP_CONNECTION_INFO()
 	{
+		super(ALIGN_NONE);
 		size = size();
 	}
 
@@ -44,7 +51,7 @@ public class LEAP_CONNECTION_INFO extends Structure
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapConnectionStatus.parse(status, eLeapConnectionStatus.Unknown);
+			statusE = eLeapConnectionStatus.parse((int) status, eLeapConnectionStatus.Unknown);
 		}
 
 		return statusE;

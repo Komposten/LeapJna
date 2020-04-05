@@ -391,16 +391,20 @@ public class LeapTestGui extends JFrame
 
 	private eLeapRS printStatus(LEAP_CONNECTION leapConnection)
 	{
-		eLeapRS result;
-		LEAP_CONNECTION_INFO.ByReference connectionStatus;
-
 		printHeader("Connection status");
 
-		connectionStatus = new LEAP_CONNECTION_INFO.ByReference();
-
-		result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.handle,
+		LEAP_CONNECTION_INFO connectionStatus = new LEAP_CONNECTION_INFO();
+		eLeapRS result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.handle,
 				connectionStatus);
-		System.out.println("Size: " + connectionStatus.size);
+
+		if (result == eLeapRS.Success)
+		{
+			System.out.format("Status: %s%n", connectionStatus.getStatus());
+		}
+		else
+		{
+			System.out.format("Failed to get status: %s%n", result);
+		}
 		return result;
 	}
 

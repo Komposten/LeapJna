@@ -148,7 +148,7 @@ public interface LeapC extends Library
 	 *      API - LeapGetConnectionInfo</a>
 	 */
 	public eLeapRS LeapGetConnectionInfo(Pointer hConnection,
-			LEAP_CONNECTION_INFO.ByReference pInfo);
+			LEAP_CONNECTION_INFO pInfo);
 
 
 	/**
