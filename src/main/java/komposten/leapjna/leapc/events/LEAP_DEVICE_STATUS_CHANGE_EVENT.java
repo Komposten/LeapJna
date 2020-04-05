@@ -53,38 +53,42 @@ public class LEAP_DEVICE_STATUS_CHANGE_EVENT extends Structure implements LEAP_E
 	 */
 	public int status;
 
-	private eLeapDeviceStatus statusE;
-	private eLeapDeviceStatus lastStatusE;
-	
+	private eLeapDeviceStatus[] statusE;
+	private eLeapDeviceStatus[] lastStatusE;
+
 	public LEAP_DEVICE_STATUS_CHANGE_EVENT(Pointer pointer)
 	{
 		super(pointer, ALIGN_NONE);
 		read();
 	}
 
+
 	/**
-	 * @return The status as an {@link eLeapDeviceStatus} instead of an <code>int</code>.
+	 * @return The status flags as an {@link eLeapDeviceStatus} array instead of an
+	 *         <code>int</code> mask.
 	 */
-	public eLeapDeviceStatus getStatus()
+	public eLeapDeviceStatus[] getStatus()
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapDeviceStatus.parse(status, eLeapDeviceStatus.Unknown);
+			statusE = eLeapDeviceStatus.parseMask(status);
 		}
+
 		return statusE;
 	}
 
 
 	/**
-	 * @return The last status as an {@link eLeapDeviceStatus} instead of an
-	 *         <code>int</code>.
+	 * @return The last status flags as an {@link eLeapDeviceStatus} array instead of an
+	 *         <code>int</code> mask.
 	 */
-	public eLeapDeviceStatus getLastStatus()
+	public eLeapDeviceStatus[] getLastStatus()
 	{
 		if (lastStatusE == null)
 		{
-			lastStatusE = eLeapDeviceStatus.parse(last_status, eLeapDeviceStatus.Unknown);
+			lastStatusE = eLeapDeviceStatus.parseMask(last_status);
 		}
+
 		return lastStatusE;
 	}
 }

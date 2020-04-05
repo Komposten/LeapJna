@@ -1,5 +1,9 @@
 package komposten.leapjna.leapc.enums;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 /**
  * The device status codes.
  * 
@@ -9,8 +13,8 @@ package komposten.leapjna.leapc.enums;
  */
 public enum eLeapDeviceStatus
 {
-	Unknown(-0x1),
-	
+	None(0x0),
+
 	/** The device is sending out frames. */
 	Streaming(0x00000001),
 
@@ -44,6 +48,11 @@ public enum eLeapDeviceStatus
 	/** The device USB control interfaces failed to initialise. */
 	BadControl(0xE8010004);
 
+	private static final eLeapDeviceStatus[] FUNCTIONAL = { Streaming, Paused, Robust,
+			Smudged, LowResource };
+	private static final eLeapDeviceStatus[] KNOWN_FAILURES = { BadCalibration, BadFirmware,
+			BadTransport, BadControl };
+
 	public final int value;
 
 	private eLeapDeviceStatus(int value)
@@ -52,16 +61,53 @@ public enum eLeapDeviceStatus
 	}
 
 
-	public static eLeapDeviceStatus parse(int value, eLeapDeviceStatus defaultValue)
+	public static eLeapDeviceStatus[] parseMask(int mask)
 	{
-		for (eLeapDeviceStatus o : eLeapDeviceStatus.values())
+		List<eLeapDeviceStatus> flags = new ArrayList<>();
+
+		if ((mask & UnknownFailure.value) == UnknownFailure.value)
 		{
-			if (o.value == value)
+			for (eLeapDeviceStatus o : KNOWN_FAILURES)
 			{
-				return o;
+				if ((mask & o.value) == o.value)
+				{
+					flags.add(o);
+				}
+			}
+
+			if (flags.isEmpty())
+			{
+				flags.add(UnknownFailure);
+			}
+		}
+		else
+		{
+			for (eLeapDeviceStatus o : FUNCTIONAL)
+			{
+				if ((mask & o.value) == o.value)
+				{
+					flags.add(o);
+				}
+			}
+
+			if (flags.isEmpty())
+			{
+				flags.add(None);
 			}
 		}
 
-		return defaultValue;
+		return flags.toArray(new eLeapDeviceStatus[flags.size()]);
+	}
+
+
+	public static int createMask(eLeapDeviceStatus... flags)
+	{
+		int mask = 0;
+		for (eLeapDeviceStatus flag : flags)
+		{
+			mask |= flag.value;
+		}
+
+		return mask;
 	}
 }

@@ -286,15 +286,16 @@ public class LeapTestGui extends JFrame
 			{
 				LEAP_DEVICE_EVENT deviceEvent = message.getDeviceEvent();
 				System.out.format("Device detected: %d | %s (%x)%n", deviceEvent.device.id,
-						deviceEvent.getStatus(), deviceEvent.status);
+						Arrays.toString(deviceEvent.getStatus()), deviceEvent.status);
 			}
 			else if (message.type == eLeapEventType.DeviceStatusChange.value)
 			{
 				LEAP_DEVICE_STATUS_CHANGE_EVENT deviceEvent = message
 						.getDeviceStatusChangeEvent();
 				System.out.format("Device changed: %d | From %s (%x) to %s (%x)%n",
-						deviceEvent.device.id, deviceEvent.getLastStatus(), deviceEvent.last_status,
-						deviceEvent.getStatus(), deviceEvent.status);
+						deviceEvent.device.id, Arrays.toString(deviceEvent.getLastStatus()),
+						deviceEvent.last_status, Arrays.toString(deviceEvent.getStatus()),
+						deviceEvent.status);
 			}
 			else if (message.type == eLeapEventType.Policy.value)
 			{

@@ -46,7 +46,7 @@ public class LEAP_DEVICE_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public int status;
 
-	private eLeapDeviceStatus statusE;
+	private eLeapDeviceStatus[] statusE;
 
 	public LEAP_DEVICE_EVENT(Pointer pointer)
 	{
@@ -56,14 +56,14 @@ public class LEAP_DEVICE_EVENT extends Structure implements LEAP_EVENT
 
 
 	/**
-	 * @return The status as an {@link eLeapDeviceStatus} instead of an
+	 * @return The status flags as an {@link eLeapDeviceStatus} array instead of an
 	 *         <code>int</code>.
 	 */
-	public eLeapDeviceStatus getStatus()
+	public eLeapDeviceStatus[] getStatus()
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapDeviceStatus.parse(status, eLeapDeviceStatus.Unknown);
+			statusE = eLeapDeviceStatus.parseMask(status);
 		}
 		return statusE;
 	}
