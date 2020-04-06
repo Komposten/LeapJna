@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
@@ -12,6 +13,9 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
+import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.enums.eLeapEventType;
@@ -197,6 +201,121 @@ public interface LeapC extends Library
 	 *      API - LeapGetConnectionInfo</a>
 	 */
 	public eLeapRS LeapGetConnectionInfo(Pointer hConnection, LEAP_CONNECTION_INFO pInfo);
+
+
+	/**
+	 * <p>
+	 * Retrieves a list of Leap Motion devices currently attached to the system.
+	 * </p>
+	 * <p>
+	 * To get the number of connected devices, call this function with the
+	 * <code>pArray</code> parameter set to <code>null</code>. The number of devices is
+	 * written to the memory specified by <code>pnArray</code>. Use the device count to
+	 * create an array of {@link LEAP_DEVICE_REF} structs large enough to hold the number of
+	 * connected devices. Finally, call <code>LeapGetDeviceList()</code> with this array and
+	 * known count to get the list of Leap devices. A device must be opened with
+	 * {@link #LeapOpenDevice(LEAP_DEVICE_REF, Pointer)} before device properties can be
+	 * queried.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param pArray A pointer to an array that LeapC fills with the device list. Use
+	 *          {@link LEAP_DEVICE_REF#toArray(int)} to create the array, and then pass the
+	 *          first object to this parameter.
+	 * @param pnArray On input, set to the number of elements in <code>pArray</code>; on
+	 *          output LeapC sets this to the number of valid device handles.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga93640c45298cc4d756e4b51c890e0a68">LeapC
+	 *      API - LeapGetDeviceList</a>
+	 */
+	public eLeapRS LeapGetDeviceList(Pointer hConnection, LEAP_DEVICE_REF pArray,
+			IntByReference pnArray);
+
+
+	/**
+	 * <p>
+	 * Opens a device reference and retrieves a handle to the device.
+	 * </p>
+	 * <p>
+	 * To ensure resources are properly freed, users must call
+	 * {@link #LeapOpenDevice(Pointer)} when finished with the device, even if the retrieved
+	 * device has problems or cannot stream.
+	 * </p>
+	 * 
+	 * @param rDevice A device reference.
+	 * @param phDevice A pointer that receives the opened device handle.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga992f1420318c3569a6a0f3ceaac43754">LeapC
+	 *      API - LeapOpenDevice</a>
+	 */
+	public eLeapRS LeapOpenDevice(LEAP_DEVICE_REF rDevice, LEAP_DEVICE phDevice);
+
+
+	/**
+	 * Closes a device handle previously opened with
+	 * {@link #LeapOpenDevice(LEAP_DEVICE_REF, LEAP_DEVICE)}.
+	 * 
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab272a3771f067d7a9d34461d557a7907">LeapC
+	 *      API - LeapCloseDevice</a>
+	 */
+	public void LeapCloseDevice(Pointer hDevice);
+
+
+	/**
+	 * <p>
+	 * Gets device properties.
+	 * </p>
+	 * <p>
+	 * To get the device serial number you must supply a {@link LEAP_DEVICE_INFO} struct
+	 * whose serial member points to a char array large enough to hold the null-terminated
+	 * serial number string. To get the required length, call
+	 * {@link #LeapGetDeviceInfo(Pointer, LEAP_DEVICE_INFO)} using a
+	 * <code>LEAP_DEVICE_INFO</code> struct that has serial set to <code>null</code>. This
+	 * will return {@link eLeapRS#InsufficientBuffer}, but LeapC still sets the
+	 * <code>serial_length</code> field of the struct to the required length. You can then
+	 * allocate memory for the string (using e.g.
+	 * {@link LEAP_DEVICE_INFO#allocateSerialBuffer(int)}, set the serial field, and call
+	 * this function again.
+	 * </p>
+	 * 
+	 * @param hDevice A handle to the device to be queried. Use {@link LEAP_DEVICE#handle}
+	 *          to obtain the handle from the device object.
+	 * @param info The struct to receive the device property data.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gafae71b1c2b532c22cbfcf8a49df7ed3a">LeapC
+	 *      API - LeapGetDeviceInfo</a>
+	 */
+	public eLeapRS LeapGetDeviceInfo(Pointer hDevice, LEAP_DEVICE_INFO info);
+
+
+	/**
+	 * <p>
+	 * Provides the human-readable canonical name of the specified device model.
+	 * </p>
+	 * <p>
+	 * This method is guaranteed to never return <code>null</code> for the
+	 * {@link LEAP_DEVICE_INFO#pid} field returned by a successful call to
+	 * {@link LeapC#LeapGetDeviceInfo(Pointer, LEAP_DEVICE_INFO)}.
+	 * </p>
+	 * 
+	 * @param pid The pid of the device.
+	 * 
+	 * @return The string name of the device model, or <code>null</code> if the device type
+	 *         string is invalid.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gada2b0efcd4531790617465723ed3059a">LeapC
+	 *      API - LeapDevicePIDToString</a>
+	 */
+	public String LeapDevicePIDToString(int pid);
 
 
 	/**

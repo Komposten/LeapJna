@@ -20,6 +20,8 @@ import komposten.leapjna.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
@@ -287,6 +289,50 @@ public class LeapTestGui extends JFrame
 				LEAP_DEVICE_EVENT deviceEvent = message.getDeviceEvent();
 				System.out.format("Device detected: %d | %s (%x)%n", deviceEvent.device.id,
 						Arrays.toString(deviceEvent.getStatus()), deviceEvent.status);
+
+				LEAP_DEVICE phDevice = new LEAP_DEVICE();
+				eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(deviceEvent.device, phDevice);
+
+				if (result == eLeapRS.Success)
+				{
+					LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
+					result = LeapC.INSTANCE.LeapGetDeviceInfo(phDevice.handle, info);
+
+					if (result == eLeapRS.InsufficientBuffer || result == eLeapRS.Success)
+					{
+						info.allocateSerialBuffer(info.serial_length);
+						result = LeapC.INSTANCE.LeapGetDeviceInfo(phDevice.handle, info);
+
+						if (result == eLeapRS.Success)
+						{
+							System.out.format("Device info for device %d:%n", deviceEvent.device.id);
+							System.out.format("  Status: %s%n", Arrays.toString(info.getStatus()));
+							System.out.format("  Caps: %s%n", Arrays.toString(info.getCapabilities()));
+							System.out.format("  PID: %s (%d)%n",
+									LeapC.INSTANCE.LeapDevicePIDToString(info.pid), info.pid);
+							System.out.format("  Baseline: %d µm%n", info.baseline);
+							System.out.format("  Serial: %s%n", info.serial);
+							System.out.format("  FoV: %.02f°x%.02f° (HxV)%n",
+									Math.toDegrees(info.h_fov), Math.toDegrees(info.v_fov));
+							System.out.format("  Range: %d µm%n", info.range);
+
+							LeapC.INSTANCE.LeapCloseDevice(phDevice.handle);
+						}
+						else
+						{
+							System.out.println("Failed to read device info: " + result);
+						}
+					}
+					else
+					{
+						System.out
+								.println("Failed to read device info to get serial length: " + result);
+					}
+				}
+				else
+				{
+					System.out.println("Failed to open device: " + result);
+				}
 			}
 			else if (message.type == eLeapEventType.DeviceStatusChange.value)
 			{
