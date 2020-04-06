@@ -1,12 +1,9 @@
 package komposten.leapjna.leapc.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 
@@ -167,7 +164,7 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 */
 	public T getElement(int index)
 	{
-		return createInstance(share(index * elementSize));
+		return Structure.newInstance(clazz, share(index * elementSize));
 	}
 
 
@@ -187,39 +184,6 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 		}
 
 		return list.toArray(array);
-	}
-
-
-	private T createInstance(Pointer pointer)
-	{
-		Constructor<T> ctor;
-		try
-		{
-			ctor = clazz.getDeclaredConstructor(Pointer.class);
-			return ctor.newInstance(pointer);
-		}
-		catch (NoSuchMethodException | IllegalAccessException e)
-		{
-			String msg = "The structure class " + clazz.getName()
-					+ " must have a public constructor with the signature " + clazz.getSimpleName()
-					+ "(Pointer)!";
-			throw new LeapException(msg, e);
-		}
-		catch (InstantiationException e)
-		{
-			String msg = "The structure class " + clazz.getName() + " must not be abstract!";
-			throw new LeapException(msg, e);
-		}
-		catch (IllegalArgumentException e)
-		{
-			throw new LeapException("This should not happen.", e);
-		}
-		catch (InvocationTargetException e)
-		{
-			String msg = "A exception occurred while creating a new " + clazz.getName()
-					+ " instance!";
-			throw new LeapException(msg, e);
-		}
 	}
 
 
