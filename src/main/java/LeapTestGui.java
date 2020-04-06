@@ -45,7 +45,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
-import komposten.leapjna.leapc.util.ArrayByReference;
+import komposten.leapjna.leapc.util.ArrayPointer;
 
 /*FIXME Check for memory leaks!
  *   We're currently releasing the native memory from the tracking events after
@@ -294,7 +294,7 @@ public class LeapTestGui extends JFrame
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, null, pnArray);
 				System.out.println("Device count: " + pnArray.getValue());
 
-				ArrayByReference<LEAP_DEVICE_REF> pArray = ArrayByReference
+				ArrayPointer<LEAP_DEVICE_REF> pArray = ArrayPointer
 						.empty(LEAP_DEVICE_REF.class, pnArray.getValue());
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray, pnArray);
 

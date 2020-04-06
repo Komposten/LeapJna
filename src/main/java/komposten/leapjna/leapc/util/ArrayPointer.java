@@ -10,7 +10,21 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 
-public class ArrayByReference<T extends Structure> extends Memory implements Disposable
+/**
+ * <p>
+ * A pointer to a memory block containing one or more instances of a
+ * <em>constant-size</em> {@link Structure}.
+ * </p>
+ * <p>
+ * In order for this class to work properly the structure class stored by this array must
+ * have a public no-arg constructor, a public constructor taking a single Pointer as
+ * argument, and a constant size.
+ * </p>
+ * 
+ * 
+ * @param <T> The structure type contained in the array.
+ */
+public class ArrayPointer<T extends Structure> extends Memory implements Disposable
 {
 	private int elementSize;
 	private int size;
@@ -29,11 +43,10 @@ public class ArrayByReference<T extends Structure> extends Memory implements Dis
 	 * @param clazz The type to store in the array.
 	 * @param arraySize The number of elements to allocate space for.
 	 */
-	public static <T extends Structure> ArrayByReference<T> empty(Class<T> clazz,
-			int arraySize)
+	public static <T extends Structure> ArrayPointer<T> empty(Class<T> clazz, int arraySize)
 	{
 		int elementSize = Structure.newInstance(clazz).size();
-		return new ArrayByReference<>(clazz, elementSize, arraySize);
+		return new ArrayPointer<>(clazz, elementSize, arraySize);
 	}
 
 
@@ -49,14 +62,14 @@ public class ArrayByReference<T extends Structure> extends Memory implements Dis
 	 * @param values The elements to store in the array.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Structure> ArrayByReference<T> fromArray(T[] values)
+	public static <T extends Structure> ArrayPointer<T> fromArray(T[] values)
 	{
 		if (values.length < 0)
 		{
 			throw new IllegalArgumentException("elements must have at least one element!");
 		}
 
-		ArrayByReference<T> result = new ArrayByReference<T>((Class<T>) values[0].getClass(),
+		ArrayPointer<T> result = new ArrayPointer<T>((Class<T>) values[0].getClass(),
 				values[0].size(), values.length);
 		result.setValues(0, values);
 
@@ -76,7 +89,7 @@ public class ArrayByReference<T extends Structure> extends Memory implements Dis
 	 * @param elementSize The size, in bytes, each element needs.
 	 * @param arraySize The number of elements to allocate space for.
 	 */
-	private ArrayByReference(Class<T> clazz, int elementSize, int arraySize)
+	private ArrayPointer(Class<T> clazz, int elementSize, int arraySize)
 	{
 		super(arraySize * elementSize);
 		this.elementSize = elementSize;
@@ -159,7 +172,10 @@ public class ArrayByReference<T extends Structure> extends Memory implements Dis
 
 
 	/**
-	 * @return The array referenced by this object.
+	 * @param array The array into which the elements of this list are to be stored, if it
+	 *          is big enough; otherwise, a new array of the same runtime type is allocated
+	 *          for this purpose.
+	 * @return An array containing the data referenced by this object.
 	 */
 	public T[] getValues(T[] array)
 	{

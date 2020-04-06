@@ -27,7 +27,7 @@ import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
-import komposten.leapjna.leapc.util.ArrayByReference;
+import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.leapc.util.Configurations;
 import komposten.leapjna.util.LeapTypeMapper;
 
@@ -224,7 +224,7 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param pArray A pointer to an array that LeapC fills with the device list. Use
-	 *          {@link ArrayByReference#empty(Class, int)} with the appropriate array size
+	 *          {@link ArrayPointer#empty(Class, int)} with the appropriate array size
 	 *          to create the pointer.
 	 * @param pnArray On input, set to the number of elements in <code>pArray</code>; on
 	 *          output LeapC sets this to the number of valid device handles.
@@ -234,7 +234,7 @@ public interface LeapC extends Library
 	 *      API - LeapGetDeviceList</a>
 	 */
 	public eLeapRS LeapGetDeviceList(Pointer hConnection,
-			ArrayByReference<LEAP_DEVICE_REF> pArray, IntByReference pnArray);
+			ArrayPointer<LEAP_DEVICE_REF> pArray, IntByReference pnArray);
 
 
 	/**
