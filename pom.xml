@@ -15,26 +15,12 @@
 		<jgrapht.version>1.2.0</jgrapht.version>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
-    <dependency>
-      <groupId>net.java.dev.jna</groupId>
-      <artifactId>jna</artifactId>
-      <version>5.5.0</version>
-    </dependency>
-    
 		<dependency>
-			<groupId>com.github.komposten</groupId>
-			<artifactId>utilities</artifactId>
-			<version>master-SNAPSHOT</version>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>5.5.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>

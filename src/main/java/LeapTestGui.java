@@ -43,7 +43,6 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
-import komposten.utilities.logging.LogUtils;
 
 /*FIXME Check for memory leaks!
  *   We're currently releasing the native memory from the tracking events after
@@ -54,7 +53,6 @@ import komposten.utilities.logging.LogUtils;
  *   
  *   Might not be enough with just data.clear(). I still see the same pattern
  *   of occasionally climbing memory over long periods of times (15+ minutes).
- *   
  */
 
 
@@ -67,7 +65,6 @@ public class LeapTestGui extends JFrame
 
 	public LeapTestGui()
 	{
-		LogUtils.writeToFile("log.txt");
 		buildUi();
 		addKeyListener(new KeyAdapter()
 		{
