@@ -5,23 +5,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
-import com.sun.jna.ptr.ByReference;
 
 
-public class ArrayByReference<T extends Structure> extends ByReference
+public class ArrayByReference<T extends Structure> extends Memory
 {
 	private int elementSize;
 	private int size;
 	private Class<T> clazz;
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Structure> ArrayByReference<T> create(T structure,
-			int arraySize)
+	public ArrayByReference(T structure, int arraySize)
 	{
-		return new ArrayByReference<T>((Class<T>) structure.getClass(), structure.size(),
-				arraySize);
+		this((Class<T>) structure.getClass(), structure.size(), arraySize);
 	}
 
 
@@ -47,7 +45,7 @@ public class ArrayByReference<T extends Structure> extends ByReference
 	/**
 	 * @return The size of the array referenced by this object.
 	 */
-	public int getSize()
+	public int getArraySize()
 	{
 		return size;
 	}
@@ -59,16 +57,18 @@ public class ArrayByReference<T extends Structure> extends ByReference
 	 * @param index The array index of the element to update.
 	 * @param value The new value.
 	 * @throws ArrayIndexOutOfBoundsException If the index is negative or
-	 *           <code>>= </code>{@link #getSize()}.
+	 *           <code>>= </code>{@link #getArraySize()}.
 	 */
-	public void setElement(int index, float value)
+	public void setElement(int index, T value)
 	{
 		if (index < 0 || index >= size)
 		{
 			throw new ArrayIndexOutOfBoundsException(index);
 		}
 
-		getPointer().setFloat(index * 4, value);
+		byte[] buffer = new byte[elementSize];
+		value.getPointer().read(0, buffer, 0, elementSize);
+		write(index * elementSize, buffer, 0, elementSize);
 	}
 
 
@@ -78,7 +78,7 @@ public class ArrayByReference<T extends Structure> extends ByReference
 	 * @param offset The array index to copy the elements to.
 	 * @param values The new values.
 	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the offset plus
-	 *           the array size is larger than {@link #getSize()}.
+	 *           the array size is larger than {@link #getArraySize()}.
 	 */
 	public void setValues(int offset, T... values)
 	{
@@ -100,7 +100,7 @@ public class ArrayByReference<T extends Structure> extends ByReference
 		for (int i = 0; i < values.length; i++)
 		{
 			values[i].getPointer().read(0, buffer, 0, elementSize);
-			getPointer().write((offset + i) * elementSize, buffer, 0, elementSize);
+			write((offset + i) * elementSize, buffer, 0, elementSize);
 		}
 	}
 
@@ -109,9 +109,9 @@ public class ArrayByReference<T extends Structure> extends ByReference
 	 * @param index The index of the element to fetch.
 	 * @return The value at the specified index in the array referenced by this object.
 	 */
-	public float getElement(int index)
+	public T getElement(int index)
 	{
-		return getPointer().getFloat(index * 4);
+		return createInstance(share(index * elementSize));
 	}
 
 
@@ -124,7 +124,7 @@ public class ArrayByReference<T extends Structure> extends ByReference
 
 		for (int i = 0; i < size; i++)
 		{
-			list.add(createInstance(getPointer().share(i * elementSize)));
+			list.add(getElement(i));
 		}
 
 		return list.toArray(array);

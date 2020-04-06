@@ -296,7 +296,7 @@ public class LeapTestGui extends JFrame
 
 				ArrayByReference<LEAP_DEVICE_REF> pArray = ArrayByReference
 						.create(new LEAP_DEVICE_REF(), pnArray.getValue());
-				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray.getPointer(), pnArray);
+				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray, pnArray);
 
 				System.out.println(
 						Arrays.toString(pArray.getValues(new LEAP_DEVICE_REF[pnArray.getValue()])));
