@@ -10,7 +10,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 
-public class ArrayByReference<T extends Structure> extends Memory
+public class ArrayByReference<T extends Structure> extends Memory implements Disposable
 {
 	private int elementSize;
 	private int size;
@@ -204,5 +204,12 @@ public class ArrayByReference<T extends Structure> extends Memory
 					+ " instance!";
 			throw new LeapException(msg, e);
 		}
+	}
+
+
+	@Override
+	public synchronized void dispose()
+	{
+		super.dispose();
 	}
 }
