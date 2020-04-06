@@ -16,6 +16,18 @@ public class ArrayByReference<T extends Structure> extends Memory
 	private int size;
 	private Class<T> clazz;
 
+	/**
+	 * <p>
+	 * Creates a new <code>ArrayByReference</code> using the provided structure instance to
+	 * infer the array type and element size.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: All elements will be assumed to have the same size!
+	 * </p>
+	 * 
+	 * @param structure An instance of the type to store in the array.
+	 * @param arraySize The number of elements to allocate space for.
+	 */
 	@SuppressWarnings("unchecked")
 	public ArrayByReference(T structure, int arraySize)
 	{
@@ -23,6 +35,18 @@ public class ArrayByReference<T extends Structure> extends Memory
 	}
 
 
+	/**
+	 * <p>
+	 * Creates a new <code>ArrayByReference</code> based on the provided type.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: All elements will be assumed to have the same size!
+	 * </p>
+	 * 
+	 * @param clazz The type to store in the array.
+	 * @param elementSize The size, in bytes, each element needs.
+	 * @param arraySize The number of elements to allocate space for.
+	 */
 	public ArrayByReference(Class<T> clazz, int elementSize, int arraySize)
 	{
 		super(arraySize * elementSize);
@@ -32,11 +56,23 @@ public class ArrayByReference<T extends Structure> extends Memory
 	}
 
 
-	public ArrayByReference(Class<T> clazz, int elementSize, T... values)
+	/**
+	 * <p>
+	 * Creates a new <code>ArrayByReference</code> based on the provided data array.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: All elements will be assumed to have the same size!
+	 * </p>
+	 * 
+	 * @param values The values to base the array on. Must contain at least 1 value!
+	 * @throws ArrayIndexOutOfBoundsException If <code>values</code> is zero-length.
+	 */
+	@SuppressWarnings("unchecked")
+	public ArrayByReference(T[] values)
 	{
-		super(values.length * elementSize);
-		this.elementSize = elementSize;
-		this.clazz = clazz;
+		super(values.length * values[0].size());
+		this.elementSize = values[0].size();
+		this.clazz = (Class<T>) values[0].getClass();
 		size = values.length;
 		setValues(0, values);
 	}
@@ -80,7 +116,7 @@ public class ArrayByReference<T extends Structure> extends Memory
 	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the offset plus
 	 *           the array size is larger than {@link #getArraySize()}.
 	 */
-	public void setValues(int offset, T... values)
+	public void setValues(int offset, T[] values)
 	{
 		if (offset < 0)
 		{
