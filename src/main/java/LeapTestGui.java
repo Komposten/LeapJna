@@ -294,8 +294,8 @@ public class LeapTestGui extends JFrame
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, null, pnArray);
 				System.out.println("Device count: " + pnArray.getValue());
 
-				ArrayByReference<LEAP_DEVICE_REF> pArray = new ArrayByReference<>(
-						new LEAP_DEVICE_REF(), pnArray.getValue());
+				ArrayByReference<LEAP_DEVICE_REF> pArray = ArrayByReference
+						.empty(LEAP_DEVICE_REF.class, pnArray.getValue());
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray, pnArray);
 
 				System.out.println(

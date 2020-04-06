@@ -18,20 +18,49 @@ public class ArrayByReference<T extends Structure> extends Memory
 
 	/**
 	 * <p>
-	 * Creates a new <code>ArrayByReference</code> using the provided structure instance to
-	 * infer the array type and element size.
+	 * Creates an empty <code>ArrayByReference</code> based on the provided type and array
+	 * size.
 	 * </p>
 	 * <p>
-	 * <b>Note</b>: All elements will be assumed to have the same size!
+	 * <b>Note</b>: All elements will be assumed to have the same size, calculated using
+	 * {@link Structure#size()}!
 	 * </p>
 	 * 
-	 * @param structure An instance of the type to store in the array.
+	 * @param clazz The type to store in the array.
 	 * @param arraySize The number of elements to allocate space for.
 	 */
-	@SuppressWarnings("unchecked")
-	public ArrayByReference(T structure, int arraySize)
+	public static <T extends Structure> ArrayByReference<T> empty(Class<T> clazz,
+			int arraySize)
 	{
-		this((Class<T>) structure.getClass(), structure.size(), arraySize);
+		int elementSize = Structure.newInstance(clazz).size();
+		return new ArrayByReference<>(clazz, elementSize, arraySize);
+	}
+
+
+	/**
+	 * <p>
+	 * Creates an <code>ArrayByReference</code> based on the provided array.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: All elements will be assumed to have the same size, calculated using
+	 * {@link Structure#size()} on the first element in <code>values</code>!
+	 * </p>
+	 * 
+	 * @param values The elements to store in the array.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends Structure> ArrayByReference<T> fromArray(T[] values)
+	{
+		if (values.length < 0)
+		{
+			throw new IllegalArgumentException("elements must have at least one element!");
+		}
+
+		ArrayByReference<T> result = new ArrayByReference<T>((Class<T>) values[0].getClass(),
+				values[0].size(), values.length);
+		result.setValues(0, values);
+
+		return result;
 	}
 
 
@@ -47,34 +76,12 @@ public class ArrayByReference<T extends Structure> extends Memory
 	 * @param elementSize The size, in bytes, each element needs.
 	 * @param arraySize The number of elements to allocate space for.
 	 */
-	public ArrayByReference(Class<T> clazz, int elementSize, int arraySize)
+	private ArrayByReference(Class<T> clazz, int elementSize, int arraySize)
 	{
 		super(arraySize * elementSize);
 		this.elementSize = elementSize;
 		this.clazz = clazz;
 		size = arraySize;
-	}
-
-
-	/**
-	 * <p>
-	 * Creates a new <code>ArrayByReference</code> based on the provided data array.
-	 * </p>
-	 * <p>
-	 * <b>Note</b>: All elements will be assumed to have the same size!
-	 * </p>
-	 * 
-	 * @param values The values to base the array on. Must contain at least 1 value!
-	 * @throws ArrayIndexOutOfBoundsException If <code>values</code> is zero-length.
-	 */
-	@SuppressWarnings("unchecked")
-	public ArrayByReference(T[] values)
-	{
-		super(values.length * values[0].size());
-		this.elementSize = values[0].size();
-		this.clazz = (Class<T>) values[0].getClass();
-		size = values.length;
-		setValues(0, values);
 	}
 
 

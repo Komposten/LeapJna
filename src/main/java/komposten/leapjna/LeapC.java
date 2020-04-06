@@ -223,7 +223,9 @@ public interface LeapC extends Library
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
-	 * @param pArray A pointer to an array that LeapC fills with the device list.
+	 * @param pArray A pointer to an array that LeapC fills with the device list. Use
+	 *          {@link ArrayByReference#empty(Class, int)} with the appropriate array size
+	 *          to create the pointer.
 	 * @param pnArray On input, set to the number of elements in <code>pArray</code>; on
 	 *          output LeapC sets this to the number of valid device handles.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
