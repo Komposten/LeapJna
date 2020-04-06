@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.LeapC;
@@ -22,6 +23,7 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
+import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
@@ -43,6 +45,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.util.ArrayByReference;
 
 /*FIXME Check for memory leaks!
  *   We're currently releasing the native memory from the tracking events after
@@ -286,6 +289,17 @@ public class LeapTestGui extends JFrame
 				LEAP_DEVICE_EVENT deviceEvent = message.getDeviceEvent();
 				System.out.format("Device detected: %d | %s (%x)%n", deviceEvent.device.id,
 						Arrays.toString(deviceEvent.getStatus()), deviceEvent.status);
+
+				IntByReference pnArray = new IntByReference();
+				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, null, pnArray);
+				System.out.println("Device count: " + pnArray.getValue());
+
+				ArrayByReference<LEAP_DEVICE_REF> pArray = ArrayByReference
+						.create(new LEAP_DEVICE_REF(), pnArray.getValue());
+				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray.getPointer(), pnArray);
+
+				System.out.println(
+						Arrays.toString(pArray.getValues(new LEAP_DEVICE_REF[pnArray.getValue()])));
 
 				LEAP_DEVICE phDevice = new LEAP_DEVICE();
 				eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(deviceEvent.device, phDevice);

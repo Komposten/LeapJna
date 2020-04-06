@@ -27,6 +27,7 @@ import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.util.ArrayByReference;
 import komposten.leapjna.leapc.util.Configurations;
 import komposten.leapjna.util.LeapTypeMapper;
 
@@ -232,7 +233,7 @@ public interface LeapC extends Library
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga93640c45298cc4d756e4b51c890e0a68">LeapC
 	 *      API - LeapGetDeviceList</a>
 	 */
-	public eLeapRS LeapGetDeviceList(Pointer hConnection, LEAP_DEVICE_REF pArray,
+	public eLeapRS LeapGetDeviceList(Pointer hConnection, Pointer pArray,
 			IntByReference pnArray);
 
 
