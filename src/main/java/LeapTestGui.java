@@ -18,6 +18,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.data.LEAP_CLOCK_REBASER;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
@@ -132,8 +133,63 @@ public class LeapTestGui extends JFrame
 
 				// doInterpolateLoop(leapConnection);
 				doPollLoop(leapConnection);
+				// doRebaseTest(leapConnection);
 			}
 		}
+	}
+
+
+	private void doRebaseTest(LEAP_CONNECTION leapConnection)
+	{
+		// Initial poll to open the connection.
+		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+		LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
+
+		LEAP_CLOCK_REBASER rebaser = new LEAP_CLOCK_REBASER();
+		long userClock = System.nanoTime() / 1000;
+		long leapClock = LeapC.INSTANCE.LeapGetNow();
+		eLeapRS result = LeapC.INSTANCE.LeapCreateClockRebaser(rebaser);
+		System.out.format("User clock: %d, Leap clock: %d, Diff: %d%n", userClock, leapClock,
+				userClock - leapClock);
+
+		if (result != eLeapRS.Success)
+		{
+			System.out.println("Failed to create rebaser: " + result);
+			return;
+		}
+		result = LeapC.INSTANCE.LeapUpdateRebase(rebaser.handle, userClock, leapClock);
+		if (result != eLeapRS.Success)
+		{
+			System.out.println("Failed to update rebaser: " + result);
+			return;
+		}
+
+		try
+		{
+			Thread.sleep(250);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+
+		userClock = System.nanoTime() / 1000;
+		leapClock = LeapC.INSTANCE.LeapGetNow();
+		System.out.format("User clock: %d, Leap clock: %d, Diff: %d%n", userClock, leapClock,
+				userClock - leapClock);
+
+		LongByReference pLeapClock = new LongByReference();
+		result = LeapC.INSTANCE.LeapRebaseClock(rebaser.handle, userClock, pLeapClock);
+		if (result != eLeapRS.Success)
+		{
+			System.out.println("Failed to rebase clock: " + result);
+			return;
+		}
+
+		System.out.format("Rebased: %d, Leap clock: %d, Diff: %d%n", pLeapClock.getValue(),
+				leapClock, pLeapClock.getValue() - leapClock);
+
+		LeapC.INSTANCE.LeapDestroyClockRebaser(rebaser.handle);
 	}
 
 
@@ -294,8 +350,8 @@ public class LeapTestGui extends JFrame
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, null, pnArray);
 				System.out.println("Device count: " + pnArray.getValue());
 
-				ArrayPointer<LEAP_DEVICE_REF> pArray = ArrayPointer
-						.empty(LEAP_DEVICE_REF.class, pnArray.getValue());
+				ArrayPointer<LEAP_DEVICE_REF> pArray = ArrayPointer.empty(LEAP_DEVICE_REF.class,
+						pnArray.getValue());
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray, pnArray);
 
 				System.out.println(

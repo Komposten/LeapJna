@@ -9,6 +9,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
+import komposten.leapjna.leapc.data.LEAP_CLOCK_REBASER;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
@@ -224,8 +225,8 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param pArray A pointer to an array that LeapC fills with the device list. Use
-	 *          {@link ArrayPointer#empty(Class, int)} with the appropriate array size
-	 *          to create the pointer.
+	 *          {@link ArrayPointer#empty(Class, int)} with the appropriate array size to
+	 *          create the pointer.
 	 * @param pnArray On input, set to the number of elements in <code>pArray</code>; on
 	 *          output LeapC sets this to the number of valid device handles.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
@@ -570,4 +571,101 @@ public interface LeapC extends Library
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 */
 	public eLeapRS LeapSetAllocator(Pointer hConnection, LEAP_ALLOCATOR allocator);
+
+
+	/**
+	 * <p>
+	 * Initializes a new Leap clock-rebaser handle object.
+	 * </p>
+	 * <p>
+	 * Pass the filled-in {@link LEAP_CLOCK_REBASER} object to calls to
+	 * {@link #LeapUpdateRebase(LEAP_CLOCK_REBASER, long, long)},
+	 * {@link #LeapRebaseClock(LEAP_CLOCK_REBASER, long, LongByReference)}, and
+	 * {@link #LeapDestroyClockRebaser(Pointer)}.
+	 * </p>
+	 * 
+	 * @param phClockRebaser A pointer to the clock-rebaser object to be initialized.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga95c0d7e31b8337021c41f13d4ef6849b">LeapC
+	 *      API - LeapCreateClockRebaser</a>
+	 */
+	public eLeapRS LeapCreateClockRebaser(LEAP_CLOCK_REBASER phClockRebaser);
+
+
+	/**
+	 * <p>
+	 * Destroys a previously created clock-rebaser object.
+	 * </p>
+	 * <p>
+	 * This method destroys the specified clock-rebaser object, and releases all resources
+	 * associated with it.
+	 * </p>
+	 * 
+	 * @param hClockRebaser The handle to the clock-rebaser object to be destroyed. Use
+	 *          {@link LEAP_CLOCK_REBASER#handle} to obtain the handle from the clock
+	 *          rebaser object.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga4335f1588e9c1a3277f4c0815521956c">LeapC
+	 *      API - LeapDestroyClockRebaser</a>
+	 */
+	public void LeapDestroyClockRebaser(Pointer hClockRebaser);
+
+
+	/**
+	 * <p>
+	 * Computes the Leap Motion clock corresponding to a specified application clock value.
+	 * </p>
+	 * <p>
+	 * Use this function to translate your application clock to the Leap Motion clock when
+	 * interpolating frames. {@link #LeapUpdateRebase(LEAP_CLOCK_REBASER, long, long)} must
+	 * be called for every rendered frame for the relationship between the two clocks to
+	 * remain synchronised.
+	 * </p>
+	 * 
+	 * @param hClockRebaser The handle to a rebaser object created by
+	 *          {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)}. Use
+	 *          {@link LEAP_CLOCK_REBASER#handle} to obtain the handle from the clock
+	 *          rebaser object.
+	 * @param userClock The clock in microseconds referenced to the application clock.
+	 * @param pLeapClock The corresponding Leap Motion clock value.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gadd9e1af6480d7948b77ccf40fbca337a">LeapC
+	 *      API - LeapRebaseClock</a>
+	 */
+	public eLeapRS LeapRebaseClock(Pointer hClockRebaser, long userClock,
+			LongByReference pLeapClock);
+
+
+	/**
+	 * <p>
+	 * Updates the relationship between the Leap Motion clock and the user clock.
+	 * </p>
+	 * <p>
+	 * When using {@link #LeapInterpolateFrame(Pointer, long, LEAP_TRACKING_EVENT, long)},
+	 * call this function for every graphics frame rendered by your application. The
+	 * function should be called as close to the actual point of rendering as possible.
+	 * </p>
+	 * <p>
+	 * The relationship between the application clock and the Leap Motion clock is neither
+	 * fixed nor stable. Simulation restarts can cause user clock values to change
+	 * instantaneously. Certain systems simulate slow motion, or respond to heavy load, by
+	 * reducing the tick rate of the user clock. As a result, the
+	 * <code>LeapUpdateRebase()</code> function must be called for every rendered frame.
+	 * </p>
+	 * 
+	 * @param hClockRebaser The handle to a rebaser object created by
+	 *          {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)}. Use
+	 *          {@link LEAP_CLOCK_REBASER#handle} to obtain the handle from the clock
+	 *          rebaser object.
+	 * @param userClock A clock value supplied by the application, in microseconds, sampled
+	 *          at about the same time as {@link #LeapGetNow()} was sampled.
+	 * @param leapClock The Leap Motion clock value sampled by a call to
+	 *          {@link #LeapGetNow()}.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gac111f105a4b418e1f7ed08a1b74c8bca">LeapC
+	 *      API - LeapUpdateRebase</a>
+	 */
+	public eLeapRS LeapUpdateRebase(Pointer hClockRebaser, long userClock,
+			long leapClock);
 }
