@@ -37,4 +37,10 @@ public class LEAP_DEVICE_REF extends Structure
 	{
 		super(ALIGN_NONE);
 	}
+
+	public LEAP_DEVICE_REF(Pointer pointer)
+	{
+		super(pointer, ALIGN_NONE);
+		read();
+	}
 }
