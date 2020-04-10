@@ -14,11 +14,16 @@ import com.sun.jna.Structure;
  * <em>constant-size</em> {@link Structure}.
  * </p>
  * <p>
+ * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
+ * data. <br />
+ * Use {@link #setElement(int, Structure)} or {@link #setElements(int, Structure[])} to
+ * write data to the array.
+ * </p>
+ * <p>
  * In order for this class to work properly the structure class stored by this array must
  * have a public no-arg constructor, a public constructor taking a single Pointer as
  * argument, and a constant size.
  * </p>
- * 
  * 
  * @param <T> The structure type contained in the array.
  */
@@ -36,6 +41,12 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 * <p>
 	 * <b>Note</b>: All elements will be assumed to have the same size, calculated using
 	 * {@link Structure#size()}!
+	 * </p>
+	 * <p>
+	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
+	 * data. <br />
+	 * Use {@link #setElement(int, Structure)} or {@link #setElements(int, Structure[])} to
+	 * write data to the array.
 	 * </p>
 	 * 
 	 * @param clazz The type to store in the array.
@@ -59,6 +70,12 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 * <p>
 	 * <b>Note</b>: All elements will be assumed to have the same size, calculated using
 	 * {@link Structure#size()} on the first element in <code>values</code>!
+	 * </p>
+	 * <p>
+	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
+	 * data. <br />
+	 * Use {@link #setElement(int, Structure)} or {@link #setElements(int, Structure[])} to
+	 * write data to the array.
 	 * </p>
 	 * 
 	 * @param values The elements to store in the array.
