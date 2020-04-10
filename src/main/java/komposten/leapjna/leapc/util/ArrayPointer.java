@@ -1,6 +1,7 @@
 package komposten.leapjna.leapc.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.sun.jna.Memory;
@@ -39,6 +40,8 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 * 
 	 * @param clazz The type to store in the array.
 	 * @param arraySize The number of elements to allocate space for.
+	 * @throws IllegalArgumentException If the specified type has no public no-arg
+	 *           constructor, if its size is zero, or if its size cannot be determined.
 	 */
 	public static <T extends Structure> ArrayPointer<T> empty(Class<T> clazz, int arraySize)
 	{
@@ -49,7 +52,9 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 
 	/**
 	 * <p>
-	 * Creates an <code>ArrayByReference</code> based on the provided array.
+	 * Creates an <code>ArrayByReference</code> based on the provided array. The elements in
+	 * the provided array will be copied from native memory, so ensure that they have been
+	 * {@link Structure#write() written} before calling this method.
 	 * </p>
 	 * <p>
 	 * <b>Note</b>: All elements will be assumed to have the same size, calculated using
@@ -57,17 +62,34 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 * </p>
 	 * 
 	 * @param values The elements to store in the array.
+	 * @throws IllegalArgumentException If <code>values</code> is zero-length.
+	 * @throws NullPointerException If all of the elements in <code>values</code> is null.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Structure> ArrayPointer<T> fromArray(T[] values)
 	{
-		if (values.length < 0)
+		if (values.length < 1)
 		{
 			throw new IllegalArgumentException("elements must have at least one element!");
 		}
 
-		ArrayPointer<T> result = new ArrayPointer<T>((Class<T>) values[0].getClass(),
-				values[0].size(), values.length);
+		T nonNullValue = null;
+		for (T value : values)
+		{
+			if (value != null)
+			{
+				nonNullValue = value;
+				break;
+			}
+		}
+
+		if (nonNullValue == null)
+		{
+			throw new NullPointerException("At least one value in values must be non-null!");
+		}
+
+		ArrayPointer<T> result = new ArrayPointer<T>((Class<T>) nonNullValue.getClass(),
+				nonNullValue.size(), values.length);
 		result.setValues(0, values);
 
 		return result;
@@ -92,6 +114,10 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 		this.elementSize = elementSize;
 		this.clazz = clazz;
 		size = arraySize;
+
+		// Clear the memory to get rid of garbage data.
+		int memorySize = (int) size();
+		write(0, new byte[memorySize], 0, memorySize);
 	}
 
 
@@ -105,10 +131,12 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 
 
 	/**
-	 * Updates a single element in the array referenced by this object.
+	 * Updates a single element in the array referenced by this object. The element will be
+	 * copied from native memory, so ensure that it has been {@link Structure#write()
+	 * written} before calling this method.
 	 * 
 	 * @param index The array index of the element to update.
-	 * @param value The new value.
+	 * @param value The new value. May be <code>null</code>.
 	 * @throws ArrayIndexOutOfBoundsException If the index is negative or
 	 *           <code>>= </code>{@link #getArraySize()}.
 	 */
@@ -120,16 +148,23 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 		}
 
 		byte[] buffer = new byte[elementSize];
-		value.getPointer().read(0, buffer, 0, elementSize);
+
+		if (value != null)
+		{
+			value.getPointer().read(0, buffer, 0, elementSize);
+		}
+
 		write(index * elementSize, buffer, 0, elementSize);
 	}
 
 
 	/**
-	 * Copies the provided elements into the array referenced by this object.
+	 * Copies the provided elements into the array referenced by this object. The provided
+	 * elements will be copied from native memory, so ensure that they have been
+	 * {@link Structure#write() written} before calling this method.
 	 * 
 	 * @param offset The array index to copy the elements to.
-	 * @param values The new values.
+	 * @param values The new values. May contain <code>null</code> values.
 	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the offset plus
 	 *           the array size is larger than {@link #getArraySize()}.
 	 */
@@ -152,7 +187,11 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 		byte[] buffer = new byte[elementSize];
 		for (int i = 0; i < values.length; i++)
 		{
-			values[i].getPointer().read(0, buffer, 0, elementSize);
+			if (values[i] != null)
+				values[i].getPointer().read(0, buffer, 0, elementSize);
+			else
+				Arrays.fill(buffer, (byte) 0);
+
 			write((offset + i) * elementSize, buffer, 0, elementSize);
 		}
 	}
@@ -160,7 +199,10 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 
 	/**
 	 * @param index The index of the element to fetch.
-	 * @return The value at the specified index in the array referenced by this object.
+	 * @return The value at the specified index in the array referenced by this object. If
+	 *         the class <code>T</code> does not have a <code>T(Pointer)</code> constructor,
+	 *         you may need to manually call {@link Structure#read()} on the element before
+	 *         it contains its actual data.
 	 */
 	public T getElement(int index)
 	{
@@ -172,7 +214,10 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 * @param array The array into which the elements of this list are to be stored, if it
 	 *          is big enough; otherwise, a new array of the same runtime type is allocated
 	 *          for this purpose.
-	 * @return An array containing the data referenced by this object.
+	 * @return An array containing the data referenced by this object. If the class
+	 *         <code>T</code> does not have a <code>T(Pointer)</code> constructor, you may
+	 *         need to manually call {@link Structure#read()} on each element before it
+	 *         contains its actual data.
 	 */
 	public T[] getValues(T[] array)
 	{
@@ -180,7 +225,8 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 
 		for (int i = 0; i < size; i++)
 		{
-			list.add(getElement(i));
+			T element = getElement(i);
+			list.add(element);
 		}
 
 		return list.toArray(array);
