@@ -99,7 +99,7 @@ class ArrayPointerTest
 
 
 	@Test
-	void setElement_newElement_overwriteExisting()
+	void setElement_newValue_overwriteExisting()
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
 				.empty(StructureWithCtors.class, 2);
@@ -111,7 +111,7 @@ class ArrayPointerTest
 
 
 	@Test
-	void setElement_nullElement_clearExisting()
+	void setElement_nullValue_clearExisting()
 	{
 		StructureWithCtors[] values = new StructureWithCtors[] {
 				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
@@ -125,13 +125,13 @@ class ArrayPointerTest
 
 
 	@Test
-	void setValues_newValues_overwriteExisting()
+	void setElements_newValues_overwriteExisting()
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
 				.empty(StructureWithCtors.class, 4);
 
-		arrayPointer.setValues(1, new StructureWithCtors[] { new StructureWithCtors(7, 8, 9),
-				new StructureWithCtors(5, 4, 3) });
+		arrayPointer.setElements(1, new StructureWithCtors[] {
+				new StructureWithCtors(7, 8, 9), new StructureWithCtors(5, 4, 3) });
 		assertMemoryContains(arrayPointer, 0, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 20, 7, 8, 9);
 		assertMemoryContains(arrayPointer, 40, 5, 4, 3);
@@ -140,7 +140,7 @@ class ArrayPointerTest
 
 
 	@Test
-	void setValues_nullclearExisting()
+	void setElements_nullValues_clearExisting()
 	{
 		StructureWithCtors[] values = new StructureWithCtors[] {
 				new StructureWithCtors(1, 2, 3), new StructureWithCtors(3, 5, 6),
@@ -148,7 +148,7 @@ class ArrayPointerTest
 
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
 
-		arrayPointer.setValues(1, new StructureWithCtors[2]);
+		arrayPointer.setElements(1, new StructureWithCtors[2]);
 		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
 		assertMemoryContains(arrayPointer, 20, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 40, 0, 0, 0);
@@ -157,7 +157,7 @@ class ArrayPointerTest
 
 
 	@Test
-	void getValues_initialisedFromArray_correctValues()
+	void getElements_initialisedFromArray_correctValues()
 	{
 		StructureWithCtors[] inputValues = new StructureWithCtors[] {
 				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
@@ -165,7 +165,7 @@ class ArrayPointerTest
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(inputValues);
 
 		StructureWithCtors[] values = arrayPointer
-				.getValues(new StructureWithCtors[arrayPointer.getArraySize()]);
+				.getElements(new StructureWithCtors[arrayPointer.getArraySize()]);
 
 		assertThat(values).hasSize(2);
 		assertThat(values[0]).satisfies(value -> {
@@ -182,16 +182,16 @@ class ArrayPointerTest
 
 
 	@Test
-	void getValues_setWithSetValues_correctValues()
+	void getElements_setWithSetElements_correctValues()
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
 				.empty(StructureWithCtors.class, 4);
 
-		arrayPointer.setValues(1, new StructureWithCtors[] { new StructureWithCtors(1, 2, 3),
-				new StructureWithCtors(5, 4.5, 4) });
+		arrayPointer.setElements(1, new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) });
 
 		StructureWithCtors[] values = arrayPointer
-				.getValues(new StructureWithCtors[arrayPointer.getArraySize()]);
+				.getElements(new StructureWithCtors[arrayPointer.getArraySize()]);
 
 		assertThat(values).hasSize(4);
 		assertThat(values[0]).satisfies(value -> {
@@ -218,7 +218,7 @@ class ArrayPointerTest
 
 
 	@Test
-	void getValues_setWithSetElement_correctValues()
+	void getElements_setWithSetElement_correctValues()
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
 				.empty(StructureWithCtors.class, 3);
@@ -226,7 +226,7 @@ class ArrayPointerTest
 		arrayPointer.setElement(1, new StructureWithCtors(1, 2, 3));
 
 		StructureWithCtors[] values = arrayPointer
-				.getValues(new StructureWithCtors[arrayPointer.getArraySize()]);
+				.getElements(new StructureWithCtors[arrayPointer.getArraySize()]);
 
 		assertThat(values).hasSize(3);
 		assertThat(values[0]).satisfies(value -> {
@@ -248,7 +248,7 @@ class ArrayPointerTest
 
 
 	@Test
-	void getValues_structureWithoutPointerCtor_mustReadManually()
+	void getElements_structureWithoutPointerCtor_mustReadManually()
 	{
 		StructureNoPointerCtor[] inputValues = new StructureNoPointerCtor[] {
 				new StructureNoPointerCtor(1), new StructureNoPointerCtor(5) };
@@ -257,7 +257,7 @@ class ArrayPointerTest
 				.fromArray(inputValues);
 
 		StructureNoPointerCtor[] values = arrayPointer
-				.getValues(new StructureNoPointerCtor[arrayPointer.getArraySize()]);
+				.getElements(new StructureNoPointerCtor[arrayPointer.getArraySize()]);
 
 		assertThat(values).hasSize(2);
 

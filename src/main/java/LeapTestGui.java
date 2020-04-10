@@ -299,7 +299,7 @@ public class LeapTestGui extends JFrame
 				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray, pnArray);
 
 				System.out.println(
-						Arrays.toString(pArray.getValues(new LEAP_DEVICE_REF[pnArray.getValue()])));
+						Arrays.toString(pArray.getElements(new LEAP_DEVICE_REF[pnArray.getValue()])));
 
 				LEAP_DEVICE phDevice = new LEAP_DEVICE();
 				eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(deviceEvent.device, phDevice);

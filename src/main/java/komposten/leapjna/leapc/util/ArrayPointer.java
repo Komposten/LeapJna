@@ -90,7 +90,7 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 
 		ArrayPointer<T> result = new ArrayPointer<T>((Class<T>) nonNullValue.getClass(),
 				nonNullValue.size(), values.length);
-		result.setValues(0, values);
+		result.setElements(0, values);
 
 		return result;
 	}
@@ -164,11 +164,11 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 * {@link Structure#write() written} before calling this method.
 	 * 
 	 * @param offset The array index to copy the elements to.
-	 * @param values The new values. May contain <code>null</code> values.
+	 * @param values The new elements. May contain <code>null</code> values.
 	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the offset plus
 	 *           the array size is larger than {@link #getArraySize()}.
 	 */
-	public void setValues(int offset, T[] values)
+	public void setElements(int offset, T[] values)
 	{
 		if (offset < 0)
 		{
@@ -219,7 +219,7 @@ public class ArrayPointer<T extends Structure> extends Memory implements Disposa
 	 *         need to manually call {@link Structure#read()} on each element before it
 	 *         contains its actual data.
 	 */
-	public T[] getValues(T[] array)
+	public T[] getElements(T[] array)
 	{
 		List<T> list = new ArrayList<>(size);
 
