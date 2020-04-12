@@ -9,10 +9,26 @@ LeapJna is a library that provides Java bindings for the [Leap Motion](https://w
 * Read current frame time
 * Poll the device for events
 * Read full tracking data from tracking events
-* Frame interpolation
+* Interpolate tracking data
+* Convert between application time and Leap time.
+* Read images and image distortion matrices.
+* Change Leap service policies
+* Change Leap service configurations
+* Pause/resume tracking[*](#broken-api-features)
+* List devices and read device information
+* Read point mappings and head poses[**](#untested-api-features).
+* Convert between image pixels and 3D vectors.
 
 ### Untested API features
 * Device failure events
+* Point mappings (not sure what they are and how to enable them)
+* Head pose (not sure how to enable it)
+
+### Broken API features
+Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see,
+which means that they won't work as expected in LeapJna either.
+
+A list of such features can be found here: [Broken API Features](BROKEN_API_FEATURES.md).
 
 ## Using LeapJNA
 1. Add LeapJNA to your classpath.
