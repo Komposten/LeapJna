@@ -22,7 +22,15 @@ public class LEAP_VECTOR extends Structure
 	public float z;
 
 	public LEAP_VECTOR()
-	{}
+	{
+		super(ALIGN_NONE);
+	}
+
+
+	public LEAP_VECTOR(float x, float y, float z)
+	{
+		set(x, y, z);
+	}
 
 
 	public LEAP_VECTOR(Pointer pointer)
@@ -38,5 +46,27 @@ public class LEAP_VECTOR extends Structure
 	public float[] asArray()
 	{
 		return new float[] { x, y, z };
+	}
+
+
+	/**
+	 * Sets the values in this vector and writes them to native memory.
+	 */
+	public void set(float x, float y, float z)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+
+		write();
+	}
+
+
+	public static class ByValue extends LEAP_VECTOR implements Structure.ByValue
+	{
+		public ByValue()
+		{
+			super();
+		}
 	}
 }
