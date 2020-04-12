@@ -66,6 +66,9 @@ public class LeapTestGui extends JFrame
 	private static final float FRAME_TIME = 1000f / FRAME_RATE;
 	private RenderPanel renderPanel;
 	private Thread leapJnaThread;
+	private LEAP_CONNECTION leapConnection;
+
+	private boolean isPaused;
 
 	public LeapTestGui()
 	{
@@ -83,6 +86,10 @@ public class LeapTestGui extends JFrame
 				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 				{
 					terminate();
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_P)
+				{
+					requestPause();
 				}
 			}
 		});
@@ -116,7 +123,7 @@ public class LeapTestGui extends JFrame
 	{
 		printHeader("Creating connection");
 		renderPanel.setStage(RenderPanel.Stage.Connecting);
-		LEAP_CONNECTION leapConnection = new LEAP_CONNECTION();
+		leapConnection = new LEAP_CONNECTION();
 		eLeapRS result = LeapC.INSTANCE.LeapCreateConnection(null, leapConnection);
 
 		printStatus(leapConnection);
@@ -544,6 +551,22 @@ public class LeapTestGui extends JFrame
 		}
 		catch (InterruptedException e)
 		{
+		}
+	}
+
+
+	private void requestPause()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetPause(leapConnection.handle, isPaused ? 0 : 1);
+
+		if (result == eLeapRS.Success)
+		{
+			isPaused = !isPaused;
+			System.out.println(isPaused ? "Paused" : "Resumed");
+		}
+		else
+		{
+			System.out.println("Pause/resume failed: " + result);
 		}
 	}
 

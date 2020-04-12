@@ -447,6 +447,30 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Pauses the service.
+	 * </p>
+	 * <p>
+	 * Attempts to pause or unpause the service depending on the argument. This is treated
+	 * as a 'user pause', as though a user had requested a pause through the Leap Control
+	 * Panel. The connection must have the {@link eLeapPolicyFlag#AllowPauseResume} policy
+	 * set or it will fail with {@link eLeapRS#InvalidArgument}.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param pause Set to '<code>1</code>' to pause, or '<code>0</code>' to unpause
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab1da8139358849a062e1665e6edef2fb">LeapC
+	 *      API - LeapSetPause</a>
+	 */
+	public eLeapRS LeapSetPause(Pointer hConnection, int pause);
+
+
+	/**
+	 * <p>
 	 * Requests the current value of a service configuration setting.
 	 * </p>
 	 * <p>
@@ -631,6 +655,7 @@ public interface LeapC extends Library
 	 *          rebaser object.
 	 * @param userClock The clock in microseconds referenced to the application clock.
 	 * @param pLeapClock The corresponding Leap Motion clock value.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gadd9e1af6480d7948b77ccf40fbca337a">LeapC
 	 *      API - LeapRebaseClock</a>
@@ -664,6 +689,7 @@ public interface LeapC extends Library
 	 *          at about the same time as {@link #LeapGetNow()} was sampled.
 	 * @param leapClock The Leap Motion clock value sampled by a call to
 	 *          {@link #LeapGetNow()}.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gac111f105a4b418e1f7ed08a1b74c8bca">LeapC
 	 *      API - LeapUpdateRebase</a>
