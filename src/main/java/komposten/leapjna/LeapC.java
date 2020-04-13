@@ -359,11 +359,12 @@ public interface LeapC extends Library
 	 * minimum size of this buffer.
 	 * </p>
 	 * <p>
-	 * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
-	 * synchronize time measurements in the application with time measurements in the Leap
-	 * Motion service. This process is required to achieve accurate, smooth interpolation.
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Leap Motion service.
+	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
-	 * TODO Update method references when rebasing has been added.
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
@@ -390,12 +391,13 @@ public interface LeapC extends Library
 	 * measured frames.
 	 * </p>
 	 * <p>
-	 * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
-	 * synchronize time measurements in the application with time measurements in the Leap
-	 * Motion service. This process is required to achieve accurate, smooth interpolation.
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Leap Motion service.
+	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
-	 * TODO Test this to make sure everything is working. <br/>
-	 * TODO Update method references when rebasing has been added.
+	 * TODO Test this to make sure everything is working.
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
