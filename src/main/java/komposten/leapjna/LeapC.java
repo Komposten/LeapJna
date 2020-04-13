@@ -18,6 +18,7 @@ import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
+import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
@@ -772,4 +773,24 @@ public interface LeapC extends Library
 	 */
 	public LEAP_VECTOR.ByValue LeapRectilinearToPixel(Pointer hConnection, int camera,
 			LEAP_VECTOR rectilinear);
+
+
+	/**
+	 * <b>Note</b>: Telemetry profiling has documentation in neither the API reference nor
+	 * <code>leapc.h</code> in the SDK. It seems like <code>telemetryData</code> needs to be
+	 * pre-populated with information before passed into this method, but what that
+	 * information should be I don't know.
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param telemetryData A {@link LEAP_TELEMETRY_DATA} instance.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 */
+	public eLeapRS LeapTelemetryProfiling(Pointer hConnection,
+			LEAP_TELEMETRY_DATA telemetryData);
+
+
+	public long LeapTelemetryGetNow();
 }
