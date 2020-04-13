@@ -351,6 +351,45 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Constructs a frame at the specified timestamp by interpolating between a frame near
+	 * the timestamp and a frame near the sourceTimestamp.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapGetFrameSize(Pointer, long, LongByReference)} to calculate the
+	 * minimum size of this buffer.
+	 * </p>
+	 * <p>
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Leap Motion service.
+	 * This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param timestamp The timestamp to which to interpolate the frame data.
+	 * @param sourceTimestamp The timestamp of the beginning frame from which to interpolate
+	 *          the data.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapGetFrameSize</code> to get the required size,
+	 *          and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to create the
+	 *          struct and allocate memory.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gabb48588b94c0d66bd9291f3052170a89">LeapC
+	 *      API - LeapInterpolateFrameFromTime</a>
+	 */
+	public eLeapRS LeapInterpolateFrameFromTime(Pointer hConnection, long timestamp,
+			long sourceTimestamp, LEAP_TRACKING_EVENT pEvent, long ncbEvent);
+
+
+	/**
+	 * <p>
 	 * Constructs a frame at the specified timestamp by interpolating between measured
 	 * frames.
 	 * </p>
