@@ -41,7 +41,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * The event type. Use {@link #getType()} to get the type as a {@link eLeapEventType}
 	 * value.
 	 */
-	public short type;
+	public int type;
 
 	/**
 	 * <p>
@@ -59,12 +59,14 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	private eLeapEventType typeE;
 
 	public LEAP_CONNECTION_MESSAGE()
-	{}
+	{
+		super(ALIGN_NONE);
+	}
 
 
 	public LEAP_CONNECTION_MESSAGE(Pointer pointer)
 	{
-		super(pointer);
+		super(pointer, ALIGN_NONE);
 		read();
 	}
 

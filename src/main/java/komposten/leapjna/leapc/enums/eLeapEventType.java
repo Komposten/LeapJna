@@ -33,15 +33,15 @@ public enum eLeapEventType
 	LogEvents(0x10B),
 	HeadPose(0x10C);
 	
-	public final short value;
+	public final int value;
 
 	private eLeapEventType(int value)
 	{
-		this.value = (short)value;
+		this.value = value;
 	}
 	
 	
-	public static eLeapEventType parse(short value, eLeapEventType defaultValue)
+	public static eLeapEventType parse(int value, eLeapEventType defaultValue)
 	{
 		for (eLeapEventType o : eLeapEventType.values())
 		{
