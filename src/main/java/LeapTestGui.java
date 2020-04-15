@@ -527,6 +527,7 @@ public class LeapTestGui extends JFrame
 		LeapC.INSTANCE.LeapCloseConnection(leapConnection.handle);
 		printStatus(leapConnection);
 		LeapC.INSTANCE.LeapDestroyConnection(leapConnection.handle);
+		closeWindow();
 	}
 
 
@@ -587,7 +588,15 @@ public class LeapTestGui extends JFrame
 		{
 			leapJnaThread.interrupt();
 		}
+		else
+		{
+			closeWindow();
+		}
+	}
 
+
+	private void closeWindow()
+	{
 		setVisible(false);
 		dispose();
 	}
