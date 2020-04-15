@@ -283,7 +283,18 @@ public class LeapTestGui extends JFrame
 		while (true)
 		{
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-			LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
+			eLeapRS result = LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30,
+					message);
+
+			if (result != eLeapRS.Success)
+			{
+				System.out.format("Polling failed with result %s for event type %s%n",
+						result, message.getType());
+			}
+			else
+			{
+				System.out.format("Received event of type %s%n", message.getType());
+			}
 
 			if (firstIteration)
 			{
@@ -300,8 +311,7 @@ public class LeapTestGui extends JFrame
 				System.out.println("Images mode change request: " + pRequestID.getValue());
 
 				LongByReference pSize = new LongByReference();
-				eLeapRS result = LeapC.INSTANCE.LeapGetPointMappingSize(leapConnection.handle,
-						pSize);
+				result = LeapC.INSTANCE.LeapGetPointMappingSize(leapConnection.handle, pSize);
 				if (result == eLeapRS.Success)
 				{
 					System.out.println("Point mapping size: " + pSize.getValue());
@@ -365,7 +375,7 @@ public class LeapTestGui extends JFrame
 						Arrays.toString(pArray.getElements(new LEAP_DEVICE_REF[pnArray.getValue()])));
 
 				LEAP_DEVICE phDevice = new LEAP_DEVICE();
-				eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(deviceEvent.device, phDevice);
+				result = LeapC.INSTANCE.LeapOpenDevice(deviceEvent.device, phDevice);
 
 				if (result == eLeapRS.Success)
 				{
