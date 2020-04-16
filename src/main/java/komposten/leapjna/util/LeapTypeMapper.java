@@ -7,6 +7,5 @@ public class LeapTypeMapper extends DefaultTypeMapper
 	public LeapTypeMapper()
 	{
 		addTypeConverter(JnaEnum.class, new EnumConverter());
-		addTypeConverter(JnaShortEnum.class, new ShortEnumConverter());
 	}
 }
