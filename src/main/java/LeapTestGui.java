@@ -152,8 +152,8 @@ public class LeapTestGui extends JFrame
 				printHeader("Polling connection");
 
 				// doInterpolateLoop(leapConnection);
-				doReadRecording(leapConnection);
-				// doPollLoop(leapConnection);
+				// doReadRecording(leapConnection);
+				doPollLoop(leapConnection);
 				// doRebaseTest(leapConnection);
 			}
 		}
@@ -360,6 +360,7 @@ public class LeapTestGui extends JFrame
 		System.out.println("Closing connection!");
 		LeapC.INSTANCE.LeapCloseConnection(leapConnection.handle);
 		LeapC.INSTANCE.LeapDestroyConnection(leapConnection.handle);
+		leapJnaThread = null;
 	}
 
 
