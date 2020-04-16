@@ -18,6 +18,9 @@ import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
+import komposten.leapjna.leapc.data.LEAP_RECORDING;
+import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
+import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
@@ -25,6 +28,7 @@ import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPerspectiveType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
@@ -832,4 +836,124 @@ public interface LeapC extends Library
 
 
 	public long LeapTelemetryGetNow();
+
+
+	/**
+	 * <p>
+	 * Opens or creates a {@link LEAP_RECORDING}.
+	 * </p>
+	 * <p>
+	 * Pass the {@link LEAP_RECORDING} pointer to <code>LeapRecordingOpen()</code> to
+	 * initiate reading from or writing to a recording. The recording path is relative to
+	 * the "user path" which is the SD card on Android.
+	 * </p>
+	 * 
+	 * @param ppRecording The recording being opened.
+	 * @param filePath The file path. This will be passed directly to the OS without
+	 *          modification. An ".lmt" suffix is suggested.
+	 * @param params The {@link LEAP_RECORDING_PARAMETERS} describing what operations are
+	 *          requested.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga483c11c1bc9a91467f14d188e7055cb9">LeapC
+	 *      API - LeapRecordingOpen</a>
+	 */
+	public eLeapRS LeapRecordingOpen(LEAP_RECORDING ppRecording, String filePath,
+			LEAP_RECORDING_PARAMETERS.ByValue params);
+
+
+	/**
+	 * Writes a tracking frame to a {@link LEAP_RECORDING} file.
+	 * 
+	 * @param pRecording The recording being written to. Use {@link LEAP_RECORDING#handle}
+	 *          to obtain the handle from the recording object.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with the frame data to write.
+	 * @param pnBytesWritten If non-null the number of bytes written.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gadeddce2276e9e01bae39ac30df910083">LeapC
+	 *      API - LeapRecordingWrite</a>
+	 */
+	public eLeapRS LeapRecordingWrite(Pointer pRecording, LEAP_TRACKING_EVENT pEvent,
+			LongByReference pnBytesWritten);
+
+
+	/**
+	 * <p>
+	 * Fills in a {@link LEAP_RECORDING_STATUS} struct for an open recording.
+	 * </p>
+	 * <p>
+	 * This struct provides the applicable {@link eLeapRecordingFlags}.
+	 * </p>
+	 * 
+	 * @param pRecording The open recording. Use {@link LEAP_RECORDING#handle} to obtain the
+	 *          handle from the recording object.
+	 * @param pStatus A {@link LEAP_RECORDING_STATUS} struct to receive the recording
+	 *          status.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga2065c14a97c2dc184904f14fe2dee39e">LeapC
+	 *      API - LeapRecordingGetStatus</a>
+	 */
+	public eLeapRS LeapRecordingGetStatus(Pointer pRecording,
+			LEAP_RECORDING_STATUS pStatus);
+
+
+	/**
+	 * <p>
+	 * Reads a tracking frame from a {@link LEAP_RECORDING} file.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapRecordingReadSize(Pointer, LongByReference)} to calculate the
+	 * minimum size of this buffer.
+	 * </p>
+	 * 
+	 * @param pRecording The recording being read from. Use {@link LEAP_RECORDING#handle} to
+	 *          obtain the handle from the recording object.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapRecordingReadSize</code> to get the required
+	 *          size, and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to
+	 *          create the struct and allocate memory.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gae199628d40e996fc6586559b74e8aeb4">LeapC
+	 *      API - LeapRecordingRead</a>
+	 */
+	public eLeapRS LeapRecordingRead(Pointer pRecording, LEAP_TRACKING_EVENT pEvent,
+			long ncbEvent);
+
+
+	/**
+	 * <p>
+	 * Retrieves the number of bytes required to allocate the next frame in a recording.
+	 * </p>
+	 * <p>
+	 * Use this function to determine the size of the buffer to allocate before calling
+	 * {@link #LeapRecordingRead(Pointer, LEAP_TRACKING_EVENT, long)}.
+	 * </p>
+	 * 
+	 * @param hConnection The recording being read from. Use {@link LEAP_RECORDING#handle}
+	 *          to obtain the handle from the recording object.
+	 * @param pncbEvent A pointer that receives the number of bytes required to store the
+	 *          next frame.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga73bde2a17dd2d8714546a2a41e18fe01">LeapC
+	 *      API - LeapRecordingReadSize</a>
+	 */
+	public eLeapRS LeapRecordingReadSize(Pointer pRecording, LongByReference pncbEvent);
+
+
+	/**
+	 * Closes a {@link LEAP_RECORDING}.
+	 * 
+	 * @param ppRecording The recording being closed. Will modify *ppRecording to be null.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gaba62f3b921e087f034dc7b44cd3f2939">LeapC
+	 *      API - LeapRecordingClose</a>
+	 */
+	public eLeapRS LeapRecordingClose(LEAP_RECORDING ppRecording);
 }

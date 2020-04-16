@@ -29,12 +29,16 @@ import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
+import komposten.leapjna.leapc.data.LEAP_RECORDING;
+import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
+import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
@@ -69,6 +73,7 @@ public class LeapTestGui extends JFrame
 	private LEAP_CONNECTION leapConnection;
 
 	private boolean isPaused;
+	private LEAP_RECORDING recording;
 
 	public LeapTestGui()
 	{
@@ -90,6 +95,14 @@ public class LeapTestGui extends JFrame
 				else if (e.getKeyCode() == KeyEvent.VK_P)
 				{
 					requestPause();
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_R)
+				{
+					requestRecording();
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_S && recording != null)
+				{
+					requestRecordingStatus();
 				}
 			}
 		});
@@ -139,7 +152,8 @@ public class LeapTestGui extends JFrame
 				printHeader("Polling connection");
 
 				// doInterpolateLoop(leapConnection);
-				doPollLoop(leapConnection);
+				doReadRecording(leapConnection);
+				// doPollLoop(leapConnection);
 				// doRebaseTest(leapConnection);
 			}
 		}
@@ -269,6 +283,86 @@ public class LeapTestGui extends JFrame
 	}
 
 
+	private void doReadRecording(LEAP_CONNECTION leapConnection)
+	{
+		// Poll once to open the connection.
+		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+		LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
+
+		// Open the recording.
+		LEAP_RECORDING ppRecording = new LEAP_RECORDING();
+		String filePath = "recording.lmt";
+		LEAP_RECORDING_PARAMETERS.ByValue params = new LEAP_RECORDING_PARAMETERS.ByValue(
+				eLeapRecordingFlags.Reading);
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(ppRecording, filePath, params);
+
+		if (result == eLeapRS.Success)
+		{
+			while (true)
+			{
+				double deltaTime = System.nanoTime();
+				LongByReference pFrameSize = new LongByReference();
+
+				// Get an interpolated frame at a certain rate.
+				result = LeapC.INSTANCE.LeapRecordingReadSize(ppRecording.handle, pFrameSize);
+
+				if (result == eLeapRS.Success)
+				{
+					LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT(
+							(int) pFrameSize.getValue());
+					result = LeapC.INSTANCE.LeapRecordingRead(ppRecording.handle, pEvent,
+							pFrameSize.getValue());
+
+					if (result == eLeapRS.Success)
+					{
+						renderPanel.setFrameData(pEvent);
+					}
+					else
+					{
+						System.out.println("Failed to read frame: " + result);
+						break;
+					}
+				}
+				else
+				{
+					System.out.println("Failed to get frame size: " + result);
+					break;
+				}
+
+				deltaTime = (System.nanoTime() - deltaTime) / 1E6;
+
+				try
+				{
+					int sleepTime = (int) (FRAME_TIME - deltaTime);
+					if (sleepTime < 0)
+						sleepTime = 0;
+					Thread.sleep(sleepTime);
+				}
+				catch (InterruptedException e)
+				{
+					Thread.currentThread().interrupt();
+				}
+
+				if (Thread.interrupted())
+				{
+					break;
+				}
+			}
+
+			System.out.println("Closing recording!");
+			LeapC.INSTANCE.LeapRecordingClose(ppRecording);
+		}
+		else
+		{
+			System.out.println("Failed to open recording: " + result);
+		}
+
+		System.out.println("Closing connection!");
+		LeapC.INSTANCE.LeapCloseConnection(leapConnection.handle);
+		LeapC.INSTANCE.LeapDestroyConnection(leapConnection.handle);
+	}
+
+
 	private void doPollLoop(LEAP_CONNECTION leapConnection)
 	{
 		double trackingTimer = 0;
@@ -288,12 +382,12 @@ public class LeapTestGui extends JFrame
 
 			if (result != eLeapRS.Success)
 			{
-				System.out.format("Polling failed with result %s for event type %s%n",
-						result, message.getType());
+				System.out.format("Polling failed with result %s for event type %s%n", result,
+						message.getType());
 			}
 			else
 			{
-				System.out.format("Received event of type %s%n", message.getType());
+				// System.out.format("Received event of type %s%n", message.getType());
 			}
 
 			if (firstIteration)
@@ -494,7 +588,14 @@ public class LeapTestGui extends JFrame
 
 			if (trackingTimer > FRAME_TIME && message.type == eLeapEventType.Tracking.value)
 			{
-				renderPanel.setFrameData(message.getTrackingEvent());
+				LEAP_TRACKING_EVENT trackingEvent = message.getTrackingEvent();
+				if (recording != null)
+				{
+					result = LeapC.INSTANCE.LeapRecordingWrite(recording.handle, trackingEvent,
+							null);
+				}
+
+				renderPanel.setFrameData(trackingEvent);
 
 				trackingTimer = 0;
 				framerate++;
@@ -578,6 +679,61 @@ public class LeapTestGui extends JFrame
 		else
 		{
 			System.out.println("Pause/resume failed: " + result);
+		}
+	}
+
+
+	private void requestRecording()
+	{
+		if (recording == null)
+		{
+			recording = new LEAP_RECORDING();
+			LEAP_RECORDING_PARAMETERS.ByValue params = new LEAP_RECORDING_PARAMETERS.ByValue(
+					eLeapRecordingFlags.Writing);
+			String filePath = "recording_" + System.currentTimeMillis() + ".lmt";
+
+			eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(recording, filePath, params);
+
+			if (result != eLeapRS.Success)
+			{
+				recording = null;
+				System.out.println("Failed to start recording: " + result);
+			}
+			else
+			{
+				System.out.println("Recording to " + filePath);
+			}
+		}
+		else
+		{
+			eLeapRS result = LeapC.INSTANCE.LeapRecordingClose(recording);
+
+			if (result != eLeapRS.Success)
+			{
+				System.out.println("Failed to close recording: " + result);
+			}
+			else
+			{
+				System.out.println("Stopped recording!");
+				recording = null;
+			}
+		}
+	}
+
+
+	private void requestRecordingStatus()
+	{
+		LEAP_RECORDING_STATUS pStatus = new LEAP_RECORDING_STATUS();
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingGetStatus(recording.handle, pStatus);
+
+		if (result != eLeapRS.Success)
+		{
+			System.out.println("Failed to get recording status: " + result);
+		}
+		else
+		{
+			System.out
+					.println("Status of current recording: " + Arrays.toString(pStatus.getMode()));
 		}
 	}
 
