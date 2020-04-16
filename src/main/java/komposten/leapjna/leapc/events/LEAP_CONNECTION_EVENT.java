@@ -21,8 +21,8 @@ import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 {
 	/**
-	 * A combination of {@link eLeapServiceDisposition} flags. Use {@link #getFlags()} to get
-	 * the type as a {@link eLeapServiceDisposition} value.
+	 * A combination of {@link eLeapServiceDisposition} flags. Use {@link #getFlags()} to
+	 * get the type as a {@link eLeapServiceDisposition} value.
 	 */
 	public int flags;
 
@@ -43,7 +43,7 @@ public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 	{
 		if (flagsE == null)
 		{
-			flagsE = eLeapServiceDisposition.parse((int) flags, eLeapServiceDisposition.None);
+			flagsE = eLeapServiceDisposition.parse(flags, eLeapServiceDisposition.None);
 		}
 
 		return flagsE;

@@ -52,18 +52,6 @@ import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
 
-/*FIXME Check for memory leaks!
- *   We're currently releasing the native memory from the tracking events after
- *   Passing the data to the render panel.
- *
- *   Should probably mention that this might be needed in the docs for 
- *   LEAP_CONNECTION_MESSAGE. But verify that it is needed first!
- *   
- *   Might not be enough with just data.clear(). I still see the same pattern
- *   of occasionally climbing memory over long periods of times (15+ minutes).
- */
-
-
 public class LeapTestGui extends JFrame
 {
 	private static final int FRAME_RATE = 60;
@@ -791,7 +779,6 @@ class RenderPanel extends JPanel
 	{
 		this.data = data;
 		repaint();
-		data.clear();
 	}
 
 
@@ -800,7 +787,6 @@ class RenderPanel extends JPanel
 		this.image = data.image[0];
 		createTexture(image);
 		SwingUtilities.invokeLater(this::repaint);
-		data.clear();
 	}
 
 
