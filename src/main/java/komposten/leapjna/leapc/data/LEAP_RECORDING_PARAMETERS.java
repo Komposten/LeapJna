@@ -3,6 +3,7 @@ package komposten.leapjna.leapc.data;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 
@@ -34,18 +35,18 @@ public class LEAP_RECORDING_PARAMETERS extends Structure
 	public int mode;
 
 	private eLeapRecordingFlags[] modeE;
-	
-	
+
+
 	public LEAP_RECORDING_PARAMETERS()
 	{}
-	
-	
+
+
 	public LEAP_RECORDING_PARAMETERS(eLeapRecordingFlags... flags)
 	{
 		mode = eLeapRecordingFlags.createMask(flags);
 		write();
 	}
-	
+
 
 	/**
 	 * @return The mode flags as an {@link eLeapDeviceStatus} array instead of an
@@ -55,14 +56,15 @@ public class LEAP_RECORDING_PARAMETERS extends Structure
 	{
 		if (modeE == null)
 		{
-			modeE = eLeapRecordingFlags.parseMask(mode);
+			modeE = Enums.parseMask(mode, eLeapRecordingFlags.class);
 		}
 
 		return modeE;
 	}
-	
-	
-	public static class ByValue extends LEAP_RECORDING_PARAMETERS implements Structure.ByValue
+
+
+	public static class ByValue extends LEAP_RECORDING_PARAMETERS
+			implements Structure.ByValue
 	{
 		public ByValue(eLeapRecordingFlags... flags)
 		{

@@ -3,6 +3,8 @@ package komposten.leapjna.leapc.enums;
 import java.util.ArrayList;
 import java.util.List;
 
+import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
+
 
 /**
  * The device status codes.
@@ -11,7 +13,7 @@ import java.util.List;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga1d2b70b83923751202242cbfcf56072b">LeapC
  *      API - eLeapDeviceStatus</a>
  */
-public enum eLeapDeviceStatus
+public enum eLeapDeviceStatus implements IntFlagEnum<eLeapDeviceStatus>
 {
 	None(0x0),
 
@@ -61,7 +63,29 @@ public enum eLeapDeviceStatus
 	}
 
 
-	public static eLeapDeviceStatus[] parseMask(int mask)
+	@Override
+	public int getValue()
+	{
+		return value;
+	}
+
+
+	@Override
+	public eLeapDeviceStatus getEmptyMaskConstant()
+	{
+		return None;
+	}
+
+
+	@Override
+	public boolean useDefaultParseMask()
+	{
+		return false;
+	}
+
+
+	@Override
+	public eLeapDeviceStatus[] parseMask(int mask)
 	{
 		List<eLeapDeviceStatus> flags = new ArrayList<>();
 
@@ -102,12 +126,6 @@ public enum eLeapDeviceStatus
 
 	public static int createMask(eLeapDeviceStatus... flags)
 	{
-		int mask = 0;
-		for (eLeapDeviceStatus flag : flags)
-		{
-			mask |= flag.value;
-		}
-
-		return mask;
+		return Enums.createMask(flags);
 	}
 }

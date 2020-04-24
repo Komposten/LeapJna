@@ -1,12 +1,10 @@
 package komposten.leapjna.leapc.enums;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.data.LEAP_RECORDING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
-import komposten.leapjna.leapc.data.LEAP_RECORDING;
+import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
 
 
 /**
@@ -24,7 +22,7 @@ import komposten.leapjna.leapc.data.LEAP_RECORDING;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga7f321cfd29f8d1b74589cde5dfb3a1ed">LeapC
  *      API - eLeapRecordingFlags</a>
  */
-public enum eLeapRecordingFlags
+public enum eLeapRecordingFlags implements IntFlagEnum<eLeapRecordingFlags>
 {
 	Error(0x00000000), Reading(0x00000001), Writing(0x00000002), Flushing(
 			0x00000004), Compressed(0x00000008);
@@ -37,37 +35,22 @@ public enum eLeapRecordingFlags
 	}
 
 
-	public static eLeapRecordingFlags[] parseMask(int mask)
+	@Override
+	public int getValue()
 	{
-		List<eLeapRecordingFlags> flags = new ArrayList<>();
+		return value;
+	}
 
-		for (eLeapRecordingFlags o : eLeapRecordingFlags.values())
-		{
-			if ((mask & o.value) == o.value && o != Error)
-			{
-				flags.add(o);
-			}
-		}
 
-		if (flags.isEmpty())
-		{
-			return new eLeapRecordingFlags[] { Error };
-		}
-		else
-		{
-			return flags.toArray(new eLeapRecordingFlags[flags.size()]);
-		}
+	@Override
+	public eLeapRecordingFlags getEmptyMaskConstant()
+	{
+		return Error;
 	}
 
 
 	public static int createMask(eLeapRecordingFlags... flags)
 	{
-		int mask = 0;
-		for (eLeapRecordingFlags flag : flags)
-		{
-			mask |= flag.value;
-		}
-
-		return mask;
+		return Enums.createMask(flags);
 	}
 }

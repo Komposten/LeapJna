@@ -5,6 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 
 
@@ -56,7 +57,7 @@ public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
 	{
 		if (severityE == null)
 		{
-			severityE = eLeapLogSeverity.parse(severity, eLeapLogSeverity.Unknown);
+			severityE = Enums.parse(severity, eLeapLogSeverity.Unknown);
 		}
 		return severityE;
 	}

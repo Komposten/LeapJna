@@ -4,6 +4,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.Union;
 
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapValueType;
 
 
@@ -32,8 +33,7 @@ public class LEAP_VARIANT extends Structure
 		public String strValue;
 
 		public ValueUnion()
-		{
-		}
+		{}
 
 
 		private ValueUnion(boolean value)
@@ -85,8 +85,8 @@ public class LEAP_VARIANT extends Structure
 	{
 		super(ALIGN_NONE);
 	}
-	
-	
+
+
 	@Override
 	public void read()
 	{
@@ -133,7 +133,7 @@ public class LEAP_VARIANT extends Structure
 	{
 		if (typeE == null)
 		{
-			typeE = eLeapValueType.parse(type, eLeapValueType.Unknown);
+			typeE = Enums.parse(type, eLeapValueType.Unknown);
 		}
 
 		return typeE;

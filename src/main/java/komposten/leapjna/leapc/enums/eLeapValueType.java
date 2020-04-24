@@ -1,6 +1,8 @@
 package komposten.leapjna.leapc.enums;
 
-public enum eLeapValueType
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+public enum eLeapValueType implements IntEnum
 {
 	/** The type is unknown (which is an abnormal condition). */
 	Unknown(0),
@@ -15,18 +17,11 @@ public enum eLeapValueType
 	{
 		this.value = value;
 	}
-
-
-	public static eLeapValueType parse(int value, eLeapValueType defaultValue)
+	
+	
+	@Override
+	public int getValue()
 	{
-		for (eLeapValueType o : eLeapValueType.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

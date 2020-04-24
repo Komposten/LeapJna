@@ -5,6 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 
@@ -46,7 +47,7 @@ public class LEAP_RECORDING_STATUS extends Structure
 	{
 		if (modeE == null)
 		{
-			modeE = eLeapRecordingFlags.parseMask(mode);
+			modeE = Enums.parseMask(mode, eLeapRecordingFlags.class);
 		}
 
 		return modeE;

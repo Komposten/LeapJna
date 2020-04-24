@@ -6,6 +6,7 @@ import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 
 
@@ -51,7 +52,7 @@ public class LEAP_POLICY_EVENT extends Structure implements LEAP_EVENT
 	{
 		if (policyE == null)
 		{
-			policyE = eLeapPolicyFlag.parseMask(current_policy);
+			policyE = Enums.parseMask(current_policy, eLeapPolicyFlag.class);
 		}
 
 		return policyE;

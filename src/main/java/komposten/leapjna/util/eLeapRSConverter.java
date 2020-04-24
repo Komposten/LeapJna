@@ -4,36 +4,33 @@ import com.sun.jna.FromNativeContext;
 import com.sun.jna.ToNativeContext;
 import com.sun.jna.TypeConverter;
 
-public class EnumConverter implements TypeConverter
-{
+import komposten.leapjna.leapc.enums.Enums;
+import komposten.leapjna.leapc.enums.eLeapRS;
 
+public class eLeapRSConverter implements TypeConverter
+{
 	@Override
 	public Object fromNative(Object nativeValue, FromNativeContext context)
 	{
 		Integer value = (Integer)nativeValue;
 		Class<?> targetClass = context.getTargetType();
 		
-		if (!JnaEnum.class.isAssignableFrom(targetClass)) {
+		if (!eLeapRS.class.isAssignableFrom(targetClass)) {
 			return null;
 		}
-		Object[] enums = targetClass.getEnumConstants();
-		if (enums.length == 0) {
-			throw new RuntimeException("Could not convert type; no valid values assigned!");
-		}
-
-		JnaEnum<?> instance = (JnaEnum<?>) enums[0];
-		return instance.getForValue(value);
+		
+		return Enums.parse(value, eLeapRS.Unknown);
 	}
 
 
 	@Override
 	public Object toNative(Object value, ToNativeContext context)
 	{
-		JnaEnum<?> enumValue = (JnaEnum<?>) value;
+		eLeapRS enumValue = (eLeapRS) value;
 		
 		if (enumValue == null)
 			return null;
-		return enumValue.getIntValue();
+		return enumValue.getValue();
 	}
 
 	

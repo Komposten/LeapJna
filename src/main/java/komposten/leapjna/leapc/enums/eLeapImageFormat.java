@@ -1,5 +1,7 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
 /**
  * Image formats.
  * 
@@ -7,7 +9,7 @@ package komposten.leapjna.leapc.enums;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga88575674641d03abef07b3a6712c0e95">LeapC
  *      API - eLeapImageFormat</a>
  */
-public enum eLeapImageFormat
+public enum eLeapImageFormat implements IntEnum
 {
 	/** An invalid or unknown format. */
 	Unknown(0),
@@ -24,18 +26,11 @@ public enum eLeapImageFormat
 	{
 		this.value = value;
 	}
-
-
-	public static eLeapImageFormat parse(int value, eLeapImageFormat defaultValue)
+	
+	
+	@Override
+	public int getValue()
 	{
-		for (eLeapImageFormat o : eLeapImageFormat.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

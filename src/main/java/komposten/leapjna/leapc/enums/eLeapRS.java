@@ -1,6 +1,6 @@
 package komposten.leapjna.leapc.enums;
 
-import komposten.leapjna.util.JnaEnum;
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 
 /**
@@ -10,8 +10,13 @@ import komposten.leapjna.util.JnaEnum;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e">LeapC
  *      API - eLeapRS</a>
  */
-public enum eLeapRS implements JnaEnum<eLeapRS>
+public enum eLeapRS implements IntEnum
 {
+	/**
+	 * Indicates that an unknown result code, i.e. one which doesn't match any of the
+	 * constants, was encountered.
+	 */
+	Unknown(-1),
 	Success(0),
 	UnknownError(0xE2010000),
 	InvalidArgument(0xE2010001),
@@ -42,23 +47,8 @@ public enum eLeapRS implements JnaEnum<eLeapRS>
 
 
 	@Override
-	public int getIntValue()
+	public int getValue()
 	{
 		return value;
-	}
-
-
-	@Override
-	public eLeapRS getForValue(int value)
-	{
-		for (eLeapRS o : eLeapRS.values())
-		{
-			if (o.getIntValue() == value)
-			{
-				return o;
-			}
-		}
-
-		return null;
 	}
 }

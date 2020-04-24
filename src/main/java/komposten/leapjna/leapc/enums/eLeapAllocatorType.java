@@ -1,5 +1,8 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+
 /**
  * Defines the various types of data that may be allocated using the allocator.
  * 
@@ -7,10 +10,10 @@ package komposten.leapjna.leapc.enums;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga4ef8bec6852369fbf3dcd97906d0a9fa">LeapC
  *      API - eLeapAllocatorType</a>
  */
-public enum eLeapAllocatorType
+public enum eLeapAllocatorType implements IntEnum
 {
 	Unknown(-1),
-	
+
 	/** Signed 8-bit integer (char) */
 	Int8(0),
 
@@ -49,16 +52,9 @@ public enum eLeapAllocatorType
 	}
 
 
-	public static eLeapAllocatorType parse(int value, eLeapAllocatorType defaultValue)
+	@Override
+	public int getValue()
 	{
-		for (eLeapAllocatorType o : eLeapAllocatorType.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

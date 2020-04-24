@@ -6,6 +6,7 @@ import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 
 
@@ -43,7 +44,7 @@ public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 	{
 		if (flagsE == null)
 		{
-			flagsE = eLeapServiceDisposition.parse(flags, eLeapServiceDisposition.None);
+			flagsE = Enums.parse(flags, eLeapServiceDisposition.None);
 		}
 
 		return flagsE;

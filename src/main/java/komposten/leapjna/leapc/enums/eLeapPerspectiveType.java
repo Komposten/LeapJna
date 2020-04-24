@@ -1,5 +1,8 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+
 /**
  * Camera perspective types.
  * 
@@ -7,7 +10,7 @@ package komposten.leapjna.leapc.enums;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga2bbde1c3af778eba35f0b1a8cf1338c2">LeapC
  *      API - eLeapPerspectiveType</a>
  */
-public enum eLeapPerspectiveType
+public enum eLeapPerspectiveType implements IntEnum
 {
 	/** An unknown or invalid type. */
 	Invalid(0),
@@ -29,16 +32,9 @@ public enum eLeapPerspectiveType
 	}
 
 
-	public static eLeapPerspectiveType parse(int value, eLeapPerspectiveType defaultValue)
+	@Override
+	public int getValue()
 	{
-		for (eLeapPerspectiveType o : eLeapPerspectiveType.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

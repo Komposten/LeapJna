@@ -1,5 +1,8 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+
 /**
  * Device hardware types.
  * 
@@ -7,7 +10,7 @@ package komposten.leapjna.leapc.enums;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga5ed369865afe29bdadc65c450eb44c75">LeapC
  *      API - eLeapDevicePID</a>
  */
-public enum eLeapDevicePID
+public enum eLeapDevicePID implements IntEnum
 {
 	/** An unknown device. */
 	Unknown(0x0000),
@@ -35,16 +38,9 @@ public enum eLeapDevicePID
 	}
 
 
-	public static eLeapDevicePID parse(int value, eLeapDevicePID defaultValue)
+	@Override
+	public int getValue()
 	{
-		for (eLeapDevicePID o : eLeapDevicePID.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

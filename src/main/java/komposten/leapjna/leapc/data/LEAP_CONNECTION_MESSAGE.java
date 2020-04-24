@@ -6,6 +6,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
@@ -23,6 +24,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+
 
 /**
  * Defines a basic message from the LeapC message queue.
@@ -49,8 +51,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * </p>
 	 * <p>
 	 * Check the event type using {@link #type} or {@link #getType()} and then call the
-	 * relevant <code>get***Event()</code> method for that event type to get the event
-	 * data.
+	 * relevant <code>get***Event()</code> method for that event type to get the event data.
 	 * </p>
 	 */
 	public Pointer pEvent;
@@ -72,14 +73,13 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 
 
 	/**
-	 * @return The event type as an {@link eLeapEventType} instead of a
-	 *         <code>short</code>.
+	 * @return The event type as an {@link eLeapEventType} instead of a <code>short</code>.
 	 */
 	public eLeapEventType getType()
 	{
 		if (typeE == null)
 		{
-			typeE = eLeapEventType.parse(type, eLeapEventType.None);
+			typeE = Enums.parse(type, eLeapEventType.None);
 		}
 
 		return typeE;

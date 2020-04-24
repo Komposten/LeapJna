@@ -1,11 +1,11 @@
 package komposten.leapjna.leapc.enums;
 
-public enum eLeapDroppedFrameType
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+
+public enum eLeapDroppedFrameType implements IntEnum
 {
-	Unknown(-1),
-	PreprocessingQueue(0),
-	TrackingQueue(1),
-	Other(2);
+	Unknown(-1), PreprocessingQueue(0), TrackingQueue(1), Other(2);
 
 	public final int value;
 
@@ -15,16 +15,9 @@ public enum eLeapDroppedFrameType
 	}
 
 
-	public static eLeapDroppedFrameType parse(int value, eLeapDroppedFrameType defaultValue)
+	@Override
+	public int getValue()
 	{
-		for (eLeapDroppedFrameType o : eLeapDroppedFrameType.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

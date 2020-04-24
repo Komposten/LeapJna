@@ -1,5 +1,7 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
 /**
  * Functional image types (not data formats).
  * 
@@ -7,7 +9,7 @@ package komposten.leapjna.leapc.enums;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#gab85c92adbf1b49d95cf472defadbaf50">LeapC
  *      API - eLeapImageType</a>
  */
-public enum eLeapImageType
+public enum eLeapImageType implements IntEnum
 {
 	/** An invalid or unknown type. */
 	Unknown(0),
@@ -24,18 +26,11 @@ public enum eLeapImageType
 	{
 		this.value = value;
 	}
-
-
-	public static eLeapImageType parse(int value, eLeapImageType defaultValue)
+	
+	
+	@Override
+	public int getValue()
 	{
-		for (eLeapImageType o : eLeapImageType.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

@@ -1,6 +1,7 @@
 package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.leapc.data.LEAP_HAND;
+import komposten.leapjna.leapc.enums.Enums.ByteEnum;
 
 
 /**
@@ -15,7 +16,7 @@ import komposten.leapjna.leapc.data.LEAP_HAND;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga6d751aedb178355c21ec1cac4706e044">LeapC
  *      API - eLeapHandType</a>
  */
-public enum eLeapHandType
+public enum eLeapHandType implements ByteEnum
 {
 	Left((byte) 0x000),
 	Right((byte) 0x001),
@@ -29,16 +30,9 @@ public enum eLeapHandType
 	}
 
 
-	public static eLeapHandType parse(byte value, eLeapHandType defaultType)
+	@Override
+	public byte getValue()
 	{
-		switch (value)
-		{
-			case 0x000 :
-				return Left;
-			case 0x001 :
-				return Right;
-			default :
-				return defaultType;
-		}
+		return value;
 	}
 }

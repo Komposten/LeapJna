@@ -5,6 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceCaps;
 import komposten.leapjna.leapc.enums.eLeapDevicePID;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
@@ -126,7 +127,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapDeviceStatus.parseMask(status);
+			statusE = Enums.parseMask(status, eLeapDeviceStatus.class);
 		}
 
 		return statusE;
@@ -141,7 +142,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	{
 		if (capsE == null)
 		{
-			capsE = eLeapDeviceCaps.parseMask(caps);
+			capsE = Enums.parseMask(caps, eLeapDeviceCaps.class);
 		}
 
 		return capsE;
@@ -156,7 +157,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	{
 		if (pidE == null)
 		{
-			pidE = eLeapDevicePID.parse(pid, eLeapDevicePID.Invalid);
+			pidE = Enums.parse(pid, eLeapDevicePID.Invalid);
 		}
 
 		return pidE;

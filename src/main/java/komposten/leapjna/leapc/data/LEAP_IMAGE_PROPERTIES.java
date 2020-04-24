@@ -3,6 +3,7 @@ package komposten.leapjna.leapc.data;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapImageType;
 
@@ -67,7 +68,7 @@ public class LEAP_IMAGE_PROPERTIES extends Structure
 	{
 		if (typeE == null)
 		{
-			typeE = eLeapImageType.parse(type, eLeapImageType.Unknown);
+			typeE = Enums.parse(type, eLeapImageType.Unknown);
 		}
 		return typeE;
 	}
@@ -80,7 +81,7 @@ public class LEAP_IMAGE_PROPERTIES extends Structure
 	{
 		if (formatE == null)
 		{
-			formatE = eLeapImageFormat.parse(format, eLeapImageFormat.Unknown);
+			formatE = Enums.parse(format, eLeapImageFormat.Unknown);
 		}
 		return formatE;
 	}

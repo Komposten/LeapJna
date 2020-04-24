@@ -4,6 +4,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 
 
@@ -51,7 +52,7 @@ public class LEAP_CONNECTION_INFO extends Structure
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapConnectionStatus.parse((int) status, eLeapConnectionStatus.Unknown);
+			statusE = Enums.parse((int) status, eLeapConnectionStatus.Unknown);
 		}
 
 		return statusE;

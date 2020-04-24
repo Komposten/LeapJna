@@ -1,8 +1,6 @@
 package komposten.leapjna.leapc.enums;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
 
 /**
  * The service policy flags.
@@ -11,7 +9,7 @@ import java.util.List;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#gaf9b8fb0f14bd75188519ab4eaedd6a47">LeapC
  *      API - eLeapDeviceStatus</a>
  */
-public enum eLeapPolicyFlag
+public enum eLeapPolicyFlag implements IntFlagEnum<eLeapPolicyFlag>
 {
 	/** No active policy flags. */
 	None(0x00000000),
@@ -37,39 +35,24 @@ public enum eLeapPolicyFlag
 	{
 		this.value = value;
 	}
-
-
-	public static eLeapPolicyFlag[] parseMask(int mask)
+	
+	
+	@Override
+	public int getValue()
 	{
-		List<eLeapPolicyFlag> flags = new ArrayList<>();
-
-		for (eLeapPolicyFlag o : eLeapPolicyFlag.values())
-		{
-			if ((mask & o.value) == o.value && o != None)
-			{
-				flags.add(o);
-			}
-		}
-
-		if (flags.isEmpty())
-		{
-			return new eLeapPolicyFlag[] { None };
-		}
-		else
-		{
-			return flags.toArray(new eLeapPolicyFlag[flags.size()]);
-		}
+		return value;
+	}
+	
+	
+	@Override
+	public eLeapPolicyFlag getEmptyMaskConstant()
+	{
+		return None;
 	}
 
 
 	public static int createMask(eLeapPolicyFlag... flags)
 	{
-		int mask = 0;
-		for (eLeapPolicyFlag flag : flags)
-		{
-			mask |= flag.value;
-		}
-
-		return mask;
+		return Enums.createMask(flags);
 	}
 }

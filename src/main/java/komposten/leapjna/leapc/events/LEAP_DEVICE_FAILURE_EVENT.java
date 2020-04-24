@@ -7,6 +7,7 @@ import com.sun.jna.Structure.FieldOrder;
 import komposten.leapjna.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 
 
@@ -63,7 +64,7 @@ public class LEAP_DEVICE_FAILURE_EVENT extends Structure implements LEAP_EVENT
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapDeviceStatus.parseMask(status);
+			statusE = Enums.parseMask(status, eLeapDeviceStatus.class);
 		}
 		
 		return statusE;

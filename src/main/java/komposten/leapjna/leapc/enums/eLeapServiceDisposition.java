@@ -1,6 +1,8 @@
 package komposten.leapjna.leapc.enums;
 
-public enum eLeapServiceDisposition
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+public enum eLeapServiceDisposition implements IntEnum
 {
 	/** No flags. */
 	None(0),
@@ -22,23 +24,11 @@ public enum eLeapServiceDisposition
 	{
 		this.value = value;
 	}
-
-
-	public static eLeapServiceDisposition parse(int value,
-			eLeapServiceDisposition defaultStatus)
+	
+	
+	@Override
+	public int getValue()
 	{
-		switch (value)
-		{
-			case 0 :
-				return None;
-			case 1 :
-				return LowFpsDetected;
-			case 2 :
-				return PoorPerformancePause;
-			case (1 | 2) :
-				return All;
-			default :
-				return defaultStatus;
-		}
+		return value;
 	}
 }

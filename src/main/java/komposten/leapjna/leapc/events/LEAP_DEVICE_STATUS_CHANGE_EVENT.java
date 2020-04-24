@@ -5,6 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 
 
@@ -71,7 +72,7 @@ public class LEAP_DEVICE_STATUS_CHANGE_EVENT extends Structure implements LEAP_E
 	{
 		if (statusE == null)
 		{
-			statusE = eLeapDeviceStatus.parseMask(status);
+			statusE = Enums.parseMask(status, eLeapDeviceStatus.class);
 		}
 
 		return statusE;
@@ -86,7 +87,7 @@ public class LEAP_DEVICE_STATUS_CHANGE_EVENT extends Structure implements LEAP_E
 	{
 		if (lastStatusE == null)
 		{
-			lastStatusE = eLeapDeviceStatus.parseMask(last_status);
+			lastStatusE = Enums.parseMask(last_status, eLeapDeviceStatus.class);
 		}
 
 		return lastStatusE;

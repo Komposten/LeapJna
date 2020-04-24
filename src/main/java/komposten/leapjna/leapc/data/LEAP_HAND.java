@@ -4,6 +4,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapHandType;
 
 
@@ -148,7 +149,7 @@ public class LEAP_HAND extends Structure
 	{
 		if (typeE == null)
 		{
-			typeE = eLeapHandType.parse(type, eLeapHandType.Unknown);
+			typeE = Enums.parse(type, eLeapHandType.Unknown);
 		}
 
 		return typeE;

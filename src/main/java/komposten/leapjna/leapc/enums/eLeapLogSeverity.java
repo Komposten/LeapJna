@@ -1,5 +1,8 @@
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
+
+
 /**
  * System message severity types.
  * 
@@ -7,7 +10,7 @@ package komposten.leapjna.leapc.enums;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga03d3b2203fa8af12c5436b6974a10fbb">LeapC
  *      API - eLeapLogSeverity</a>
  */
-public enum eLeapLogSeverity
+public enum eLeapLogSeverity implements IntEnum
 {
 	/** The message severity is not known or was not specified. */
 	Unknown(0),
@@ -29,16 +32,9 @@ public enum eLeapLogSeverity
 	}
 
 
-	public static eLeapLogSeverity parse(int value, eLeapLogSeverity defaultValue)
+	@Override
+	public int getValue()
 	{
-		for (eLeapLogSeverity o : eLeapLogSeverity.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-
-		return defaultValue;
+		return value;
 	}
 }

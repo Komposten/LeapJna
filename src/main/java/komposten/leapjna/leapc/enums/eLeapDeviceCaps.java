@@ -1,7 +1,6 @@
 package komposten.leapjna.leapc.enums;
 
-import java.util.ArrayList;
-import java.util.List;
+import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
 
 
 /**
@@ -11,7 +10,7 @@ import java.util.List;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga5d5cfae19b88160a1a5c14cc46faf435">LeapC
  *      API - eLeapDeviceCaps</a>
  */
-public enum eLeapDeviceCaps
+public enum eLeapDeviceCaps implements IntFlagEnum<eLeapDeviceCaps>
 {
 	/** The device has no specific capabilities. */
 	None(0x00000000),
@@ -27,37 +26,22 @@ public enum eLeapDeviceCaps
 	}
 
 
-	public static eLeapDeviceCaps[] parseMask(int mask)
+	@Override
+	public int getValue()
 	{
-		List<eLeapDeviceCaps> flags = new ArrayList<>();
+		return value;
+	}
 
-		for (eLeapDeviceCaps o : eLeapDeviceCaps.values())
-		{
-			if ((mask & o.value) == o.value && o != None)
-			{
-				flags.add(o);
-			}
-		}
 
-		if (flags.isEmpty())
-		{
-			return new eLeapDeviceCaps[] { None };
-		}
-		else
-		{
-			return flags.toArray(new eLeapDeviceCaps[flags.size()]);
-		}
+	@Override
+	public eLeapDeviceCaps getEmptyMaskConstant()
+	{
+		return None;
 	}
 
 
 	public static int createMask(eLeapDeviceCaps... flags)
 	{
-		int mask = 0;
-		for (eLeapDeviceCaps flag : flags)
-		{
-			mask |= flag.value;
-		}
-
-		return mask;
+		return Enums.createMask(flags);
 	}
 }

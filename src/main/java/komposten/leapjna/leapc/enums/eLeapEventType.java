@@ -1,6 +1,10 @@
 package komposten.leapjna.leapc.enums;
 
+import com.sun.jna.Pointer;
+
 import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 
 /**
@@ -11,7 +15,7 @@ import komposten.leapjna.LeapC;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga04f93b375f7c8040178ec5be2bf658ec">LeapC
  *      API - eLeapEventType</a>
  */
-public enum eLeapEventType
+public enum eLeapEventType implements IntEnum
 {
 	None(0x000),
 	Connection(0x001),
@@ -39,18 +43,11 @@ public enum eLeapEventType
 	{
 		this.value = value;
 	}
-	
-	
-	public static eLeapEventType parse(int value, eLeapEventType defaultValue)
+
+
+	@Override
+	public int getValue()
 	{
-		for (eLeapEventType o : eLeapEventType.values())
-		{
-			if (o.value == value)
-			{
-				return o;
-			}
-		}
-		
-		return defaultValue;
+		return value;
 	}
 }
