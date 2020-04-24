@@ -7,9 +7,9 @@ LeapJna is a library that provides Java bindings for the [Leap Motion](https://w
 **Note**: Neither LeapJna nor I (Komposten) am associated with [Ultraleap Ltd](https://ultraleap.com/).
 
 ## Supported API features
-All functionality in the Leap Motion C API v4 have been mapped in LeapJna and should work.
+LeapJna includes Java bindings for all functionality in the Leap Motion C API from Orion SDK v4.0.0+52173.
 
-However, some functions have not been fully tested and some appear to not function as expected in the LeapC API itself. More information about these are found below.
+However, some of these bindings have not been fully tested and some appear to not function as expected in the LeapC API itself. More information about these are found below.
 
 ### Untested API bindings
 LeapJna's bindings for some of the API features have not been tested. Those are as follows:
@@ -21,7 +21,7 @@ LeapJna's bindings for some of the API features have not been tested. Those are 
 Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see,
 which means that they won't work as expected in LeapJna either.
 
-A list of such features can be found here: [Broken API Features](BROKEN_API_FEATURES.md).
+A list of these features can be found here: [Broken API Features](BROKEN_API_FEATURES.md).
 
 ## Using LeapJna
 1. Add LeapJna to your classpath.
