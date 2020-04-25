@@ -26,7 +26,7 @@ A list of these features can be found here: [Broken API Features](BROKEN_API_FEA
 ## Using LeapJna
 1. Add LeapJna to your classpath.
     * If you don't use Maven/Gradle you will need to add JNA as well.
-2. Download the Leap Motion SDK, put LeapC.dll and LeapC.lib in a folder "win32-x86-64" and add that folder to your classpath.
+2. Download the Leap Motion SDK, put LeapC.dll in a folder "win32-x86-64" and add that folder to your classpath.
     * If you want to use a different location for the DLL, or if you're using a different operating system than 64-bit Windows, refer to [JNA's documentation for library loading](http://java-native-access.github.io/jna/5.5.0/javadoc/com/sun/jna/NativeLibrary.html) for options.
 3. Import LeapC in your Java class: `import komposten.leapjna.LeapC;`
 4. Obtain the LeapC instance using `LeapC.INSTANCE`.
