@@ -21,6 +21,9 @@ import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
+import komposten.leapjna.leapc.enums.eLeapValueType;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
@@ -275,6 +278,29 @@ public class LeapCTest
 		assertThat(event.getEvents()[1].severity).isEqualTo(eLeapLogSeverity.Critical.value);
 		assertThat(event.getEvents()[1].timestamp).isEqualTo(12346);
 		assertThat(event.getEvents()[1].message).isEqualTo("Bye!");
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeConfigResponseEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.ConfigResponse);
+		LEAP_CONFIG_RESPONSE_EVENT event = message.getConfigResponseEvent();
+		
+		assertThat(event.requestID).isEqualTo(1);
+		assertThat(event.value.type).isEqualTo(eLeapValueType.Boolean.value);
+		assertThat(event.value.union.boolValue).isEqualTo(true);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeConfigChangeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.ConfigChange);
+		LEAP_CONFIG_CHANGE_EVENT event = message.getConfigChangeEvent();
+		
+		assertThat(event.requestID).isEqualTo(1);
+		assertThat(event.value).isEqualTo(true);
 	}
 	
 	
