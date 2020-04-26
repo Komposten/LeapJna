@@ -123,6 +123,18 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 
 
 	/**
+	 * @return The event data as a device event.
+	 * @throws IllegalStateException If this event message is not an
+	 *           {@link eLeapEventType#DeviceLost} event.
+	 */
+	public LEAP_DEVICE_EVENT getDeviceLostEvent()
+	{
+		checkType(eLeapEventType.DeviceLost);
+		return getOrCreateEvent(LEAP_DEVICE_EVENT::new);
+	}
+
+
+	/**
 	 * @return The event data as a device status change event.
 	 * @throws IllegalStateException If this event message is not an
 	 *           {@link eLeapEventType#DeviceStatusChange} event.

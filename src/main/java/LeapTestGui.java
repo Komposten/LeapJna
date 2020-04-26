@@ -534,6 +534,10 @@ public class LeapTestGui extends JFrame
 			{
 				System.out.println(message.getDeviceFailureEvent().status);
 			}
+			else if (message.type == eLeapEventType.DeviceLost.value)
+			{
+				System.out.println("Device was lost: " + message.getDeviceLostEvent().device);
+			}
 			else if (message.type == eLeapEventType.ConfigResponse.value)
 			{
 				LEAP_CONFIG_RESPONSE_EVENT responseEvent = message.getConfigResponseEvent();
