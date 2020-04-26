@@ -15,7 +15,6 @@ However, some of these bindings have not been fully tested and some appear to no
 LeapJna's bindings for some of the API features have not been tested. Those are as follows:
 * Device failure events (I don't have a failing device to test this)
 * Point mappings (I'm not sure what they are and how to enable them)
-* Head pose (I'm not sure how to enable it)
 
 ### Broken API features
 Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see,

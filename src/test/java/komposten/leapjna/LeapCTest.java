@@ -15,6 +15,7 @@ import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
+import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
@@ -29,8 +30,11 @@ import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
+import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
+import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 
@@ -301,6 +305,41 @@ public class LeapCTest
 		
 		assertThat(event.requestID).isEqualTo(1);
 		assertThat(event.value).isEqualTo(true);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeHeadPoseEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.HeadPose);
+		LEAP_HEAD_POSE_EVENT event = message.getHeadPoseEvent();
+		
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.head_position.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
+		assertThat(event.head_orientation.asArray()).containsExactly(new float[] { 0.4f, 0.3f, 0.2f, 0.1f }, PRECISION);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeFrameDroppedEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DroppedFrame);
+		LEAP_DROPPED_FRAME_EVENT event = message.getDroppedFrameEvent();
+		
+		assertThat(event.frame_id).isEqualTo(1);
+		assertThat(event.type).isEqualTo(eLeapDroppedFrameType.Other.value);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypePointMappingChangeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.PointMappingChange);
+		LEAP_POINT_MAPPING_CHANGE_EVENT event = message.getPointMappingChangeEvent();
+		
+		assertThat(event.frame_id).isEqualTo(1);
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.nPoints).isEqualTo(2);
 	}
 	
 	
