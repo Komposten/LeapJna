@@ -43,7 +43,7 @@ import komposten.leapjna.util.LeapTypeMapper;
 public interface LeapC extends Library
 {
 	public LeapC INSTANCE = (LeapC) Native
-			.synchronizedLibrary(Native.load("LeapC", LeapC.class, new HashMap<String, Object>()
+			.synchronizedLibrary(Native.load(LeapCConfig.getDllName(), LeapC.class, new HashMap<String, Object>()
 			{
 				{
 					put(Library.OPTION_TYPE_MAPPER, new LeapTypeMapper());
