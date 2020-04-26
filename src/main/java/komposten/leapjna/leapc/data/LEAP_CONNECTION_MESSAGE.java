@@ -278,7 +278,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 		if (type != eventType.value)
 		{
 			throw new IllegalStateException(
-					"Incorrect event type: " + typeE + " != " + eventType);
+					"Incorrect event type: " + getType() + " != " + eventType);
 		}
 	}
 
