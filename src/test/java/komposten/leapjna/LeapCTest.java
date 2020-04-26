@@ -75,6 +75,69 @@ public class LeapCTest
 
 
 	@Test
+	void LeapPollConnection_eventTypeConnectionEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Connection);
+		LEAP_CONNECTION_EVENT event = message.getConnectionEvent();
+		assertThat(event.flags).isEqualTo(eLeapServiceDisposition.LowFpsDetected.value);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeConnectionLostEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.ConnectionLost);
+		LEAP_CONNECTION_LOST_EVENT event = message.getConnectionLostEvent();
+		assertThat(event.flags).isEqualTo(eLeapEventType.ConnectionLost.value);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Device);
+		LEAP_DEVICE_EVENT event = message.getDeviceEvent();
+		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
+		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
+		assertThat(event.device.id).isEqualTo(1);
+		assertThat(event.device.handle).isEqualTo(event.getPointer());
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceStatusChangeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceStatusChange);
+		LEAP_DEVICE_STATUS_CHANGE_EVENT event = message.getDeviceStatusChangeEvent();
+		assertThat(event.last_status).isEqualTo(eLeapDeviceStatus.Paused.value);
+		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
+		assertThat(event.device.id).isEqualTo(1);
+		assertThat(event.device.handle).isEqualTo(event.getPointer());
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceFailureEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceFailure);
+		LEAP_DEVICE_FAILURE_EVENT event = message.getDeviceFailureEvent();
+		assertThat(event.status).isEqualTo(eLeapDeviceStatus.BadFirmware.value);
+		// Can't test the handle since it's an opaque struct.
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceLostEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceLost);
+		LEAP_DEVICE_EVENT event = message.getDeviceLostEvent();
+		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
+		assertThat(event.device.id).isEqualTo(1);
+		assertThat(event.device.handle).isEqualTo(event.getPointer());
+	}
+
+
+	@Test
 	void LeapPollConnection_eventTypeTrackingEvent_mapsProperly()
 	{
 		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Tracking);
@@ -166,69 +229,6 @@ public class LeapCTest
 		assertThat(digit.distal.next_joint.asArray()).containsExactly(new float[] { x++, y++, z++ }, precision);
 		assertThat(digit.distal.width).isCloseTo(14, precision);
 		assertThat(digit.distal.rotation.asArray()).containsExactly(new float[] { rx++, ry++, rz++, rw++ }, precision);
-	}
-
-
-	@Test
-	void LeapPollConnection_eventTypeConnectionEvent_mapsProperly()
-	{
-		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Connection);
-		LEAP_CONNECTION_EVENT event = message.getConnectionEvent();
-		assertThat(event.flags).isEqualTo(eLeapServiceDisposition.LowFpsDetected.value);
-	}
-
-
-	@Test
-	void LeapPollConnection_eventTypeConnectionLostEvent_mapsProperly()
-	{
-		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.ConnectionLost);
-		LEAP_CONNECTION_LOST_EVENT event = message.getConnectionLostEvent();
-		assertThat(event.flags).isEqualTo(eLeapEventType.ConnectionLost.value);
-	}
-
-
-	@Test
-	void LeapPollConnection_eventTypeDeviceEvent_mapsProperly()
-	{
-		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Device);
-		LEAP_DEVICE_EVENT event = message.getDeviceEvent();
-		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
-		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
-		assertThat(event.device.id).isEqualTo(1);
-		assertThat(event.device.handle).isEqualTo(event.getPointer());
-	}
-
-
-	@Test
-	void LeapPollConnection_eventTypeDeviceStatusChangeEvent_mapsProperly()
-	{
-		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceStatusChange);
-		LEAP_DEVICE_STATUS_CHANGE_EVENT event = message.getDeviceStatusChangeEvent();
-		assertThat(event.last_status).isEqualTo(eLeapDeviceStatus.Paused.value);
-		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
-		assertThat(event.device.id).isEqualTo(1);
-		assertThat(event.device.handle).isEqualTo(event.getPointer());
-	}
-
-
-	@Test
-	void LeapPollConnection_eventTypeDeviceFailureEvent_mapsProperly()
-	{
-		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceFailure);
-		LEAP_DEVICE_FAILURE_EVENT event = message.getDeviceFailureEvent();
-		assertThat(event.status).isEqualTo(eLeapDeviceStatus.BadFirmware.value);
-		// Can't test the handle since it's an opaque struct.
-	}
-
-
-	@Test
-	void LeapPollConnection_eventTypeDeviceLostEvent_mapsProperly()
-	{
-		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceLost);
-		LEAP_DEVICE_EVENT event = message.getDeviceLostEvent();
-		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
-		assertThat(event.device.id).isEqualTo(1);
-		assertThat(event.device.handle).isEqualTo(event.getPointer());
 	}
 	
 	
