@@ -42,10 +42,8 @@ public class LEAP_DEVICE_FAILURE_EVENT extends Structure implements LEAP_EVENT
 	 * <p>
 	 * You are not responsible for closing this handle.
 	 * </p>
-	 * TODO Maybe replace this with a {@link LEAP_DEVICE}, is possible (determine when
-	 * testing).
 	 */
-	public Pointer hDevice;
+	public LEAP_DEVICE hDevice;
 
 	private eLeapDeviceStatus[] statusE;
 
