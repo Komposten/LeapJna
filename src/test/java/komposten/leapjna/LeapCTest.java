@@ -77,13 +77,7 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeTrackingEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.Tracking.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.Tracking.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Tracking);
 		LEAP_TRACKING_EVENT trackingEvent = message.getTrackingEvent();
 		assertThat(trackingEvent.tracking_frame_id).isEqualTo(1);
 		assertThat(trackingEvent.nHands).isEqualTo(2);
@@ -178,13 +172,7 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeConnectionEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.Connection.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.Connection.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Connection);
 		LEAP_CONNECTION_EVENT event = message.getConnectionEvent();
 		assertThat(event.flags).isEqualTo(eLeapServiceDisposition.LowFpsDetected.value);
 	}
@@ -193,13 +181,7 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeConnectionLostEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.ConnectionLost.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.ConnectionLost.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.ConnectionLost);
 		LEAP_CONNECTION_LOST_EVENT event = message.getConnectionLostEvent();
 		assertThat(event.flags).isEqualTo(eLeapEventType.ConnectionLost.value);
 	}
@@ -208,13 +190,7 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeDeviceEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.Device.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.Device.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Device);
 		LEAP_DEVICE_EVENT event = message.getDeviceEvent();
 		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
 		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
@@ -226,13 +202,7 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeDeviceStatusChangeEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.DeviceStatusChange.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.DeviceStatusChange.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceStatusChange);
 		LEAP_DEVICE_STATUS_CHANGE_EVENT event = message.getDeviceStatusChangeEvent();
 		assertThat(event.last_status).isEqualTo(eLeapDeviceStatus.Paused.value);
 		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
@@ -244,16 +214,9 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeDeviceFailureEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.DeviceFailure.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.DeviceFailure.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceFailure);
 		LEAP_DEVICE_FAILURE_EVENT event = message.getDeviceFailureEvent();
 		assertThat(event.status).isEqualTo(eLeapDeviceStatus.BadFirmware.value);
-		
 		// Can't test the handle since it's an opaque struct.
 	}
 
@@ -261,16 +224,23 @@ public class LeapCTest
 	@Test
 	void LeapPollConnection_eventTypeDeviceLostEvent_mapsProperly()
 	{
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		message.type = eLeapEventType.DeviceLost.value;
-
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
-		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(message.type).isEqualTo(eLeapEventType.DeviceLost.value);
-
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.DeviceLost);
 		LEAP_DEVICE_EVENT event = message.getDeviceLostEvent();
 		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
 		assertThat(event.device.id).isEqualTo(1);
 		assertThat(event.device.handle).isEqualTo(event.getPointer());
+	}
+	
+	
+	private LEAP_CONNECTION_MESSAGE assertLeapPollConnection(eLeapEventType eventType)
+	{
+		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+		message.type = eventType.value;
+
+		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(message.type).isEqualTo(eventType.value);
+		
+		return message;
 	}
 }
