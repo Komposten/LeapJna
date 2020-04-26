@@ -6,7 +6,6 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
@@ -23,6 +22,8 @@ import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 
 
@@ -217,6 +218,58 @@ public class LeapCTest
 		LEAP_DEVICE_EVENT event = message.getDeviceEvent();
 		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
 		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
+		assertThat(event.device.id).isEqualTo(1);
+		assertThat(event.device.handle).isEqualTo(event.getPointer());
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceStatusChangeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+		message.type = eLeapEventType.DeviceStatusChange.value;
+
+		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(message.type).isEqualTo(eLeapEventType.DeviceStatusChange.value);
+
+		LEAP_DEVICE_STATUS_CHANGE_EVENT event = message.getDeviceStatusChangeEvent();
+		assertThat(event.last_status).isEqualTo(eLeapDeviceStatus.Paused.value);
+		assertThat(event.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
+		assertThat(event.device.id).isEqualTo(1);
+		assertThat(event.device.handle).isEqualTo(event.getPointer());
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceFailureEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+		message.type = eLeapEventType.DeviceFailure.value;
+
+		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(message.type).isEqualTo(eLeapEventType.DeviceFailure.value);
+
+		LEAP_DEVICE_FAILURE_EVENT event = message.getDeviceFailureEvent();
+		assertThat(event.status).isEqualTo(eLeapDeviceStatus.BadFirmware.value);
+		
+		// Can't test the handle since it's an opaque struct.
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeDeviceLostEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
+		message.type = eLeapEventType.DeviceLost.value;
+
+		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(message.type).isEqualTo(eLeapEventType.DeviceLost.value);
+
+		LEAP_DEVICE_EVENT event = message.getDeviceLostEvent();
+		assertThat(event.flags).isEqualTo(eLeapEventType.Device.value);
 		assertThat(event.device.id).isEqualTo(1);
 		assertThat(event.device.handle).isEqualTo(event.getPointer());
 	}
