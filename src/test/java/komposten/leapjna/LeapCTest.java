@@ -17,6 +17,8 @@ import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
+import komposten.leapjna.leapc.enums.eLeapLogSeverity;
+import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
@@ -24,6 +26,9 @@ import komposten.leapjna.leapc.events.LEAP_CONNECTION_LOST_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
+import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
+import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 
 
@@ -135,6 +140,16 @@ public class LeapCTest
 		assertThat(event.device.id).isEqualTo(1);
 		assertThat(event.device.handle).isEqualTo(event.getPointer());
 	}
+	
+	
+	@Test
+	void LeapPollConnection_eventTypePolicyEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Policy);
+		LEAP_POLICY_EVENT event = message.getPolicyEvent();
+		assertThat(event.reserved).isEqualTo(1);
+		assertThat(event.current_policy).isEqualTo(eLeapPolicyFlag.Images.value);
+	}
 
 
 	@Test
@@ -229,6 +244,37 @@ public class LeapCTest
 		assertThat(digit.distal.next_joint.asArray()).containsExactly(new float[] { x++, y++, z++ }, precision);
 		assertThat(digit.distal.width).isCloseTo(14, precision);
 		assertThat(digit.distal.rotation.asArray()).containsExactly(new float[] { rx++, ry++, rz++, rw++ }, precision);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeLogEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.LogEvent);
+		LEAP_LOG_EVENT event = message.getLogEvent();
+		
+		assertThat(event.severity).isEqualTo(eLeapLogSeverity.Information.value);
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.message).isEqualTo("Hello Leap!");
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeLogEvents_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.LogEvents);
+		LEAP_LOG_EVENTS event = message.getLogEvents();
+		
+		assertThat(event.nEvents).isEqualTo(2);
+		assertThat(event.events).isNotEqualTo(Pointer.NULL);
+		
+		assertThat(event.getEvents()[0].severity).isEqualTo(eLeapLogSeverity.Information.value);
+		assertThat(event.getEvents()[0].timestamp).isEqualTo(12345);
+		assertThat(event.getEvents()[0].message).isEqualTo("Hello Leap!");
+
+		assertThat(event.getEvents()[1].severity).isEqualTo(eLeapLogSeverity.Critical.value);
+		assertThat(event.getEvents()[1].timestamp).isEqualTo(12346);
+		assertThat(event.getEvents()[1].message).isEqualTo("Bye!");
 	}
 	
 	
