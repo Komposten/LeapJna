@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CLOCK_REBASER;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
@@ -549,7 +549,7 @@ public class LeapTestGui extends JFrame
 			{
 				LEAP_CONFIG_CHANGE_EVENT changeEvent = message.getConfigChangeEvent();
 				System.out.println(
-						"Config change: " + changeEvent.requestID + " | " + changeEvent.value);
+						"Config change: " + changeEvent.requestID + " | " + changeEvent.status);
 
 				if (changeEvent.requestID == pRequestID.getValue())
 				{

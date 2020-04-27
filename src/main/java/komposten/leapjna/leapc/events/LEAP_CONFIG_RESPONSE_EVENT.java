@@ -5,7 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.LongByReference;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 

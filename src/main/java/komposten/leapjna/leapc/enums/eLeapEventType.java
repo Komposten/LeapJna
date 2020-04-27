@@ -3,7 +3,7 @@ package komposten.leapjna.leapc.enums;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.LongByReference;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.enums.Enums.IntEnum;

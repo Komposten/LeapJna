@@ -3,7 +3,7 @@ package komposten.leapjna.leapc.data;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 

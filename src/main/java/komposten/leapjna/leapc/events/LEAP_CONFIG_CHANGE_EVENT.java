@@ -5,7 +5,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.LongByReference;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 
@@ -36,7 +36,7 @@ public class LEAP_CONFIG_CHANGE_EVENT extends Structure implements LEAP_EVENT
 	/**
 	 * The result of the change operation: true on success; false on failure.
 	 */
-	public boolean value;
+	public boolean status;
 
 	public LEAP_CONFIG_CHANGE_EVENT(Pointer pointer)
 	{

@@ -1,4 +1,4 @@
-package komposten.leapjna;
+package komposten.leapjna.leapc;
 
 import java.util.HashMap;
 

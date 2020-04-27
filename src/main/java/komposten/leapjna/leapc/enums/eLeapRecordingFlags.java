@@ -1,6 +1,6 @@
 package komposten.leapjna.leapc.enums;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_RECORDING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
