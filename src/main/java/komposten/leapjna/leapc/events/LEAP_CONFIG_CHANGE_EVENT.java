@@ -27,7 +27,7 @@ import komposten.leapjna.leapc.data.LEAP_VARIANT;
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_f_i_g___c_h_a_n_g_e___e_v_e_n_t">LeapC
  *      API - LEAP_CONFIG_CHANGE_EVENT</a>
  */
-@FieldOrder({ "requestID", "value" })
+@FieldOrder({ "requestID", "status" })
 public class LEAP_CONFIG_CHANGE_EVENT extends Structure implements LEAP_EVENT
 {
 	/** An identifier for correlating the request and response. */
