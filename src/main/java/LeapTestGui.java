@@ -1,3 +1,12 @@
+/*
+ * Copyright 2020 Jakob Hjelm (Komposten)
+ *
+ * This file is part of LeapJna.
+ *
+ * LeapJna is a free Java library: you can use, redistribute it and/or modify
+ * it under the terms of the MIT license as written in the LICENSE file in the root
+ * of this project.
+ */
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,7 +26,7 @@ import javax.swing.SwingUtilities;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CLOCK_REBASER;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
@@ -549,7 +558,7 @@ public class LeapTestGui extends JFrame
 			{
 				LEAP_CONFIG_CHANGE_EVENT changeEvent = message.getConfigChangeEvent();
 				System.out.println(
-						"Config change: " + changeEvent.requestID + " | " + changeEvent.value);
+						"Config change: " + changeEvent.requestID + " | " + changeEvent.status);
 
 				if (changeEvent.requestID == pRequestID.getValue())
 				{

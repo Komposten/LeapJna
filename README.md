@@ -27,7 +27,7 @@ A list of these features can be found here: [Broken API Features](BROKEN_API_FEA
     * If you don't use Maven/Gradle you will need to add JNA as well.
 2. Download the Leap Motion SDK, put LeapC.dll in a folder "win32-x86-64" and add that folder to your classpath.
     * If you want to use a different location for the DLL, or if you're using a different operating system than 64-bit Windows, refer to [JNA's documentation for library loading](http://java-native-access.github.io/jna/5.5.0/javadoc/com/sun/jna/NativeLibrary.html) for options.
-3. Import LeapC in your Java class: `import komposten.leapjna.LeapC;`
+3. Import LeapC in your Java class: `import komposten.leapjna.leapc.LeapC;`
 4. Obtain the LeapC instance using `LeapC.INSTANCE`.
     * Use this instance to access the LeapC API's functions.
     * All related data structures can be found in the `komposten.leapjna.leapc` packages.
@@ -37,6 +37,6 @@ A list of these features can be found here: [Broken API Features](BROKEN_API_FEA
 ## License
 The license for LeapJna's source code can be found in the [LICENSE](LICENSE) file.
 
-Since most of the documentation for the methods in [LeapC.java](src/main/java/komposten/leapjna/LeapC.java) and classes in [komposten.leapjna.leapc](src/main/java/komposten/leapjna/leapc) (and its sub-packages) originally comes from the official [Leap Motion API Reference](https://developer.leapmotion.com/documentation/v4/modules.html), it falls under the same license as the official reference.
+Since most of the documentation for the methods in [LeapC.java](src/main/java/komposten/leapjna/leapc/LeapC.java) and classes in [komposten.leapjna.leapc.*](src/main/java/komposten/leapjna/leapc) originally comes from the official [Leap Motion API Reference](https://developer.leapmotion.com/documentation/v4/modules.html), it falls under the same license as the official reference.
 
 The Leap Motion SDK (not included in this repository) is licensed according to the [Leap Motion SDK Agreement](https://central.leapmotion.com/agreements/SdkAgreement).

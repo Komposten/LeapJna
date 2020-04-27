@@ -1,4 +1,4 @@
-package komposten.leapjna;
+package komposten.leapjna.leapc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.sun.jna.Pointer;
 
+import komposten.leapjna.leapc.LeapCConfig;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
@@ -304,7 +305,7 @@ public class LeapCTest
 		LEAP_CONFIG_CHANGE_EVENT event = message.getConfigChangeEvent();
 		
 		assertThat(event.requestID).isEqualTo(1);
-		assertThat(event.value).isEqualTo(true);
+		assertThat(event.status).isEqualTo(true);
 	}
 
 

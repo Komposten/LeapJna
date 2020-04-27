@@ -14,4 +14,5 @@ These are features in the API which do not seem to work in the expected way.
 ## Missing features
 These are features listed in the API reference and the leapc.h file in the SDK but do not exist in the SDK binaries (and can therefore not be used).
 - `LeapCameraMatrix()`
-- `LeapDistortionCoeffs()` 
+- `LeapDistortionCoeffs()`
+- `eLeapEventType.ImageComplete` and `.ImageRequestError` (as far as I know there is no function to request an image)

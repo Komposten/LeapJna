@@ -1,3 +1,12 @@
+/*
+ * Copyright 2020 Jakob Hjelm (Komposten)
+ *
+ * This file is part of LeapJna.
+ *
+ * LeapJna is a free Java library: you can use, redistribute it and/or modify
+ * it under the terms of the MIT license as written in the LICENSE file in the root
+ * of this project.
+ */
 package komposten.leapjna.leapc.events;
 
 import com.sun.jna.Pointer;
@@ -5,7 +14,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.LongByReference;
 
-import komposten.leapjna.LeapC;
+import komposten.leapjna.leapc.LeapC;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 
@@ -27,7 +36,7 @@ import komposten.leapjna.leapc.data.LEAP_VARIANT;
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_f_i_g___c_h_a_n_g_e___e_v_e_n_t">LeapC
  *      API - LEAP_CONFIG_CHANGE_EVENT</a>
  */
-@FieldOrder({ "requestID", "value" })
+@FieldOrder({ "requestID", "status" })
 public class LEAP_CONFIG_CHANGE_EVENT extends Structure implements LEAP_EVENT
 {
 	/** An identifier for correlating the request and response. */
@@ -36,7 +45,7 @@ public class LEAP_CONFIG_CHANGE_EVENT extends Structure implements LEAP_EVENT
 	/**
 	 * The result of the change operation: true on success; false on failure.
 	 */
-	public boolean value;
+	public boolean status;
 
 	public LEAP_CONFIG_CHANGE_EVENT(Pointer pointer)
 	{
