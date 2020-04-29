@@ -8,17 +8,20 @@ import org.junit.jupiter.api.Test;
 
 import com.sun.jna.Pointer;
 
-import komposten.leapjna.leapc.LeapCConfig;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
+import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
 import komposten.leapjna.leapc.data.LEAP_HAND;
+import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
+import komposten.leapjna.leapc.enums.eLeapImageFormat;
+import komposten.leapjna.leapc.enums.eLeapImageType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
@@ -33,6 +36,7 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -205,7 +209,6 @@ public class LeapCTest
 		assertThat(hand.palm.direction.asArray()).containsExactly(new float[] { -1, 3, -2 }, PRECISION);
 		assertThat(hand.palm.orientation.asArray()).containsExactly(new float[] { 1, 2, 3, 4 }, PRECISION);
 
-		// TODO Check that the digits are initialised properly.
 		assertThatDigitCorrect(hand.digits.thumb, id, 0);
 		assertThatDigitCorrect(hand.digits.index, id, 1);
 		assertThatDigitCorrect(hand.digits.middle, id, 2);
@@ -342,8 +345,81 @@ public class LeapCTest
 		assertThat(event.timestamp).isEqualTo(12345);
 		assertThat(event.nPoints).isEqualTo(2);
 	}
-	
-	
+
+
+	@Test
+	void LeapPollConnection_eventTypeImageEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Image);
+		LEAP_IMAGE_EVENT event = message.getImageEvent();
+
+		assertThat(event.info.reserved).isNotEqualTo(Pointer.NULL);
+		assertThat(event.info.reserved.getByte(0)).isEqualTo((byte) 1);
+		assertThat(event.info.frame_id).isEqualTo(2);
+		assertThat(event.info.timestamp).isEqualTo(3);
+
+		assertThat(event.image).hasSize(2);
+		assertThatImageCorrect(event.image[0], 0);
+		assertThatImageCorrect(event.image[1], 1);
+		
+		// Can't test the calibration handle since it is an opaque type.
+	}
+
+
+	private void assertThatImageCorrect(LEAP_IMAGE image, int id)
+	{
+		assertThat(image.properties.type).isEqualTo(eLeapImageType.Default.value);
+		assertThat(image.properties.format).isEqualTo(eLeapImageFormat.IR.value);
+		assertThat(image.properties.bpp).isEqualTo(1);
+		assertThat(image.properties.width).isEqualTo(16);
+		assertThat(image.properties.height).isEqualTo(8);
+		assertThat(image.properties.x_scale).isCloseTo(0.1f + id, PRECISION);
+		assertThat(image.properties.y_scale).isCloseTo(0.2f + id, PRECISION);
+		assertThat(image.properties.x_offset).isCloseTo(0.3f + id, PRECISION);
+		assertThat(image.properties.y_offset).isCloseTo(0.4f + id, PRECISION);
+
+		assertThat(image.matrix_version).isEqualTo(1);
+		assertThat(image.offset).isEqualTo(2);
+		
+		assertThat(image.distortion_matrix).isNotEqualTo(Pointer.NULL);
+		assertThatMatrixCorrect(image.getMatrix(), id);
+		
+		assertThat(image.data).isNotEqualTo(Pointer.NULL);
+		assertThatImageDataCorrect(image.getData(), id);
+	}
+
+
+	private void assertThatMatrixCorrect(LEAP_DISTORTION_MATRIX matrix, int imageId)
+	{
+		int matrixSize = LEAP_DISTORTION_MATRIX.LEAP_DISTORTION_MATRIX_N
+				* LEAP_DISTORTION_MATRIX.LEAP_DISTORTION_MATRIX_N * 2;
+		
+		float[] expectedMatrix = new float[matrixSize];
+		
+		for (int i = 0; i < matrixSize; i++)
+		{
+			expectedMatrix[i] = i / (imageId + 1f);
+		}
+		
+		assertThat(matrix.matrix).containsExactly(expectedMatrix, PRECISION);
+	}
+
+
+	private void assertThatImageDataCorrect(byte[] data, int imageId)
+	{
+		byte[] expectedData = new byte[data.length];
+		
+		for (int i = 0; i < expectedData.length; i++)
+		{
+			int value = i * (imageId + 1);
+			
+			expectedData[i] = (byte)(value % 256);
+		}
+		
+		assertThat(data).containsExactly(expectedData);
+	}
+
+
 	private LEAP_CONNECTION_MESSAGE assertLeapPollConnection(eLeapEventType eventType)
 	{
 		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
