@@ -29,6 +29,12 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 public enum eLeapEventType implements IntEnum
 {
 	/**
+	 * Indicates that an unknown event type, i.e. one which doesn't match any of the
+	 * constants, was encountered.
+	 */
+	Unknown(-1),
+	
+	/**
 	 * No event has occurred within the timeout period specified when calling
 	 * {@link LeapC#LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}.
 	 */
