@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
+import java.util.Comparator;
+
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import komposten.leapjna.leapc.enums.eLeapDeviceCaps;
 import komposten.leapjna.leapc.enums.eLeapDevicePID;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapEventType;
+import komposten.leapjna.leapc.enums.eLeapHandType;
 
 
 public class StructTests
@@ -110,7 +113,7 @@ public class StructTests
 		void getXEvent_correctType_noException()
 		{
 			assertGetEvent(eLeapEventType.Connection, () -> struct.getConnectionEvent());
-			assertGetEvent(eLeapEventType.ConnectionLost, () -> struct.getConnectionLostEvent());
+			assertGetEvent(eLeapEventType.ConnectionLost,	() -> struct.getConnectionLostEvent());
 			assertGetEvent(eLeapEventType.Device, () -> struct.getDeviceEvent());
 			assertGetEvent(eLeapEventType.DeviceLost, () -> struct.getDeviceLostEvent());
 			assertGetEvent(eLeapEventType.DeviceStatusChange, () -> struct.getDeviceStatusChangeEvent());
@@ -168,7 +171,7 @@ public class StructTests
 		}
 	}
 
-	
+
 	@Nested
 	class LEAP_DEVICE_INFO_TEST
 	{
@@ -188,7 +191,9 @@ public class StructTests
 					eLeapDeviceStatus.Streaming };
 			struct.status = eLeapDeviceStatus.createMask(expected);
 
-			assertThat(struct.getStatus()).containsExactlyInAnyOrder(expected);
+			assertThat(struct.getStatus())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
 		}
 
 
@@ -202,7 +207,9 @@ public class StructTests
 
 			expected[1] = eLeapDeviceStatus.Smudged;
 			struct.status = eLeapDeviceStatus.createMask(expected);
-			assertThat(struct.getStatus()).containsExactlyInAnyOrder(expected);
+			assertThat(struct.getStatus())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
 		}
 
 
@@ -210,9 +217,11 @@ public class StructTests
 		void getCapabilities_validMask_correctConstants()
 		{
 			eLeapDeviceCaps[] expected = { eLeapDeviceCaps.Color };
-			struct.status = eLeapDeviceCaps.createMask(expected);
+			struct.caps = eLeapDeviceCaps.createMask(expected);
 
-			assertThat(struct.getCapabilities()).containsExactlyInAnyOrder(expected);
+			assertThat(struct.getCapabilities())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
 		}
 
 
@@ -220,12 +229,14 @@ public class StructTests
 		void getCapabilities_maskChanged_correctConstants()
 		{
 			eLeapDeviceCaps[] expected = { eLeapDeviceCaps.Color };
-			struct.status = eLeapDeviceCaps.createMask(expected);
+			struct.caps = eLeapDeviceCaps.createMask(expected);
 			struct.getCapabilities();
 
 			expected[0] = eLeapDeviceCaps.None;
-			struct.status = eLeapDeviceCaps.createMask(expected);
-			assertThat(struct.getCapabilities()).containsExactlyInAnyOrder(expected);
+			struct.caps = eLeapDeviceCaps.createMask(expected);
+			assertThat(struct.getCapabilities())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
 		}
 
 
@@ -257,6 +268,114 @@ public class StructTests
 			expected = eLeapDevicePID.Peripheral;
 			struct.pid = expected.value;
 			assertThat(struct.getPid()).isSameAs(expected);
+		}
+	}
+
+
+	@Nested
+	class LEAP_DIGIT_TEST
+	{
+		@Test
+		void boneArray_allBonesInOrder()
+		{
+			LEAP_DIGIT digit = new LEAP_DIGIT();
+			digit.metacarpal = new LEAP_BONE();
+			digit.proximal = new LEAP_BONE();
+			digit.intermediate = new LEAP_BONE();
+			digit.distal = new LEAP_BONE();
+
+			LEAP_BONE[] expected = { digit.metacarpal, digit.proximal,
+					digit.intermediate, digit.distal };
+
+			assertThat(digit.boneArray())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactly(expected);
+		}
+	}
+	
+	
+	@Nested
+	class LEAP_HAND_TEST
+	{
+		private LEAP_HAND struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_HAND();
+		}
+
+
+		@Test
+		void getType_validType_correctConstant()
+		{
+			eLeapHandType expected = eLeapHandType.Right;
+			struct.type = expected.value;
+
+			assertThat(struct.getType()).isSameAs(expected);
+		}
+
+
+		@Test
+		void getType_invalidType_correctConstant()
+		{
+			struct.type = -10;
+			assertThat(struct.getType()).isSameAs(eLeapHandType.Unknown);
+		}
+
+
+		@Test
+		void getType_typeChanged_correctConstant()
+		{
+			eLeapHandType expected = eLeapHandType.Right;
+			struct.type = expected.value;
+			struct.getType();
+
+			expected = eLeapHandType.Left;
+			struct.type = expected.value;
+			assertThat(struct.getType()).isSameAs(expected);
+		}
+
+
+		@Nested
+		class DigitStructTest
+		{
+			@Test
+			void asArray_allDigitsInOrder()
+			{
+				struct.digits = new LEAP_HAND.DigitStruct();
+				struct.digits.thumb = new LEAP_DIGIT();
+				struct.digits.index = new LEAP_DIGIT();
+				struct.digits.middle = new LEAP_DIGIT();
+				struct.digits.ring = new LEAP_DIGIT();
+				struct.digits.pinky = new LEAP_DIGIT();
+
+				LEAP_DIGIT[] expected = { struct.digits.thumb, struct.digits.index,
+						struct.digits.middle, struct.digits.ring, struct.digits.pinky };
+
+				assertThat(struct.digits.asArray())
+						.usingElementComparator(new IdentityComparator<>())
+						.containsExactly(expected);
+			}
+		}
+	}
+	
+	
+	/**
+	 * A comparator used to do <code>==</code> comparison of objects.
+	 * This comparator should only be used for equality comparisons, as it does not
+	 * ever return <code>1</code> (<code>-1</code> is used when the compared objects
+	 * are not the same).
+	 */
+	class IdentityComparator<T> implements Comparator<T>
+	{
+		@Override
+		public int compare(T o1, T o2)
+		{
+			// This violates the contract that sign(compare(x, y)) == -sign(compare(y, x))
+			// for all x and y. However, since this class is only used for equality-type
+			// comparisons it doesn't matter.
+			return o1 == o2 ? 0 : -1;
 		}
 	}
 }
