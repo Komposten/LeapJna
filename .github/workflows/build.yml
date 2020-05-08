@@ -39,6 +39,7 @@ jobs:
       run: |
         MKDIR LeapJna\lib\win32-x86-64
         COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib\win32-x86-64
+        TREE LeapJna\lib /F
     - name: Build with Maven
       run: |
         CD LeapJna
