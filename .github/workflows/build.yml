@@ -21,6 +21,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Checkout LeapJna
+      uses: actions/checkout@v2
+      with:
+        path: 'LeapJna'
     - name: Checkout MockLeapC
       uses: actions/checkout@v2
       with:
@@ -31,11 +35,7 @@ jobs:
       run: |
         cmake -S MockLeapC/. -B MockLeapC/out/build
         cmake --build MockLeapC/out/build --config Release
-    - name: Checkout LeapJna
-      uses: actions/checkout@v2
-      with:
-        path: 'LeapJna'
-    - name: Copy MockLeapC.dll
+    - name: Copy MockLeapC.dll to LeapJna/lib
       run: |
         MKDIR LeapJna\lib\win32-x86-64
         COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib\win32-x86-64
