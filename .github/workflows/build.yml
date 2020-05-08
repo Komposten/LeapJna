@@ -37,10 +37,10 @@ jobs:
         cmake --build MockLeapC/out/build --config Release
     - name: Copy MockLeapC.dll to LeapJna/lib
       run: |
-        MKDIR LeapJna\lib\win32-x86-64
-        COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib\win32-x86-64
+        MKDIR LeapJna\lib
+        COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib
         TREE LeapJna\lib /F
     - name: Build with Maven
       run: |
         CD LeapJna
-        mvn -B package --file pom.xml -DargLine="-Djna.debug_load=true"
+        mvn -B package --file pom.xml -DargLine="-Djna.library.path=lib"
