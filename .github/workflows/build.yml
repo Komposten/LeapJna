@@ -12,8 +12,23 @@ on:
 
 jobs:
   build:
-
+    name: Build
     runs-on: windows-latest
+
+    steps:
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Checkout LeapJna
+      uses: actions/checkout@v2
+    - name: Build LeapJna
+      run: mvn -B compile --file pom.xml
+      
+  test:
+    name: Test
+    runs-on: windows-latest
+    needs: build
 
     steps:
     - name: Set up JDK 1.8
@@ -39,10 +54,6 @@ jobs:
         MKDIR LeapJna\lib
         COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib
         TREE LeapJna\lib /F
-    - name: Build LeapJna
-      run: |
-        CD LeapJna
-        mvn -B compile --file pom.xml
     - name: Test LeapJna
       run: |
         CD LeapJna
