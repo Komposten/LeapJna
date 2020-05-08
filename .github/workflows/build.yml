@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - unit-testing
-      - github-actions
   pull_request:
     branches:
       - master
@@ -40,7 +39,11 @@ jobs:
         MKDIR LeapJna\lib
         COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib
         TREE LeapJna\lib /F
-    - name: Build with Maven
+    - name: Build LeapJna
       run: |
         CD LeapJna
-        mvn -B package --file pom.xml -DargLine="-Djna.library.path=lib"
+        mvn -B compile --file pom.xml
+    - name: Test LeapJna
+      run: |
+        CD LeapJna
+        mvn -B test --file pom.xml -DargLine="-Djna.library.path=lib"
