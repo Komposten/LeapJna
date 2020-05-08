@@ -28,19 +28,33 @@ public class Enums
 
 	public interface IntFlagEnum<T extends IntFlagEnum<?>> extends IntEnum
 	{
-		default boolean useDefaultParseMask()
-		{
-			return true;
-		}
-
-
 		T getEmptyMaskConstant();
 
 
-		@SuppressWarnings("unused")
+		@SuppressWarnings({ "unchecked" })
 		default T[] parseMask(int mask)
 		{
-			return null;
+			T[] enumValues = (T[]) getClass().getEnumConstants();
+			T emptyMask = getEmptyMaskConstant();
+
+			List<T> flags = new ArrayList<>();
+
+			for (T enumValue : enumValues)
+			{
+				if ((mask & enumValue.getValue()) == enumValue.getValue() && enumValue != emptyMask)
+				{
+					flags.add(enumValue);
+				}
+			}
+
+			if (flags.isEmpty())
+			{
+				flags.add(emptyMask);
+			}
+
+			T[] resultArray = (T[]) Array.newInstance(emptyMask.getClass(), flags.size());
+
+			return flags.toArray(resultArray);
 		}
 	}
 
@@ -111,40 +125,7 @@ public class Enums
 	{
 		E[] enumValues = enumClass.getEnumConstants();
 
-		if (enumValues[0].useDefaultParseMask())
-		{
-			return defaultParseMask(mask, enumValues[0].getEmptyMaskConstant());
-		}
-		else
-		{
-			return enumValues[0].parseMask(mask);
-		}
-	}
-
-
-	@SuppressWarnings("unchecked")
-	private static <E extends IntFlagEnum<E>> E[] defaultParseMask(int mask, E emptyMask)
-	{
-		E[] enumValues = (E[]) emptyMask.getClass().getEnumConstants();
-
-		List<E> flags = new ArrayList<>();
-
-		for (E enumValue : enumValues)
-		{
-			if ((mask & enumValue.getValue()) == enumValue.getValue() && enumValue != emptyMask)
-			{
-				flags.add(enumValue);
-			}
-		}
-
-		if (flags.isEmpty())
-		{
-			flags.add(emptyMask);
-		}
-
-		E[] resultArray = (E[]) Array.newInstance(emptyMask.getClass(), flags.size());
-
-		return flags.toArray(resultArray);
+		return enumValues[0].parseMask(mask);
 	}
 
 

@@ -88,7 +88,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		if (typeE == null)
 		{
-			typeE = Enums.parse(type, eLeapEventType.None);
+			typeE = Enums.parse(type, eLeapEventType.Unknown);
 		}
 
 		return typeE;
