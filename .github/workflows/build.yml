@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - unit-testing
+      
   pull_request:
     branches:
       - master
@@ -20,10 +21,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+        
     - name: Checkout LeapJna
       uses: actions/checkout@v2
+      
     - name: Build LeapJna
       run: mvn -B compile --file pom.xml
+      
       
   test:
     name: Test
@@ -35,25 +39,30 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+        
     - name: Checkout LeapJna
       uses: actions/checkout@v2
       with:
         path: 'LeapJna'
+        
     - name: Checkout MockLeapC
       uses: actions/checkout@v2
       with:
         repository: 'komposten/MockLeapC'
         path: 'MockLeapC'
         token: ${{ secrets.GH_TOKEN }}
+        
     - name: Build MockLeapC
       run: |
         cmake -S MockLeapC/. -B MockLeapC/out/build
         cmake --build MockLeapC/out/build --config Release
+        
     - name: Copy MockLeapC.dll to LeapJna/lib
       run: |
         MKDIR LeapJna\lib
         COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib
         TREE LeapJna\lib /F
+        
     - name: Test LeapJna
       run: |
         CD LeapJna
