@@ -43,4 +43,4 @@ jobs:
     - name: Build with Maven
       run: |
         CD LeapJna
-        mvn -B package --file pom.xml
+        mvn -B package --file pom.xml -DargLine="-Djna.debug_load=true"
