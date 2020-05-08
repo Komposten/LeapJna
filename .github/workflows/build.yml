@@ -67,3 +67,8 @@ jobs:
       run: |
         CD LeapJna
         mvn -B test --file pom.xml -DargLine="-Djna.library.path=lib"
+        
+    - name: SonarCloud analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B verify sonar:sonar --file pom.xml -DargLine="-Djna.library.path=lib"
