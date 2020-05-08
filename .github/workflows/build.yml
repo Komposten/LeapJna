@@ -25,12 +25,14 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
     - name: Build MockLeapC
       run: |
-        cmake -S . -B ./out/build
-        cmake --build ./out/build --config Release
+        cmake -S MockLeapC/. -B MockLeapC/out/build
+        cmake --build MockLeapC/out/build --config Release
     - name: Checkout LeapJna
       uses: actions/checkout@v2
+      path: 'LeapJna'
     - name: Copy MockLeapC.dll
       run: |
+        CD LeapJna
         MKDIR lib\win32-x86-64
         COPY ..\MockLeapC\out\build\Release\MockLeapC.dll lib\win32-x86-64
     - name: Set up JDK 1.8
