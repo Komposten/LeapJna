@@ -29,7 +29,7 @@ jobs:
         cmake --build MockLeapC/out/build --config Release
     - name: Checkout LeapJna
       uses: actions/checkout@v2
-      path: 'LeapJna'
+        path: 'LeapJna'
     - name: Copy MockLeapC.dll
       run: |
         CD LeapJna
