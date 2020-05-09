@@ -19,6 +19,8 @@ jobs:
         
     - name: Checkout LeapJna
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
       
     - name: Build
       run: mvn -B compile --file pom.xml
