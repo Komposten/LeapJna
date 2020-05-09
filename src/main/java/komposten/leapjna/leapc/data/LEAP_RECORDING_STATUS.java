@@ -46,19 +46,12 @@ public class LEAP_RECORDING_STATUS extends Structure
 	 */
 	public int mode;
 
-	private eLeapRecordingFlags[] modeE;
-
 	/**
 	 * @return The mode flags as an {@link eLeapDeviceStatus} array instead of an
 	 *         <code>int</code>.
 	 */
 	public eLeapRecordingFlags[] getMode()
 	{
-		if (modeE == null)
-		{
-			modeE = Enums.parseMask(mode, eLeapRecordingFlags.class);
-		}
-
-		return modeE;
+		return Enums.parseMask(mode, eLeapRecordingFlags.class);
 	}
 }

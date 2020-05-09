@@ -71,6 +71,10 @@ public class LEAP_IMAGE extends Structure
 	 * means that the data might overridden or freed if this method is not called
 	 * immediately after receiving the <code>LEAP_IMAGE</code>.
 	 * </p>
+	 * <p>
+	 * After {@link #getData()} has been called once, successive calls will return
+	 * a cached array rather than load the data from native memory every time.
+	 * </p>
 	 * 
 	 * @return The image data as a byte array.
 	 */

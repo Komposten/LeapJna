@@ -88,18 +88,9 @@ public class LEAP_VARIANT extends Structure
 	 */
 	public ValueUnion union;
 
-	private eLeapValueType typeE;
-
 	public LEAP_VARIANT()
 	{
 		super(ALIGN_NONE);
-	}
-
-
-	@Override
-	public void read()
-	{
-		super.read();
 	}
 
 
@@ -140,12 +131,7 @@ public class LEAP_VARIANT extends Structure
 	 */
 	public eLeapValueType getType()
 	{
-		if (typeE == null)
-		{
-			typeE = Enums.parse(type, eLeapValueType.Unknown);
-		}
-
-		return typeE;
+		return Enums.parse(type, eLeapValueType.Unknown);
 	}
 
 
@@ -227,8 +213,8 @@ public class LEAP_VARIANT extends Structure
 	{
 		if (type != valueType.value)
 		{
-			throw new IllegalStateException(
-					"Incorrect value type: " + typeE + " != " + valueType);
+			throw new IllegalStateException("Incorrect value type: "
+					+ Enums.parse(type, eLeapValueType.Unknown) + " != " + valueType);
 		}
 	}
 }

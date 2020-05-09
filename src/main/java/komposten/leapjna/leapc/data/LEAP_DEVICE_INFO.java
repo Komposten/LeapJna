@@ -84,10 +84,6 @@ public class LEAP_DEVICE_INFO extends Structure
 	/** The maximum range for this device, in micrometers. */
 	public int range;
 
-	private eLeapDeviceStatus[] statusE;
-	private eLeapDeviceCaps[] capsE;
-	private eLeapDevicePID pidE;
-
 	public LEAP_DEVICE_INFO()
 	{
 		this(1);
@@ -134,12 +130,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	 */
 	public eLeapDeviceStatus[] getStatus()
 	{
-		if (statusE == null)
-		{
-			statusE = Enums.parseMask(status, eLeapDeviceStatus.class);
-		}
-
-		return statusE;
+		return Enums.parseMask(status, eLeapDeviceStatus.class);
 	}
 
 
@@ -149,12 +140,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	 */
 	public eLeapDeviceCaps[] getCapabilities()
 	{
-		if (capsE == null)
-		{
-			capsE = Enums.parseMask(caps, eLeapDeviceCaps.class);
-		}
-
-		return capsE;
+		return Enums.parseMask(caps, eLeapDeviceCaps.class);
 	}
 
 
@@ -164,11 +150,6 @@ public class LEAP_DEVICE_INFO extends Structure
 	 */
 	public eLeapDevicePID getPid()
 	{
-		if (pidE == null)
-		{
-			pidE = Enums.parse(pid, eLeapDevicePID.Invalid);
-		}
-
-		return pidE;
+		return Enums.parse(pid, eLeapDevicePID.Invalid);
 	}
 }

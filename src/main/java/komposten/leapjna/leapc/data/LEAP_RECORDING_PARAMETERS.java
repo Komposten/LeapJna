@@ -43,9 +43,6 @@ public class LEAP_RECORDING_PARAMETERS extends Structure
 	 */
 	public int mode;
 
-	private eLeapRecordingFlags[] modeE;
-
-
 	public LEAP_RECORDING_PARAMETERS()
 	{}
 
@@ -63,12 +60,7 @@ public class LEAP_RECORDING_PARAMETERS extends Structure
 	 */
 	public eLeapRecordingFlags[] getMode()
 	{
-		if (modeE == null)
-		{
-			modeE = Enums.parseMask(mode, eLeapRecordingFlags.class);
-		}
-
-		return modeE;
+		return Enums.parseMask(mode, eLeapRecordingFlags.class);
 	}
 
 
