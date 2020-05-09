@@ -66,11 +66,11 @@ jobs:
     - name: Test LeapJna
       run: |
         CD LeapJna
-        mvn -B test --file pom.xml -DargLine="-Djna.library.path=lib"
+        mvn -B test --file pom.xml
         
     - name: SonarCloud analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         CD LeapJna
-        mvn -B verify sonar:sonar --file pom.xml -DargLine="-Djna.library.path=lib"
+        mvn -B verify sonar:sonar --file pom.xml
