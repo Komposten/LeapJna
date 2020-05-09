@@ -36,8 +36,6 @@ public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public int flags;
 
-	private eLeapServiceDisposition flagsE;
-
 	public LEAP_CONNECTION_EVENT(Pointer pointer)
 	{
 		super(pointer);
@@ -51,11 +49,6 @@ public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public eLeapServiceDisposition getFlags()
 	{
-		if (flagsE == null)
-		{
-			flagsE = Enums.parse(flags, eLeapServiceDisposition.None);
-		}
-
-		return flagsE;
+		return Enums.parse(flags, eLeapServiceDisposition.None);
 	}
 }

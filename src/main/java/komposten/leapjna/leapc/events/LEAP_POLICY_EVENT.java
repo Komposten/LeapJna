@@ -45,8 +45,6 @@ public class LEAP_POLICY_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public int current_policy;
 
-	private eLeapPolicyFlag[] policyE;
-
 	public LEAP_POLICY_EVENT(Pointer pointer)
 	{
 		super(pointer, ALIGN_NONE);
@@ -59,11 +57,6 @@ public class LEAP_POLICY_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public eLeapPolicyFlag[] getCurrentPolicy()
 	{
-		if (policyE == null)
-		{
-			policyE = Enums.parseMask(current_policy, eLeapPolicyFlag.class);
-		}
-
-		return policyE;
+		return Enums.parseMask(current_policy, eLeapPolicyFlag.class);
 	}
 }
