@@ -260,7 +260,7 @@ public interface LeapC extends Library
 	 * </p>
 	 * <p>
 	 * To ensure resources are properly freed, users must call
-	 * {@link #LeapOpenDevice(Pointer)} when finished with the device, even if the retrieved
+	 * {@link #LeapCloseDevice(Pointer)} when finished with the device, even if the retrieved
 	 * device has problems or cannot stream.
 	 * </p>
 	 * 
@@ -300,7 +300,7 @@ public interface LeapC extends Library
 	 * will return {@link eLeapRS#InsufficientBuffer}, but LeapC still sets the
 	 * <code>serial_length</code> field of the struct to the required length. You can then
 	 * allocate memory for the string (using e.g.
-	 * {@link LEAP_DEVICE_INFO#allocateSerialBuffer(int)}, set the serial field, and call
+	 * {@link LEAP_DEVICE_INFO#allocateSerialBuffer(int)}), set the serial field, and call
 	 * this function again.
 	 * </p>
 	 * 

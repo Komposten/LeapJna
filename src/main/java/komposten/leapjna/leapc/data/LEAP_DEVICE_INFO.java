@@ -86,7 +86,7 @@ public class LEAP_DEVICE_INFO extends Structure
 
 	public LEAP_DEVICE_INFO()
 	{
-		this(1);
+		this(-1);
 	}
 
 
@@ -102,11 +102,20 @@ public class LEAP_DEVICE_INFO extends Structure
 	/**
 	 * Allocates space for the serial number string.
 	 * 
-	 * @param serial_length The length of the serial string.
+	 * @param serial_length The length of the serial string, or <code>-1</code> to
+	 * set the serial to <code>null</code>.
 	 */
 	public void allocateSerialBuffer(int serial_length)
 	{
-		setSerial(new String(new byte[serial_length]));
+		if (serial_length > 0)
+		{
+			setSerial(new String(new byte[serial_length]));
+		}
+		else
+		{
+			this.serial_length = 0;
+			this.serial = null;
+		}
 	}
 
 

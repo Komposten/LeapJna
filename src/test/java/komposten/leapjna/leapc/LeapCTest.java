@@ -2,6 +2,7 @@ package komposten.leapjna.leapc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,8 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
@@ -21,6 +24,8 @@ import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
+import komposten.leapjna.leapc.enums.eLeapDeviceCaps;
+import komposten.leapjna.leapc.enums.eLeapDevicePID;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapEventType;
@@ -509,5 +514,75 @@ public class LeapCTest
 			assertThat(deviceRef.handle.getByte(0)).isEqualTo((byte) (i + 1));
 			assertThat(deviceRef.id).isEqualTo(i + 3);
 		}
+	}
+	
+	
+	@Test
+	void LeapOpenDevice_success()
+	{
+		LEAP_DEVICE phDevice = new LEAP_DEVICE();
+		LEAP_DEVICE_REF rDevice = new LEAP_DEVICE_REF();
+		rDevice.id = 1;
+		
+		eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(rDevice, phDevice);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(rDevice.id).isEqualTo(2);
+		assertThat(rDevice.handle.getByte(0)).isEqualTo((byte)1);
+	}
+
+
+	@Test
+	void LeapCloseDevice_runsWithoutException()
+	{
+		assertThatCode(() -> LeapC.INSTANCE.LeapCloseDevice(null))
+				.doesNotThrowAnyException();
+	}
+	
+	
+	@Test
+	void LeapGetDeviceInfo_serialNull_setSerialLength()
+	{
+		LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceInfo(null, info);
+		
+		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
+		assertThat(info.serial_length).isEqualTo(5);
+	}
+	
+	
+	@Test
+	void LeapGetDeviceInfo_serialNotNull_setSerial()
+	{
+		// Get the serial length
+		LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceInfo(null, info);
+		
+		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
+		
+		// Create a new empty info struct with enough memory allocated for the serial
+		info = new LEAP_DEVICE_INFO(info.serial_length);
+		
+		// Get the device info
+		result = LeapC.INSTANCE.LeapGetDeviceInfo(null, info);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(info.size).isEqualTo(info.size());
+		assertThat(info.status).isEqualTo(eLeapDeviceStatus.Streaming.value);
+		assertThat(info.caps).isEqualTo(eLeapDeviceCaps.Color.value);
+		assertThat(info.pid).isEqualTo(eLeapDevicePID.Dragonfly.value);
+		assertThat(info.baseline).isEqualTo(10);
+		assertThat(info.serial).isEqualTo("LEAP#");
+		assertThat(info.serial_length).isEqualTo(info.serial.length());
+		assertThat(info.h_fov).isEqualTo(120);
+		assertThat(info.v_fov).isEqualTo(90);
+		assertThat(info.range).isEqualTo(100);
+	}
+	
+	
+	@Test
+	void LeapDevicePIDToString_dragonfly_dragonfly()
+	{
+		String pid = LeapC.INSTANCE.LeapDevicePIDToString(eLeapDevicePID.Dragonfly.value);
+		assertThat(pid).isEqualTo("dragonfly");
 	}
 }
