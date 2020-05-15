@@ -1,21 +1,26 @@
 package komposten.leapjna.leapc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
+import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
+import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.enums.Enums;
+import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapEventType;
@@ -42,6 +47,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.util.ArrayPointer;
 
 
 public class LeapCTest
@@ -84,10 +90,26 @@ public class LeapCTest
 
 
 	@Test
+	void LeapDestroyConnection_runsWithoutException()
+	{
+		assertThatCode(() -> LeapC.INSTANCE.LeapDestroyConnection(null))
+				.doesNotThrowAnyException();
+	}
+
+
+	@Test
 	void LeapOpenConnection_success()
 	{
 		eLeapRS result = LeapC.INSTANCE.LeapOpenConnection(null);
 		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapCloseConnection_runsWithoutException()
+	{
+		assertThatCode(() -> LeapC.INSTANCE.LeapCloseConnection(null))
+				.doesNotThrowAnyException();
 	}
 
 
@@ -430,5 +452,61 @@ public class LeapCTest
 		assertThat(message.type).isEqualTo(eventType.value);
 		
 		return message;
+	}
+	
+	
+	@Test
+	void LeapGetConnectionInfo_mapsProperly()
+	{
+		LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
+		
+		assertThat(pInfo.size).isEqualTo(pInfo.size());
+		
+		eLeapRS result = LeapC.INSTANCE.LeapGetConnectionInfo(null, pInfo);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pInfo.size).isEqualTo(13);
+		assertThat(pInfo.status).isEqualTo(eLeapConnectionStatus.Connected.value);
+	}
+	
+	
+	@Test
+	void LeapGetDeviceList_noArray_returnRequiredSize()
+	{
+		IntByReference pnArray = new IntByReference();
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceList(null, null, pnArray);
+
+		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
+		assertThat(pnArray.getValue()).isEqualTo(2);
+	}
+	
+	
+	@Test
+	void LeapGetDeviceList_withArray_populateArray()
+	{
+		// Read the required array size
+		IntByReference pnArray = new IntByReference();
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceList(null, null, pnArray);
+
+		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
+
+		// Create the array and call LeapGetDeviceList again.
+		ArrayPointer<LEAP_DEVICE_REF> pArray = ArrayPointer.empty(LEAP_DEVICE_REF.class,
+				pnArray.getValue());
+		result = LeapC.INSTANCE.LeapGetDeviceList(null, pArray, pnArray);
+
+		assertThat(result).isEqualTo(eLeapRS.Success);
+
+		// Read the array values
+		LEAP_DEVICE_REF[] array = new LEAP_DEVICE_REF[pnArray.getValue()];
+		pArray.getElements(array);
+
+		assertThat(array).hasSize(pnArray.getValue());
+		for (int i = 0; i < array.length; i++)
+		{
+			LEAP_DEVICE_REF deviceRef = array[i];
+			assertThat(deviceRef.handle).isNotEqualTo(Pointer.NULL);
+			assertThat(deviceRef.handle.getByte(0)).isEqualTo((byte) (i + 1));
+			assertThat(deviceRef.id).isEqualTo(i + 3);
+		}
 	}
 }
