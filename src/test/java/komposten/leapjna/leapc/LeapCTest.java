@@ -407,7 +407,8 @@ public class LeapCTest
 		assertThatMatrixCorrect(image.getMatrix(), id);
 		
 		assertThat(image.data).isNotEqualTo(Pointer.NULL);
-		assertThatImageDataCorrect(image.getData(), id);
+		assertThat(image.offset).isEqualTo(2);
+		assertThatImageDataCorrect(image.getData(), id, image.offset);
 	}
 
 
@@ -427,13 +428,13 @@ public class LeapCTest
 	}
 
 
-	private void assertThatImageDataCorrect(byte[] data, int imageId)
+	private void assertThatImageDataCorrect(byte[] data, int imageId, int offset)
 	{
 		byte[] expectedData = new byte[data.length];
 		
 		for (int i = 0; i < expectedData.length; i++)
 		{
-			int value = i * (imageId + 1);
+			int value = (i + offset) * (imageId + 1);
 			
 			expectedData[i] = (byte)(value % 256);
 		}
