@@ -8,6 +8,7 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
@@ -521,13 +522,14 @@ public class LeapCTest
 	void LeapOpenDevice_success()
 	{
 		LEAP_DEVICE phDevice = new LEAP_DEVICE();
-		LEAP_DEVICE_REF rDevice = new LEAP_DEVICE_REF();
+		LEAP_DEVICE_REF.ByValue rDevice = new LEAP_DEVICE_REF.ByValue();
 		rDevice.id = 1;
+		rDevice.handle = new Pointer(Native.malloc(1));
+		
+		assertThat(Pointer.nativeValue(rDevice.handle)).as("Failed to allocate handle").isNotEqualTo(0);
 		
 		eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(rDevice, phDevice);
 		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(rDevice.id).isEqualTo(2);
-		assertThat(rDevice.handle.getByte(0)).isEqualTo((byte)1);
 	}
 
 

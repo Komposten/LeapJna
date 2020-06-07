@@ -52,4 +52,9 @@ public class LEAP_DEVICE_REF extends Structure
 		super(pointer, ALIGN_NONE);
 		read();
 	}
+	
+	public static class ByValue extends LEAP_DEVICE_REF implements Structure.ByValue
+	{
+		
+	}
 }

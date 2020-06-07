@@ -271,7 +271,7 @@ public interface LeapC extends Library
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga992f1420318c3569a6a0f3ceaac43754">LeapC
 	 *      API - LeapOpenDevice</a>
 	 */
-	public eLeapRS LeapOpenDevice(LEAP_DEVICE_REF rDevice, LEAP_DEVICE phDevice);
+	public eLeapRS LeapOpenDevice(LEAP_DEVICE_REF.ByValue rDevice, LEAP_DEVICE phDevice);
 
 
 	/**
