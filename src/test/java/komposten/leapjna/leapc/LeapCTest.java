@@ -522,7 +522,7 @@ public class LeapCTest
 	void LeapOpenDevice_success()
 	{
 		LEAP_DEVICE phDevice = new LEAP_DEVICE();
-		LEAP_DEVICE_REF.ByValue rDevice = new LEAP_DEVICE_REF.ByValue();
+		LEAP_DEVICE_REF rDevice = new LEAP_DEVICE_REF();
 		rDevice.id = 1;
 		rDevice.handle = new Pointer(Native.malloc(1));
 		

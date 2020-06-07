@@ -34,7 +34,7 @@ import komposten.leapjna.leapc.LeapC;
  *      API - LEAP_CONNECTION_EVENT</a>
  */
 @FieldOrder({ "handle", "id" })
-public class LEAP_DEVICE_REF extends Structure
+public class LEAP_DEVICE_REF extends Structure implements Structure.ByValue
 {
 	/** A device handle. */
 	public Pointer handle;
@@ -51,10 +51,5 @@ public class LEAP_DEVICE_REF extends Structure
 	{
 		super(pointer, ALIGN_NONE);
 		read();
-	}
-	
-	public static class ByValue extends LEAP_DEVICE_REF implements Structure.ByValue
-	{
-		
 	}
 }
