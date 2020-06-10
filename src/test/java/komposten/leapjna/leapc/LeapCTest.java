@@ -23,6 +23,7 @@ import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
+import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 import komposten.leapjna.leapc.enums.eLeapDeviceCaps;
@@ -54,6 +55,7 @@ import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.leapc.util.Configurations;
 
 
 public class LeapCTest
@@ -686,5 +688,57 @@ public class LeapCTest
 	{
 		eLeapRS result = LeapC.INSTANCE.LeapSetPause(null, 1);
 		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+	
+	
+	@Test
+	void LeapRequestConfigValue_correctIdReceived()
+	{
+		LongByReference pRequestID = new LongByReference();
+		
+		// Test METRICS_ENABLED.
+		//  We expect MockLeapC to return an ID of 5.
+		String key = Configurations.Service.METRICS_ENABLED;
+		int expected = 5;
+		eLeapRS result = LeapC.INSTANCE.LeapRequestConfigValue(null, key, pRequestID);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pRequestID.getValue()).isEqualTo(expected);
+		
+		// Test IMAGES_MODE.
+		//  We expect MockLeapC to return an ID of 6.
+		key = Configurations.Tracking.IMAGES_MODE;
+		expected = 6;
+		result = LeapC.INSTANCE.LeapRequestConfigValue(null, key, pRequestID);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pRequestID.getValue()).isEqualTo(expected);
+	}
+	
+	
+	@Test
+	void LeapSaveConfigValue_correctIdReceived()
+	{
+		LongByReference pRequestID = new LongByReference();
+
+		// Test METRICS_ENABLED.
+		//  We expect MockLeapC to return an ID of 5 if we pass a bool value of true.
+		String key = Configurations.Service.METRICS_ENABLED;
+		LEAP_VARIANT value = new LEAP_VARIANT(true);
+		int expected = 5;
+		eLeapRS result = LeapC.INSTANCE.LeapSaveConfigValue(null, key, value, pRequestID);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pRequestID.getValue()).isEqualTo(expected);
+		
+		// Test IMAGES_MODE.
+		//  We expect MockLeapC to return an ID of 6 if we pass an int value of 2.
+		key = Configurations.Tracking.IMAGES_MODE;
+		value = new LEAP_VARIANT(2);
+		expected = 6;
+		result = LeapC.INSTANCE.LeapSaveConfigValue(null, key, value, pRequestID);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pRequestID.getValue()).isEqualTo(expected);
 	}
 }
