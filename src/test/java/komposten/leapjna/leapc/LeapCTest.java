@@ -106,6 +106,11 @@ public class LeapCTest
 	}
 
 
+	/**
+	 * Since we can't create functional LEAP_CONNECTION objects we can't test this
+	 * mapping properly. Instead, just check if the function exists (if it does not,
+	 * an error is thrown).
+	 */
 	@Test
 	void LeapDestroyConnection_runsWithoutException()
 	{
@@ -113,7 +118,12 @@ public class LeapCTest
 				.doesNotThrowAnyException();
 	}
 
-
+	
+	/**
+	 * Since we can't create functional LEAP_CONNECTION objects we can't test this
+	 * mapping properly. Instead, just check if the function exists and returns
+	 * <code>eLeapRS.Success</code>.
+	 */
 	@Test
 	void LeapOpenConnection_success()
 	{
@@ -122,6 +132,11 @@ public class LeapCTest
 	}
 
 
+	/**
+	 * Since we can't create functional LEAP_CONNECTION objects we can't test this
+	 * mapping properly. Instead, just check if the function exists (if it does not,
+	 * an error is thrown).
+	 */
 	@Test
 	void LeapCloseConnection_runsWithoutException()
 	{
@@ -529,6 +544,11 @@ public class LeapCTest
 	}
 	
 	
+	/**
+	 * Since we can't create functional LEAP_DEVICE objects we can't test this
+	 * mapping properly. Instead, just check if the function exists and retrieves
+	 * the correct data (in which case it returns <code>eLeapRS.Success</code>).
+	 */
 	@Test
 	void LeapOpenDevice_success()
 	{
@@ -538,12 +558,18 @@ public class LeapCTest
 		rDevice.handle = new Pointer(Native.malloc(1));
 		
 		assertThat(Pointer.nativeValue(rDevice.handle)).as("Failed to allocate handle").isNotEqualTo(0);
+		rDevice.handle.setByte(0, (byte)5);
 		
 		eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(rDevice, phDevice);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 
 
+	/**
+	 * Since we can't create functional LEAP_DEVICE objects we can't test this
+	 * mapping properly. Instead, just check if the function exists (if it does not,
+	 * an error is thrown).
+	 */
 	@Test
 	void LeapCloseDevice_runsWithoutException()
 	{
@@ -680,6 +706,11 @@ public class LeapCTest
 	}
 	
 	
+	/**
+	 * LeapSetPolicyFlags will return <code>eLeapRS.Success</code> if <code>set</code>
+	 * is a mask containing <code>BackgroundFrames</code> and <code>OptimiseHMD</code>
+	 * and <code>clear</code> contains <code>MapPoints</code> and <code>Images</code>. 
+	 */
 	@Test
 	void LeapSetPolicyFlags_success()
 	{
@@ -692,6 +723,10 @@ public class LeapCTest
 	}
 	
 	
+	/**
+	 * LeapSetPause will return <code>eLeapRS.Success</code> if <code>pause</code>
+	 * is 1 (true).
+	 */
 	@Test
 	void LeapSetPause_success()
 	{
