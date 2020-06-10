@@ -78,6 +78,51 @@ public class LeapCTest
 	{
 		LeapCConfig.useMockDll(true);
 	}
+	
+	
+	/**
+	 * Helper method for creating <code>LEAP_CONNECTION</code> objects for testing functions
+	 * which take such a connection as a parameter.
+	 * 
+	 * @return The handle of a <code>LEAP_CONNECTION</code> object.
+	 */
+	private Pointer getConnectionHandle()
+	{
+		LEAP_CONNECTION phConnection = new LEAP_CONNECTION();
+		eLeapRS result = LeapC.INSTANCE.LeapCreateConnection(null, phConnection);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		return phConnection.handle;
+	}
+
+
+	/**
+	 * Helper method for creating a fake device handle pointing to a single byte set to 2,
+	 * similar to how MockLeapC creates its device handles.
+	 */
+	private Pointer getDeviceHandle()
+	{
+		Pointer handle = new Pointer(Native.malloc(1));
+		assertThat(Pointer.nativeValue(handle)).as("Failed to allocate handle").isNotEqualTo(0);
+		handle.setByte(0, (byte)2);
+		return handle;
+	}
+	
+	
+	/**
+	 * Helper method for creating <code>LEAP_CLOCK_REBASER</code> objects for testing functions
+	 * which take such a rebaser as a parameter.
+	 * 
+	 * @return The handle of a <code>LEAP_CLOCK_REBASER</code> object.
+	 */
+	private Pointer getRebaserHandle()
+	{
+		LEAP_CLOCK_REBASER phRebaser = new LEAP_CLOCK_REBASER();
+		eLeapRS result = LeapC.INSTANCE.LeapCreateClockRebaser(phRebaser);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		return phRebaser.handle;
+	}
 
 
 	/**
@@ -114,11 +159,6 @@ public class LeapCTest
 	}
 
 
-	/**
-	 * Since we can't create functional LEAP_CONNECTION objects we can't test this
-	 * mapping properly. Instead, just check if the function exists (if it does not,
-	 * an error is thrown).
-	 */
 	@Test
 	void LeapDestroyConnection_success()
 	{
@@ -138,27 +178,26 @@ public class LeapCTest
 
 	
 	/**
-	 * Since we can't create functional LEAP_CONNECTION objects we can't test this
-	 * mapping properly. Instead, just check if the function exists and returns
-	 * <code>eLeapRS.Success</code>.
+	 * LeapOpenConnection returns <code>eLeapRS.Success</code> if the provided
+	 * handle is valid.
 	 */
 	@Test
 	void LeapOpenConnection_success()
 	{
-		eLeapRS result = LeapC.INSTANCE.LeapOpenConnection(null);
+		eLeapRS result = LeapC.INSTANCE.LeapOpenConnection(getConnectionHandle());
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 
 
 	/**
-	 * Since we can't create functional LEAP_CONNECTION objects we can't test this
-	 * mapping properly. Instead, just check if the function exists (if it does not,
-	 * an error is thrown).
+	 * LeapCloseConnection throws an exception if the provided handle is not valid.
+	 * Unfortunately that exception seems to be picked up as an <code>Invalid memory access</code>
+	 * error by JNA, though... 
 	 */
 	@Test
 	void LeapCloseConnection_runsWithoutException()
 	{
-		assertThatCode(() -> LeapC.INSTANCE.LeapCloseConnection(null))
+		assertThatCode(() -> LeapC.INSTANCE.LeapCloseConnection(getConnectionHandle()))
 				.doesNotThrowAnyException();
 	}
 
@@ -498,7 +537,7 @@ public class LeapCTest
 		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
 		message.type = eventType.value;
 
-		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(null, 0, message);
+		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(getConnectionHandle(), 0, message);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(message.type).isEqualTo(eventType.value);
 		
@@ -513,7 +552,7 @@ public class LeapCTest
 		
 		assertThat(pInfo.size).isEqualTo(pInfo.size());
 		
-		eLeapRS result = LeapC.INSTANCE.LeapGetConnectionInfo(null, pInfo);
+		eLeapRS result = LeapC.INSTANCE.LeapGetConnectionInfo(getConnectionHandle(), pInfo);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pInfo.size).isEqualTo(13);
 		assertThat(pInfo.status).isEqualTo(eLeapConnectionStatus.Connected.value);
@@ -524,7 +563,7 @@ public class LeapCTest
 	void LeapGetDeviceList_noArray_returnRequiredSize()
 	{
 		IntByReference pnArray = new IntByReference();
-		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceList(null, null, pnArray);
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceList(getConnectionHandle(), null, pnArray);
 
 		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
 		assertThat(pnArray.getValue()).isEqualTo(2);
@@ -536,14 +575,14 @@ public class LeapCTest
 	{
 		// Read the required array size
 		IntByReference pnArray = new IntByReference();
-		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceList(null, null, pnArray);
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceList(getConnectionHandle(), null, pnArray);
 
 		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
 
 		// Create the array and call LeapGetDeviceList again.
 		ArrayPointer<LEAP_DEVICE_REF> pArray = ArrayPointer.empty(LEAP_DEVICE_REF.class,
 				pnArray.getValue());
-		result = LeapC.INSTANCE.LeapGetDeviceList(null, pArray, pnArray);
+		result = LeapC.INSTANCE.LeapGetDeviceList(getConnectionHandle(), pArray, pnArray);
 
 		assertThat(result).isEqualTo(eLeapRS.Success);
 
@@ -580,19 +619,25 @@ public class LeapCTest
 		
 		eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(rDevice, phDevice);
 		assertThat(result).isEqualTo(eLeapRS.Success);
+
+		// The device handle should now point to a byte with the value 2.
+		assertThat(phDevice.handle.getByte(0)).isEqualTo((byte)2);
 	}
 
 
-	/**
-	 * Since we can't create functional LEAP_DEVICE objects we can't test this
-	 * mapping properly. Instead, just check if the function exists (if it does not,
-	 * an error is thrown).
-	 */
 	@Test
-	void LeapCloseDevice_runsWithoutException()
+	void LeapCloseDevice_success()
 	{
-		assertThatCode(() -> LeapC.INSTANCE.LeapCloseDevice(null))
-				.doesNotThrowAnyException();
+		// First create a device handle to close.
+		Pointer hDevice = getDeviceHandle();
+
+		// Then close the device.
+		LeapC.INSTANCE.LeapCloseDevice(hDevice);
+		
+		// If the function was run correctly, the device handle should now
+		// point to the value 3.
+		assertThat(hDevice.getByte(0)).isEqualTo((byte)3);
+	
 	}
 	
 	
@@ -600,7 +645,7 @@ public class LeapCTest
 	void LeapGetDeviceInfo_serialNull_setSerialLength()
 	{
 		LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
-		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceInfo(null, info);
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceInfo(getDeviceHandle(), info);
 		
 		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
 		assertThat(info.serial_length).isEqualTo(5);
@@ -612,7 +657,7 @@ public class LeapCTest
 	{
 		// Get the serial length
 		LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
-		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceInfo(null, info);
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceInfo(getDeviceHandle(), info);
 		
 		assertThat(result).isEqualTo(eLeapRS.InsufficientBuffer);
 		
@@ -620,7 +665,7 @@ public class LeapCTest
 		info = new LEAP_DEVICE_INFO(info.serial_length);
 		
 		// Get the device info
-		result = LeapC.INSTANCE.LeapGetDeviceInfo(null, info);
+		result = LeapC.INSTANCE.LeapGetDeviceInfo(getDeviceHandle(), info);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(info.size).isEqualTo(info.size());
@@ -649,7 +694,8 @@ public class LeapCTest
 	{
 		LongByReference pSize = new LongByReference();
 		long timestamp = 123;
-		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(null, timestamp, pSize);
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(getConnectionHandle(), timestamp,
+				pSize);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pSize.getValue()).isEqualTo(246);
@@ -662,14 +708,16 @@ public class LeapCTest
 		// Get a frame size from MockLeapC.
 		LongByReference pncbEvent = new LongByReference();
 		long timestamp = 123;
-		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(null, timestamp, pncbEvent);
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(getConnectionHandle(), timestamp,
+				pncbEvent);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 
 		// Create the tracking event and interpolate.
 		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT((int) pncbEvent.getValue());
-		
-		result = LeapC.INSTANCE.LeapInterpolateFrame(null, timestamp, pEvent, pncbEvent.getValue());
+
+		result = LeapC.INSTANCE.LeapInterpolateFrame(getConnectionHandle(), timestamp, pEvent,
+				pncbEvent.getValue());
 		
 		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
 		// tests, so just check a couple of values here.
@@ -687,15 +735,16 @@ public class LeapCTest
 		LongByReference pncbEvent = new LongByReference();
 		long timestamp = 123;
 		long sourceTimestamp = 101;
-		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(null, timestamp, pncbEvent);
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(getConnectionHandle(), timestamp,
+				pncbEvent);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 
 		// Create the tracking event and interpolate.
 		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT((int) pncbEvent.getValue());
 
-		result = LeapC.INSTANCE.LeapInterpolateFrameFromTime(null, sourceTimestamp, timestamp,
-				pEvent, pncbEvent.getValue());
+		result = LeapC.INSTANCE.LeapInterpolateFrameFromTime(getConnectionHandle(),
+				sourceTimestamp, timestamp, pEvent, pncbEvent.getValue());
 		
 		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
 		// tests, so just check a couple of values here.
@@ -711,8 +760,9 @@ public class LeapCTest
 	{
 		LEAP_HEAD_POSE_EVENT pEvent = new LEAP_HEAD_POSE_EVENT();
 		long timestamp = 123;
-		
-		eLeapRS result = LeapC.INSTANCE.LeapInterpolateHeadPose(null, timestamp, pEvent);
+
+		eLeapRS result = LeapC.INSTANCE.LeapInterpolateHeadPose(getConnectionHandle(),
+				timestamp, pEvent);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		
@@ -736,7 +786,7 @@ public class LeapCTest
 				eLeapPolicyFlag.OptimiseHMD);
 		long clear = eLeapPolicyFlag.createMask(eLeapPolicyFlag.MapPoints, eLeapPolicyFlag.Images);
 		
-		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(null, set, clear);
+		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(getConnectionHandle(), set, clear);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 	
@@ -748,7 +798,7 @@ public class LeapCTest
 	@Test
 	void LeapSetPause_success()
 	{
-		eLeapRS result = LeapC.INSTANCE.LeapSetPause(null, 1);
+		eLeapRS result = LeapC.INSTANCE.LeapSetPause(getConnectionHandle(), 1);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 	
@@ -762,8 +812,9 @@ public class LeapCTest
 		//  We expect MockLeapC to return an ID of 5.
 		String key = Configurations.Service.METRICS_ENABLED;
 		int expected = 5;
-		eLeapRS result = LeapC.INSTANCE.LeapRequestConfigValue(null, key, pRequestID);
-		
+		eLeapRS result = LeapC.INSTANCE.LeapRequestConfigValue(getConnectionHandle(), key,
+				pRequestID);
+
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pRequestID.getValue()).isEqualTo(expected);
 		
@@ -771,7 +822,8 @@ public class LeapCTest
 		//  We expect MockLeapC to return an ID of 6.
 		key = Configurations.Tracking.IMAGES_MODE;
 		expected = 6;
-		result = LeapC.INSTANCE.LeapRequestConfigValue(null, key, pRequestID);
+		result = LeapC.INSTANCE.LeapRequestConfigValue(getConnectionHandle(), key,
+				pRequestID);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pRequestID.getValue()).isEqualTo(expected);
@@ -788,7 +840,7 @@ public class LeapCTest
 		String key = Configurations.Service.METRICS_ENABLED;
 		LEAP_VARIANT value = new LEAP_VARIANT(true);
 		int expected = 5;
-		eLeapRS result = LeapC.INSTANCE.LeapSaveConfigValue(null, key, value, pRequestID);
+		eLeapRS result = LeapC.INSTANCE.LeapSaveConfigValue(getConnectionHandle(), key, value, pRequestID);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pRequestID.getValue()).isEqualTo(expected);
@@ -798,7 +850,7 @@ public class LeapCTest
 		key = Configurations.Tracking.IMAGES_MODE;
 		value = new LEAP_VARIANT(2);
 		expected = 6;
-		result = LeapC.INSTANCE.LeapSaveConfigValue(null, key, value, pRequestID);
+		result = LeapC.INSTANCE.LeapSaveConfigValue(getConnectionHandle(), key, value, pRequestID);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pRequestID.getValue()).isEqualTo(expected);
@@ -810,7 +862,7 @@ public class LeapCTest
 	{
 		LongByReference pSize = new LongByReference();
 		
-		eLeapRS result = LeapC.INSTANCE.LeapGetPointMappingSize(null, pSize);
+		eLeapRS result = LeapC.INSTANCE.LeapGetPointMappingSize(getConnectionHandle(), pSize);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pSize.getValue()).isEqualTo(123);
@@ -823,7 +875,8 @@ public class LeapCTest
 		LEAP_POINT_MAPPING pointMapping = new LEAP_POINT_MAPPING();
 		LongByReference pSize = new LongByReference(2);
 
-		eLeapRS result = LeapC.INSTANCE.LeapGetPointMapping(null, pointMapping, pSize);
+		eLeapRS result = LeapC.INSTANCE.LeapGetPointMapping(getConnectionHandle(),
+				pointMapping, pSize);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		
@@ -894,7 +947,7 @@ public class LeapCTest
 		// Create a LEAP_ALLOCATOR and send it to LeapSetAllocator().
 		LEAP_ALLOCATOR leapAllocator = new LEAP_ALLOCATOR(allocator, deallocator);
 		
-		eLeapRS result = LeapC.INSTANCE.LeapSetAllocator(null, leapAllocator);
+		eLeapRS result = LeapC.INSTANCE.LeapSetAllocator(getConnectionHandle(), leapAllocator);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		
 		// MockLeapC should have allocated one uint8 pointer and two float pointers.
@@ -918,7 +971,7 @@ public class LeapCTest
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(phClockRebaser.handle).isNotEqualTo(Pointer.NULL);
-		assertThat(phClockRebaser.handle.getByte(0)).isEqualTo((byte)1);
+		assertThat(phClockRebaser.handle.getByte(0)).isEqualTo((byte)3);
 	}
 	
 	
@@ -935,8 +988,8 @@ public class LeapCTest
 		LeapC.INSTANCE.LeapDestroyClockRebaser(phClockRebaser.handle);
 		
 		// If the function was run correctly, the clock rebaser handle should now
-		// point to the value 2.
-		assertThat(phClockRebaser.handle.getByte(0)).isEqualTo((byte)2);
+		// point to the value 4.
+		assertThat(phClockRebaser.handle.getByte(0)).isEqualTo((byte)4);
 	}
 	
 	
@@ -946,7 +999,7 @@ public class LeapCTest
 		LongByReference pLeapClock = new LongByReference();
 		long userClock = 1234;
 
-		eLeapRS result = LeapC.INSTANCE.LeapRebaseClock(null, userClock, pLeapClock);
+		eLeapRS result = LeapC.INSTANCE.LeapRebaseClock(getRebaserHandle(), userClock, pLeapClock);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pLeapClock.getValue()).isEqualTo(userClock * 2);
 	}
@@ -962,7 +1015,7 @@ public class LeapCTest
 		long userClock = 1234;
 		long leapClock = userClock * 2;
 		
-		eLeapRS result = LeapC.INSTANCE.LeapUpdateRebase(null, userClock, leapClock);
+		eLeapRS result = LeapC.INSTANCE.LeapUpdateRebase(getRebaserHandle(), userClock, leapClock);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 	
@@ -977,7 +1030,8 @@ public class LeapCTest
 		int camera = 1;
 		LEAP_VECTOR pixel = new LEAP_VECTOR(1, 2, 3);
 		
-		LEAP_VECTOR actual = LeapC.INSTANCE.LeapPixelToRectilinear(null, camera, pixel);
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapPixelToRectilinear(getConnectionHandle(),
+				camera, pixel);
 		float[] expected = { -2, -3, -4 };
 		
 		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
@@ -994,7 +1048,8 @@ public class LeapCTest
 		int camera = 1;
 		LEAP_VECTOR rectilinear = new LEAP_VECTOR(1, 2, 3);
 		
-		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixel(null, camera, rectilinear);
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixel(getConnectionHandle(),
+				camera, rectilinear);
 		float[] expected = { -2, -3, -4 };
 		
 		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
