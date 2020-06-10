@@ -23,7 +23,9 @@ import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
+import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
+import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 import komposten.leapjna.leapc.enums.eLeapDeviceCaps;
@@ -740,5 +742,48 @@ public class LeapCTest
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pRequestID.getValue()).isEqualTo(expected);
+	}
+	
+	
+	@Test
+	void LeapGetPointMappingSize_correctSizeReceived()
+	{
+		LongByReference pSize = new LongByReference();
+		
+		eLeapRS result = LeapC.INSTANCE.LeapGetPointMappingSize(null, pSize);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pSize.getValue()).isEqualTo(123);
+	}
+	
+	
+	@Test
+	void LeapGetPointMapping_mapsCorrectly()
+	{
+		LEAP_POINT_MAPPING pointMapping = new LEAP_POINT_MAPPING();
+		LongByReference pSize = new LongByReference(2);
+
+		eLeapRS result = LeapC.INSTANCE.LeapGetPointMapping(null, pointMapping, pSize);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		assertThat(pointMapping.frame_id).isEqualTo(pSize.getValue());
+		assertThat(pointMapping.timestamp).isEqualTo(123);
+		assertThat(pointMapping.nPoints).isEqualTo(3);
+		assertThat(pointMapping.pPoints).isNotEqualTo(Pointer.NULL);
+		assertThat(pointMapping.pIDs).isNotEqualTo(Pointer.NULL);
+		
+		int value = 0;
+		for (LEAP_VECTOR point : pointMapping.getPoints())
+		{
+			float[] expected = { value++, value++, value++ };
+			assertThat(point.asArray()).containsExactly(expected, PRECISION);
+		}
+		
+		value = 0;
+		for (int id : pointMapping.getIds())
+		{
+			assertThat(id).isEqualTo(value++);
+		}
 	}
 }
