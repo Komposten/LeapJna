@@ -3,6 +3,9 @@ package komposten.leapjna.leapc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,9 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
+import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
+import komposten.leapjna.leapc.data.LEAP_ALLOCATOR.allocate;
+import komposten.leapjna.leapc.data.LEAP_ALLOCATOR.deallocate;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
@@ -27,6 +33,7 @@ import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.Enums;
+import komposten.leapjna.leapc.enums.eLeapAllocatorType;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
 import komposten.leapjna.leapc.enums.eLeapDeviceCaps;
 import komposten.leapjna.leapc.enums.eLeapDevicePID;
@@ -785,5 +792,62 @@ public class LeapCTest
 		{
 			assertThat(id).isEqualTo(value++);
 		}
+	}
+	
+	
+	@Test
+	void LeapGetNow_correctValue()
+	{
+		long leapNow = LeapC.INSTANCE.LeapGetNow();
+		
+		assertThat(leapNow).isEqualTo(123);
+	}
+	
+	
+	@Test
+	void LeapSetAllocator_success()
+	{
+		List<Pointer> allocatedUInt8 = new ArrayList<>();
+		List<Pointer> allocatedFloat = new ArrayList<>();
+		List<Pointer> freed = new ArrayList<>();
+		
+		// Create an allocator which adds the allocated pointers to one of the lists
+		// above depending on the type it should allocate memory for.
+		allocate allocator = (size, hint, state) -> {
+			Pointer pointer = Pointer.NULL;
+
+			if (hint == eLeapAllocatorType.Uint8.value)
+			{
+				pointer = new Pointer(Native.malloc(size));
+				allocatedUInt8.add(pointer);
+			}
+			else if (hint == eLeapAllocatorType.Float.value)
+			{
+				pointer = new Pointer(Native.malloc(size * 4));
+				allocatedFloat.add(pointer);
+			}
+
+			return pointer;
+		};
+
+		// Create a deallocator which frees the provided pointer and then adds it into
+		// the freed list.
+		deallocate deallocator = (pointer, state) -> {
+			Native.free(Pointer.nativeValue(pointer));
+			freed.add(pointer);
+			return;
+		};
+		
+		// Create a LEAP_ALLOCATOR and send it to LeapSetAllocator().
+		LEAP_ALLOCATOR leapAllocator = new LEAP_ALLOCATOR(allocator, deallocator);
+		
+		eLeapRS result = LeapC.INSTANCE.LeapSetAllocator(null, leapAllocator);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		// MockLeapC should have allocated one uint8 pointer and two float pointers.
+		assertThat(allocatedUInt8).hasSize(1);
+		assertThat(allocatedFloat).hasSize(2);
+		// And it should have freed all three of those pointers.
+		assertThat(freed).hasSize(3).containsAll(allocatedUInt8).containsAll(allocatedFloat);
 	}
 }
