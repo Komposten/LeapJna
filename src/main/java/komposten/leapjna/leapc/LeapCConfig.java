@@ -1,6 +1,6 @@
 package komposten.leapjna.leapc;
 
-public class LeapCConfig
+class LeapCConfig
 {
 	private static final String DLL_NAME = "LeapC";
 	private static final String MOCK_DLL_NAME = "MockLeapC";
