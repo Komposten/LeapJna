@@ -450,7 +450,6 @@ public interface LeapC extends Library
 	 * measurements in the application with time measurements in the Leap Motion service.
 	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
-	 * TODO Test this to make sure everything is working.
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)

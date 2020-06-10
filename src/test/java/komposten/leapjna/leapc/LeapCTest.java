@@ -649,4 +649,22 @@ public class LeapCTest
 		assertThat(pEvent.info.frame_id).isEqualTo(1);
 		assertThat(pEvent.tracking_frame_id).isEqualTo(2);
 	}
+	
+	
+	@Test
+	void LeapInterpolateHeadPose_correctDataReceived()
+	{
+		LEAP_HEAD_POSE_EVENT pEvent = new LEAP_HEAD_POSE_EVENT();
+		long timestamp = 123;
+		
+		eLeapRS result = LeapC.INSTANCE.LeapInterpolateHeadPose(null, timestamp, pEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		float[] expectedHeadPosition = new float[] { 1f, 2f, 3f };
+		float[] expectedHeadOrientation = new float[] {2f, 4f, 6f, 8f };
+		assertThat(pEvent.timestamp).isEqualTo(timestamp);
+		assertThat(pEvent.head_position.asArray()).containsExactly(expectedHeadPosition, PRECISION);
+		assertThat(pEvent.head_orientation.asArray()).containsExactly(expectedHeadOrientation, PRECISION);
+	}
 }
