@@ -667,4 +667,24 @@ public class LeapCTest
 		assertThat(pEvent.head_position.asArray()).containsExactly(expectedHeadPosition, PRECISION);
 		assertThat(pEvent.head_orientation.asArray()).containsExactly(expectedHeadOrientation, PRECISION);
 	}
+	
+	
+	@Test
+	void LeapSetPolicyFlags_success()
+	{
+		long set = eLeapPolicyFlag.createMask(eLeapPolicyFlag.BackgroundFrames,
+				eLeapPolicyFlag.OptimiseHMD);
+		long clear = eLeapPolicyFlag.createMask(eLeapPolicyFlag.MapPoints, eLeapPolicyFlag.Images);
+		
+		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(null, set, clear);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+	
+	
+	@Test
+	void LeapSetPause_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetPause(null, 1);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
 }
