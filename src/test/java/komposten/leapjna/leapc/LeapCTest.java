@@ -80,14 +80,21 @@ public class LeapCTest
 	}
 
 
+	/**
+	 * Check that MockLeapC successfully received the information and created
+	 * a connection handle.
+	 */
 	@Test
 	void LeapCreateConnection_noConfig_success()
 	{
 		LEAP_CONNECTION phConnection = new LEAP_CONNECTION();
 		eLeapRS result = LeapC.INSTANCE.LeapCreateConnection(null, phConnection);
-		phConnection.read();
 
 		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		// The connection handle should now point to a byte with the value 1.
+		assertThat(phConnection.handle).isNotEqualTo(Pointer.NULL);
+		assertThat(phConnection.handle.getByte(0)).isEqualTo((byte)1);
 	}
 
 
@@ -113,10 +120,20 @@ public class LeapCTest
 	 * an error is thrown).
 	 */
 	@Test
-	void LeapDestroyConnection_runsWithoutException()
+	void LeapDestroyConnection_success()
 	{
-		assertThatCode(() -> LeapC.INSTANCE.LeapDestroyConnection(null))
-				.doesNotThrowAnyException();
+		// First create a connection to destroy.
+		LEAP_CONNECTION phConnection = new LEAP_CONNECTION();
+
+		eLeapRS createResult = LeapC.INSTANCE.LeapCreateConnection(null, phConnection);
+		assertThat(createResult).isEqualTo(eLeapRS.Success);
+
+		// Then destroy the connection.
+		LeapC.INSTANCE.LeapDestroyConnection(phConnection.handle);
+		
+		// If the function was run correctly, the connection handle should now
+		// point to the value 2.
+		assertThat(phConnection.handle.getByte(0)).isEqualTo((byte)2);
 	}
 
 	
