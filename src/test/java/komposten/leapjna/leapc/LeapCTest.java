@@ -2,7 +2,6 @@ package komposten.leapjna.leapc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
@@ -586,5 +586,67 @@ public class LeapCTest
 	{
 		String pid = LeapC.INSTANCE.LeapDevicePIDToString(eLeapDevicePID.Dragonfly.value);
 		assertThat(pid).isEqualTo("dragonfly");
+	}
+	
+	
+	@Test
+	void LeapGetFrameSize_correctSizeReceived()
+	{
+		LongByReference pSize = new LongByReference();
+		long timestamp = 123;
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(null, timestamp, pSize);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pSize.getValue()).isEqualTo(246);
+	}
+	
+	
+	@Test
+	void LeapInterpolateFrame_correctDataReceived()
+	{
+		// Get a frame size from MockLeapC.
+		LongByReference pncbEvent = new LongByReference();
+		long timestamp = 123;
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(null, timestamp, pncbEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+
+		// Create the tracking event and interpolate.
+		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT((int) pncbEvent.getValue());
+		
+		result = LeapC.INSTANCE.LeapInterpolateFrame(null, timestamp, pEvent, pncbEvent.getValue());
+		
+		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
+		// tests, so just check a couple of values here.
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pEvent.info.timestamp).isEqualTo(timestamp);
+		assertThat(pEvent.info.frame_id).isEqualTo(1);
+		assertThat(pEvent.tracking_frame_id).isEqualTo(2);
+	}
+	
+	
+	@Test
+	void LeapInterpolateFrameFromTime_correctDataReceived()
+	{
+		// Get a frame size from MockLeapC.
+		LongByReference pncbEvent = new LongByReference();
+		long timestamp = 123;
+		long sourceTimestamp = 101;
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(null, timestamp, pncbEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+
+		// Create the tracking event and interpolate.
+		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT((int) pncbEvent.getValue());
+
+		result = LeapC.INSTANCE.LeapInterpolateFrameFromTime(null, sourceTimestamp, timestamp,
+				pEvent, pncbEvent.getValue());
+		
+		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
+		// tests, so just check a couple of values here.
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pEvent.info.timestamp).isEqualTo((timestamp + sourceTimestamp) / 2);
+		assertThat(pEvent.info.frame_id).isEqualTo(1);
+		assertThat(pEvent.tracking_frame_id).isEqualTo(2);
 	}
 }
