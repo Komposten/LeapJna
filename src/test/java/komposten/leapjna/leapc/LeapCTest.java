@@ -1023,6 +1023,9 @@ public class LeapCTest
 	/**
 	 * LeapPixelToRectilinear will return a <code>LEAP_VECTOR</code> equal to
 	 * <code>-(pixel + camera)</code>.
+	 * 
+	 * If the provided connection handle is invalid, an exception is thrown. JNA
+	 * will mask this as an "Invalid memory access" error.
 	 */
 	@Test
 	void LeapPixelToRectilinear_correctValues()
@@ -1041,6 +1044,9 @@ public class LeapCTest
 	/**
 	 * LeapRectilinearToPixel will return a <code>LEAP_VECTOR</code> equal to
 	 * <code>-(rectilinear + camera)</code>.
+	 * 
+	 * If the provided connection handle is invalid, an exception is thrown. JNA
+	 * will mask this as an "Invalid memory access" error.
 	 */
 	@Test
 	void LeapRectilinearToPixel_correctValues()
