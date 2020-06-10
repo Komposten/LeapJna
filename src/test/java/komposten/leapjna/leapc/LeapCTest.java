@@ -948,4 +948,38 @@ public class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapUpdateRebase(null, userClock, leapClock);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
+	
+	
+	/**
+	 * LeapPixelToRectilinear will return a <code>LEAP_VECTOR</code> equal to
+	 * <code>-(pixel + camera)</code>.
+	 */
+	@Test
+	void LeapPixelToRectilinear_correctValues()
+	{
+		int camera = 1;
+		LEAP_VECTOR pixel = new LEAP_VECTOR(1, 2, 3);
+		
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapPixelToRectilinear(null, camera, pixel);
+		float[] expected = { -2, -3, -4 };
+		
+		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	/**
+	 * LeapRectilinearToPixel will return a <code>LEAP_VECTOR</code> equal to
+	 * <code>-(rectilinear + camera)</code>.
+	 */
+	@Test
+	void LeapRectilinearToPixel_correctValues()
+	{
+		int camera = 1;
+		LEAP_VECTOR rectilinear = new LEAP_VECTOR(1, 2, 3);
+		
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixel(null, camera, rectilinear);
+		float[] expected = { -2, -3, -4 };
+		
+		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
 }
