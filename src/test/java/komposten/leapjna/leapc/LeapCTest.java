@@ -18,6 +18,7 @@ import com.sun.jna.ptr.LongByReference;
 import komposten.leapjna.leapc.data.LEAP_ALLOCATOR;
 import komposten.leapjna.leapc.data.LEAP_ALLOCATOR.allocate;
 import komposten.leapjna.leapc.data.LEAP_ALLOCATOR.deallocate;
+import komposten.leapjna.leapc.data.LEAP_CLOCK_REBASER;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_CONFIG;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
@@ -884,5 +885,67 @@ public class LeapCTest
 		assertThat(allocatedFloat).hasSize(2);
 		// And it should have freed all three of those pointers.
 		assertThat(freed).hasSize(3).containsAll(allocatedUInt8).containsAll(allocatedFloat);
+	}
+	
+	
+	/**
+	 * Check that MockLeapC successfully received the information and created
+	 * a clock rebaser.
+	 */
+	@Test
+	void LeapCreateClockRebaser_success()
+	{
+		LEAP_CLOCK_REBASER phClockRebaser = new LEAP_CLOCK_REBASER();
+		
+		eLeapRS result = LeapC.INSTANCE.LeapCreateClockRebaser(phClockRebaser);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(phClockRebaser.handle).isNotEqualTo(Pointer.NULL);
+		assertThat(phClockRebaser.handle.getByte(0)).isEqualTo((byte)1);
+	}
+	
+	
+	@Test
+	void LeapDestroyClockRebaser_success()
+	{
+		// First create a clock rebaser to destroy.
+		LEAP_CLOCK_REBASER phClockRebaser = new LEAP_CLOCK_REBASER();
+		
+		eLeapRS createResult = LeapC.INSTANCE.LeapCreateClockRebaser(phClockRebaser);
+		assertThat(createResult).isEqualTo(eLeapRS.Success);
+
+		// Then destroy the rebaser.
+		LeapC.INSTANCE.LeapDestroyClockRebaser(phClockRebaser.handle);
+		
+		// If the function was run correctly, the clock rebaser handle should now
+		// point to the value 2.
+		assertThat(phClockRebaser.handle.getByte(0)).isEqualTo((byte)2);
+	}
+	
+	
+	@Test
+	void LeapRebaseClock_clockChangedCorrectly()
+	{
+		LongByReference pLeapClock = new LongByReference();
+		long userClock = 1234;
+
+		eLeapRS result = LeapC.INSTANCE.LeapRebaseClock(null, userClock, pLeapClock);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pLeapClock.getValue()).isEqualTo(userClock * 2);
+	}
+	
+	
+	/**
+	 * LeapUpdateRebase will return <code>eLeapRS.Success</code> if <code>leapClock</code>
+	 * is twice as big as <code>userClock</code>.
+	 */
+	@Test
+	void LeapUpdateRebase_success()
+	{
+		long userClock = 1234;
+		long leapClock = userClock * 2;
+		
+		eLeapRS result = LeapC.INSTANCE.LeapUpdateRebase(null, userClock, leapClock);
+		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 }
