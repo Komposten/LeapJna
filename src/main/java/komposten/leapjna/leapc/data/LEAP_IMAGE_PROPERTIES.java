@@ -61,8 +61,6 @@ public class LEAP_IMAGE_PROPERTIES extends Structure
 	/** Reserved for future use. */
 	public float y_offset;
 
-	private eLeapImageType typeE;
-	private eLeapImageFormat formatE;
 
 	public LEAP_IMAGE_PROPERTIES()
 	{
@@ -75,11 +73,7 @@ public class LEAP_IMAGE_PROPERTIES extends Structure
 	 */
 	public eLeapImageType getType()
 	{
-		if (typeE == null)
-		{
-			typeE = Enums.parse(type, eLeapImageType.Unknown);
-		}
-		return typeE;
+		return Enums.parse(type, eLeapImageType.Unknown);
 	}
 
 
@@ -88,10 +82,6 @@ public class LEAP_IMAGE_PROPERTIES extends Structure
 	 */
 	public eLeapImageFormat getFormat()
 	{
-		if (formatE == null)
-		{
-			formatE = Enums.parse(format, eLeapImageFormat.Unknown);
-		}
-		return formatE;
+		return Enums.parse(format, eLeapImageFormat.Unknown);
 	}
 }

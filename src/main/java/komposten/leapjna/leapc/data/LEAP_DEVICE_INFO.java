@@ -84,13 +84,9 @@ public class LEAP_DEVICE_INFO extends Structure
 	/** The maximum range for this device, in micrometers. */
 	public int range;
 
-	private eLeapDeviceStatus[] statusE;
-	private eLeapDeviceCaps[] capsE;
-	private eLeapDevicePID pidE;
-
 	public LEAP_DEVICE_INFO()
 	{
-		this(1);
+		this(-1);
 	}
 
 
@@ -106,11 +102,20 @@ public class LEAP_DEVICE_INFO extends Structure
 	/**
 	 * Allocates space for the serial number string.
 	 * 
-	 * @param serial_length The length of the serial string.
+	 * @param serial_length The length of the serial string, or <code>-1</code> to
+	 * set the serial to <code>null</code>.
 	 */
 	public void allocateSerialBuffer(int serial_length)
 	{
-		setSerial(new String(new byte[serial_length]));
+		if (serial_length > 0)
+		{
+			setSerial(new String(new byte[serial_length]));
+		}
+		else
+		{
+			this.serial_length = 0;
+			this.serial = null;
+		}
 	}
 
 
@@ -134,12 +139,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	 */
 	public eLeapDeviceStatus[] getStatus()
 	{
-		if (statusE == null)
-		{
-			statusE = Enums.parseMask(status, eLeapDeviceStatus.class);
-		}
-
-		return statusE;
+		return Enums.parseMask(status, eLeapDeviceStatus.class);
 	}
 
 
@@ -149,12 +149,7 @@ public class LEAP_DEVICE_INFO extends Structure
 	 */
 	public eLeapDeviceCaps[] getCapabilities()
 	{
-		if (capsE == null)
-		{
-			capsE = Enums.parseMask(caps, eLeapDeviceCaps.class);
-		}
-
-		return capsE;
+		return Enums.parseMask(caps, eLeapDeviceCaps.class);
 	}
 
 
@@ -164,11 +159,6 @@ public class LEAP_DEVICE_INFO extends Structure
 	 */
 	public eLeapDevicePID getPid()
 	{
-		if (pidE == null)
-		{
-			pidE = Enums.parse(pid, eLeapDevicePID.Invalid);
-		}
-
-		return pidE;
+		return Enums.parse(pid, eLeapDevicePID.Invalid);
 	}
 }

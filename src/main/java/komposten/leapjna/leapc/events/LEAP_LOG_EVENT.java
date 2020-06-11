@@ -50,8 +50,6 @@ public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public String message;
 
-	private eLeapLogSeverity severityE;
-
 	public LEAP_LOG_EVENT(Pointer pointer)
 	{
 		super(pointer, ALIGN_NONE);
@@ -64,10 +62,6 @@ public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public eLeapLogSeverity getSeverity()
 	{
-		if (severityE == null)
-		{
-			severityE = Enums.parse(severity, eLeapLogSeverity.Unknown);
-		}
-		return severityE;
+		return Enums.parse(severity, eLeapLogSeverity.Unknown);
 	}
 }

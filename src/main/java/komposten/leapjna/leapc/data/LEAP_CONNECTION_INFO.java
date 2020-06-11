@@ -48,8 +48,6 @@ public class LEAP_CONNECTION_INFO extends Structure
 	 */
 	public long status;
 
-	private eLeapConnectionStatus statusE;
-
 	public LEAP_CONNECTION_INFO()
 	{
 		super(ALIGN_NONE);
@@ -57,18 +55,11 @@ public class LEAP_CONNECTION_INFO extends Structure
 	}
 
 
+	/**
+	 * @return The connection status as an {@link eLeapConnectionStatus} instead of a <code>long</code>.
+	 */
 	public eLeapConnectionStatus getStatus()
 	{
-		if (statusE == null)
-		{
-			statusE = Enums.parse((int) status, eLeapConnectionStatus.Unknown);
-		}
-
-		return statusE;
-	}
-
-	public static class ByReference extends LEAP_CONNECTION_INFO
-			implements Structure.ByReference
-	{
+		return Enums.parse((int) status, eLeapConnectionStatus.Unknown);
 	}
 }

@@ -38,8 +38,6 @@ public class LEAP_DROPPED_FRAME_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public int type;
 
-	private eLeapDroppedFrameType typeE;
-
 	public LEAP_DROPPED_FRAME_EVENT(Pointer pointer)
 	{
 		super(pointer, ALIGN_NONE);
@@ -52,10 +50,6 @@ public class LEAP_DROPPED_FRAME_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public eLeapDroppedFrameType getType()
 	{
-		if (typeE == null)
-		{
-			typeE = Enums.parse(type, eLeapDroppedFrameType.Unknown);
-		}
-		return typeE;
+		return Enums.parse(type, eLeapDroppedFrameType.Unknown);
 	}
 }

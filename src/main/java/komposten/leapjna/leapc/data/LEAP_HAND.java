@@ -134,8 +134,6 @@ public class LEAP_HAND extends Structure
 	 */
 	public LEAP_BONE arm;
 
-	private eLeapHandType typeE;
-
 
 	public LEAP_HAND()
 	{
@@ -156,15 +154,6 @@ public class LEAP_HAND extends Structure
 	 */
 	public eLeapHandType getType()
 	{
-		if (typeE == null)
-		{
-			typeE = Enums.parse(type, eLeapHandType.Unknown);
-		}
-
-		return typeE;
-	}
-
-	public static class ByReference extends LEAP_HAND implements Structure.ByReference
-	{
+		return Enums.parse(type, eLeapHandType.Unknown);
 	}
 }

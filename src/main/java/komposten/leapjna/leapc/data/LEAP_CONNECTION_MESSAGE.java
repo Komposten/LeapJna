@@ -66,7 +66,6 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	public Pointer pEvent;
 
 	private LEAP_EVENT event;
-	private eLeapEventType typeE;
 
 	public LEAP_CONNECTION_MESSAGE()
 	{
@@ -81,17 +80,20 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	}
 
 
+	@Override
+	public void read()
+	{
+		super.read();
+		event = null;
+	}
+
+
 	/**
-	 * @return The event type as an {@link eLeapEventType} instead of a <code>short</code>.
+	 * @return The event type as an {@link eLeapEventType} instead of an <code>int</code>.
 	 */
 	public eLeapEventType getType()
 	{
-		if (typeE == null)
-		{
-			typeE = Enums.parse(type, eLeapEventType.Unknown);
-		}
-
-		return typeE;
+		return Enums.parse(type, eLeapEventType.Unknown);
 	}
 
 

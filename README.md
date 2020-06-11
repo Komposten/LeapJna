@@ -1,5 +1,7 @@
 # LeapJna
 
+[![Java CI](https://github.com/Komposten/LeapJna/workflows/Java%20CI/badge.svg?branch=unit-testing)](https://github.com/Komposten/LeapJna/actions?query=workflow%3A"Java+CI") [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Komposten_LeapJna&metric=alert_status)](https://sonarcloud.io/dashboard?id=Komposten_LeapJna) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Komposten_LeapJna&metric=coverage)](https://sonarcloud.io/dashboard?id=Komposten_LeapJna) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Komposten_LeapJna&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Komposten_LeapJna)
+
 **Java bindings for the Leap Motion Orion SDK**
 
 LeapJna is a library that provides Java bindings for the [Leap Motion](https://www.leapmotion.com/) [Orion SDK](https://developer.leapmotion.com/get-started). The official Java bindings were deprecated in SDK version 3 and can not be used at all with SDK version 4. LeapJna uses [Java Native Access](https://github.com/java-native-access/jna) to create an interface for communicating with the Leap Motion SDK's LeapC API to fetch tracking data from a Leap Motion Controller.
@@ -9,16 +11,15 @@ LeapJna is a library that provides Java bindings for the [Leap Motion](https://w
 ## Supported API features
 LeapJna includes Java bindings for all functionality in the Leap Motion C API from Orion SDK v4.0.0+52173.
 
-However, some of these bindings have not been fully tested and some appear to not function as expected in the LeapC API itself. More information about these are found below.
-
 ### Untested API bindings
-LeapJna's bindings for some of the API features have not been tested. Those are as follows:
+LeapJna's bindings for some of the API features have not been tested with an actual Leap Motion device. Those are as follows:
 * Device failure events (I don't have a failing device to test this)
 * Point mappings (I'm not sure what they are and how to enable them)
 
+These _should_ still work, as I have tested the bindings using a mock Leap C API, but I can't guarantee it.
+
 ### Broken API features
-Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see,
-which means that they won't work as expected in LeapJna either.
+Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see, which means that they won't work as expected in LeapJna either.
 
 A list of these features can be found here: [Broken API Features](BROKEN_API_FEATURES.md).
 

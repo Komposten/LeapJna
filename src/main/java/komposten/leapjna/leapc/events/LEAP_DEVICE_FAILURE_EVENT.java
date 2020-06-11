@@ -54,8 +54,6 @@ public class LEAP_DEVICE_FAILURE_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public LEAP_DEVICE hDevice;
 
-	private eLeapDeviceStatus[] statusE;
-
 	public LEAP_DEVICE_FAILURE_EVENT(Pointer pointer)
 	{
 		super(pointer, ALIGN_NONE);
@@ -69,12 +67,7 @@ public class LEAP_DEVICE_FAILURE_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public eLeapDeviceStatus[] getStatus()
 	{
-		if (statusE == null)
-		{
-			statusE = Enums.parseMask(status, eLeapDeviceStatus.class);
-		}
-		
-		return statusE;
+		return Enums.parseMask(status, eLeapDeviceStatus.class);
 	}
 
 }
