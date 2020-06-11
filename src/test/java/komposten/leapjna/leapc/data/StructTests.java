@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import komposten.leapjna.leapc.enums.eLeapHandType;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapImageType;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
+import komposten.leapjna.leapc.enums.eLeapValueType;
 
 
 public class StructTests
@@ -541,6 +543,191 @@ public class StructTests
 			assertThat(struct.getMode())
 					.usingElementComparator(new IdentityComparator<>())
 					.containsExactlyInAnyOrder(expected);
+		}
+	}
+	
+	
+	@Nested
+	class LEAP_VARIANT_TEST
+	{
+		private LEAP_VARIANT struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_VARIANT(true);
+		}
+
+
+		@Test
+		void getType_validType_correctConstant()
+		{
+			eLeapValueType expected = eLeapValueType.Boolean;
+			struct.type = expected.value;
+
+			assertThat(struct.getType()).isSameAs(expected);
+		}
+
+
+		@Test
+		void getType_invalidType_correctConstant()
+		{
+			struct.type = -1234;
+			assertThat(struct.getType()).isSameAs(eLeapValueType.Unknown);
+		}
+
+
+		@Test
+		void getType_typeChanged_correctConstant()
+		{
+			eLeapValueType expected = eLeapValueType.Boolean;
+			struct.type = expected.value;
+			struct.getType();
+
+			expected = eLeapValueType.Float;
+			struct.type = expected.value;
+			assertThat(struct.getType()).isSameAs(expected);
+		}
+		
+		
+		@Test
+		void getBoolean_booleanType_correctValue()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(true);
+			assertThat(variant.getBoolean()).isTrue();
+			
+			variant = new LEAP_VARIANT(false);
+			assertThat(variant.getBoolean()).isFalse();
+		}
+		
+		
+		@Test
+		void getBoolean_nonBooleanType_throwsIllegalStateException()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(1);
+			assertThatIllegalStateException().isThrownBy(() -> variant.getBoolean());
+		}
+		
+		
+		@Test
+		void getInt_intType_correctValue()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(1);
+			assertThat(variant.getInt()).isEqualTo(1);
+			
+			variant = new LEAP_VARIANT(2);
+			assertThat(variant.getInt()).isEqualTo(2);
+		}
+		
+		
+		@Test
+		void getInt_nonIntType_throwsIllegalStateException()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(1.0f);
+			assertThatIllegalStateException().isThrownBy(() -> variant.getInt());
+		}
+		
+		
+		@Test
+		void getFloat_floatType_correctValue()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(1.0f);
+			assertThat(variant.getFloat()).isEqualTo(1.0f);
+			
+			variant = new LEAP_VARIANT(1.5f);
+			assertThat(variant.getFloat()).isEqualTo(1.5f);
+		}
+		
+		
+		@Test
+		void getFloat_nonFloatType_throwsIllegalStateException()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(1);
+			assertThatIllegalStateException().isThrownBy(() -> variant.getFloat());
+		}
+		
+		
+		@Test
+		void getString_stringType_correctValue()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT("leap");
+			assertThat(variant.getString()).isEqualTo("leap");
+			
+			variant = new LEAP_VARIANT("sleep");
+			assertThat(variant.getString()).isEqualTo("sleep");
+		}
+		
+		
+		@Test
+		void getString_nonStringType_throwsIllegalStateException()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(true);
+			assertThatIllegalStateException().isThrownBy(() -> variant.getString());
+		}
+		
+		
+		@Test
+		void getValue_hasValue_returnsValue()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT(true);
+			assertThat(variant.getValue()).isEqualTo(true);
+			
+			variant = new LEAP_VARIANT(1);
+			assertThat(variant.getValue()).isEqualTo(1);
+			
+			variant = new LEAP_VARIANT(1.0f);
+			assertThat(variant.getValue()).isEqualTo(1.0f);
+			
+			variant = new LEAP_VARIANT("leap");
+			assertThat(variant.getValue()).isEqualTo("leap");
+		}
+		
+		
+		@Test
+		void getValue_noValue_returnsNull()
+		{
+			LEAP_VARIANT variant = new LEAP_VARIANT();
+			assertThat(variant.getValue()).isNull();
+		}
+	}
+	
+	
+	@Nested
+	class LEAP_VECTOR_TEST
+	{
+		private final Offset<Float> PRECISION = Offset.offset(0.01f);
+		
+		@Test
+		void constructor_withParameters_intialisedCorrectly()
+		{
+			LEAP_VECTOR vector = new LEAP_VECTOR(1, 2, 3);
+
+			assertThat(vector.x).isCloseTo(1, PRECISION);
+			assertThat(vector.y).isCloseTo(2, PRECISION);
+			assertThat(vector.z).isCloseTo(3, PRECISION);
+		}
+		
+
+		@Test
+		void set_updatesValues()
+		{
+			LEAP_VECTOR vector = new LEAP_VECTOR(1, 2, 3);
+			
+			vector.set(2, 4, 6);
+
+			assertThat(vector.x).isCloseTo(2, PRECISION);
+			assertThat(vector.y).isCloseTo(4, PRECISION);
+			assertThat(vector.z).isCloseTo(6, PRECISION);
+		}
+		
+		
+		@Test
+		void asArray_correctOrder()
+		{
+			LEAP_VECTOR vector = new LEAP_VECTOR(1, 2, 3);
+			float[] expected = { 1, 2, 3 };
+			
+			assertThat(vector.asArray()).containsExactly(expected, PRECISION);
 		}
 	}
 	
