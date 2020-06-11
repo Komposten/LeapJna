@@ -20,6 +20,7 @@ import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapImageType;
+import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 
 
 public class StructTests
@@ -434,6 +435,112 @@ public class StructTests
 			expected = eLeapImageFormat.IR;
 			struct.format = expected.value;
 			assertThat(struct.getFormat()).isSameAs(expected);
+		}
+	}
+
+
+	@Nested
+	class LEAP_RECORDING_PARAMETERS_TEST
+	{
+		private LEAP_RECORDING_PARAMETERS struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_RECORDING_PARAMETERS();
+		}
+		
+		
+		@Test
+		void getMode_invalidMask_correctConstant()
+		{
+			struct.mode = 0x100000;
+
+			assertThat(struct.getMode())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(eLeapRecordingFlags.Error);
+		}
+
+
+		@Test
+		void getMode_validMask_correctConstants()
+		{
+			eLeapRecordingFlags[] expected = { eLeapRecordingFlags.Writing,
+					eLeapRecordingFlags.Flushing };
+			struct.mode = eLeapRecordingFlags.createMask(expected);
+
+			assertThat(struct.getMode())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
+		}
+
+
+		@Test
+		void getMode_maskChanged_correctConstants()
+		{
+			eLeapRecordingFlags[] expected = { eLeapRecordingFlags.Writing,
+					eLeapRecordingFlags.Flushing };
+			struct.mode = eLeapRecordingFlags.createMask(expected);
+			struct.getMode();
+
+			expected[1] = eLeapRecordingFlags.Reading;
+			struct.mode = eLeapRecordingFlags.createMask(expected);
+			assertThat(struct.getMode())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
+		}
+	}
+
+
+	@Nested
+	class LEAP_RECORDING_STATUS_TEST
+	{
+		private LEAP_RECORDING_STATUS struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_RECORDING_STATUS();
+		}
+		
+		
+		@Test
+		void getMode_invalidMask_correctConstant()
+		{
+			struct.mode = 0x100000;
+
+			assertThat(struct.getMode())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(eLeapRecordingFlags.Error);
+		}
+
+
+		@Test
+		void getMode_validMask_correctConstants()
+		{
+			eLeapRecordingFlags[] expected = { eLeapRecordingFlags.Writing,
+					eLeapRecordingFlags.Flushing };
+			struct.mode = eLeapRecordingFlags.createMask(expected);
+
+			assertThat(struct.getMode())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
+		}
+
+
+		@Test
+		void getMode_maskChanged_correctConstants()
+		{
+			eLeapRecordingFlags[] expected = { eLeapRecordingFlags.Writing,
+					eLeapRecordingFlags.Flushing };
+			struct.mode = eLeapRecordingFlags.createMask(expected);
+			struct.getMode();
+
+			expected[1] = eLeapRecordingFlags.Reading;
+			struct.mode = eLeapRecordingFlags.createMask(expected);
+			assertThat(struct.getMode())
+					.usingElementComparator(new IdentityComparator<>())
+					.containsExactlyInAnyOrder(expected);
 		}
 	}
 	
