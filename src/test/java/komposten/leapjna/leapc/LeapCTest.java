@@ -31,6 +31,9 @@ import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
+import komposten.leapjna.leapc.data.LEAP_RECORDING;
+import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
+import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
@@ -48,6 +51,7 @@ import komposten.leapjna.leapc.enums.eLeapImageType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
+import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 import komposten.leapjna.leapc.enums.eLeapValueType;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
@@ -123,6 +127,35 @@ public class LeapCTest
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		
 		return phRebaser.handle;
+	}
+	
+	
+	/**
+	 * Helper method for creating a <code>LEAP_RECORDING</code> object for testing
+	 * functions which take such a recording as a parameter.
+	 * 
+	 * @return A <code>LEAP_RECORDING</code> object.
+	 */
+	private LEAP_RECORDING getRecording()
+	{
+		LEAP_RECORDING ppRecording = new LEAP_RECORDING();
+		LEAP_RECORDING_PARAMETERS params = new LEAP_RECORDING_PARAMETERS();
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(ppRecording, "rec.lmt", params);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		return ppRecording;
+	}
+	
+	
+	/**
+	 * Helper method for creating a <code>LEAP_RECORDING</code> object for testing
+	 * functions which take such a recording as a parameter.
+	 * 
+	 * @return The handle of a <code>LEAP_RECORDING</code> object.
+	 */
+	private Pointer getRecordingHandle()
+	{
+		return getRecording().handle;
 	}
 
 
@@ -638,7 +671,6 @@ public class LeapCTest
 		// If the function was run correctly, the device handle should now
 		// point to the value 3.
 		assertThat(hDevice.getByte(0)).isEqualTo((byte)3);
-	
 	}
 	
 	
@@ -1095,5 +1127,114 @@ public class LeapCTest
 		long telemetryNow = LeapC.INSTANCE.LeapTelemetryGetNow();
 		
 		assertThat(telemetryNow).isEqualTo(124);
+	}
+	
+	
+	@Test
+	void LeapRecordingOpen_noParams_correctHandleReturned()
+	{
+		LEAP_RECORDING ppRecording = new LEAP_RECORDING();
+		LEAP_RECORDING_PARAMETERS params = new LEAP_RECORDING_PARAMETERS();
+		
+		// Open with no params -> should return handle set to 4.
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(ppRecording, "rec.lmt", params);
+
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(ppRecording.handle).isNotEqualTo(Pointer.NULL);
+		assertThat(ppRecording.handle.getByte(0)).isEqualTo((byte)4);
+	}
+	
+	
+	@Test
+	void LeapRecordingOpen_withParams_correctHandleReturned()
+	{
+		LEAP_RECORDING ppRecording = new LEAP_RECORDING();
+		LEAP_RECORDING_PARAMETERS params = new LEAP_RECORDING_PARAMETERS(
+				eLeapRecordingFlags.Reading);
+
+		// Open with params -> should return handle set to params.mode.
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(ppRecording, "rec.lmt", params);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(ppRecording.handle).isNotEqualTo(Pointer.NULL);
+		assertThat(ppRecording.handle.getByte(0)).isEqualTo((byte)params.mode);
+	}
+
+
+	@Test
+	void LeapCloseRecording_success()
+	{
+		// First create a recording to close.
+		LEAP_RECORDING ppRecording = getRecording();
+
+		// Then close the recording.
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingClose(ppRecording);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		
+		// If the function was run correctly, the recording handle should now
+		// point to the value 5.
+		assertThat(ppRecording.handle).isNotEqualTo(Pointer.NULL);
+		assertThat(ppRecording.handle.getByte(0)).isEqualTo((byte)5);
+	}
+	
+	
+	@Test
+	void LeapRecordingWrite_success()
+	{
+		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT();
+		LongByReference pnBytesWritten = new LongByReference();
+		
+		pEvent.info.frame_id = 1;
+		pEvent.info.timestamp = 123;
+		pEvent.tracking_frame_id = 2;
+		pEvent.framerate = 3;
+
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingWrite(getRecordingHandle(), pEvent,
+				pnBytesWritten);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pnBytesWritten.getValue()).isEqualTo(4);
+	}
+	
+	
+	@Test
+	void LeapRecordingRead_success()
+	{
+		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT();
+		long ncbEvent = 4;
+		
+		pEvent.info.frame_id = 1;
+		pEvent.info.timestamp = 123;
+		pEvent.tracking_frame_id = 2;
+		pEvent.framerate = 3;
+
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingRead(getRecordingHandle(), pEvent,
+				ncbEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+	
+	
+	@Test
+	void LeapRecordingGetStatus_correctStatus()
+	{
+		LEAP_RECORDING_STATUS pStatus = new LEAP_RECORDING_STATUS();
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingGetStatus(getRecordingHandle(), pStatus);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pStatus.mode).isEqualTo(eLeapRecordingFlags.Writing.value);
+	}
+	
+	
+	@Test
+	void LeapRecordingReadSize_correctSize()
+	{
+		LongByReference pncbEvent = new LongByReference();
+		eLeapRS result = LeapC.INSTANCE.LeapRecordingReadSize(getRecordingHandle(),
+				pncbEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pncbEvent.getValue()).isEqualTo(4);
 	}
 }

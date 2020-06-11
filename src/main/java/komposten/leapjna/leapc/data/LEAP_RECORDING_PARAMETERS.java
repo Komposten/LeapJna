@@ -30,7 +30,7 @@ import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
  *      API - LEAP_RECORDING_PARAMETERS</a>
  */
 @FieldOrder({ "mode" })
-public class LEAP_RECORDING_PARAMETERS extends Structure
+public class LEAP_RECORDING_PARAMETERS extends Structure implements Structure.ByValue
 {
 	/**
 	 * <p>
@@ -61,15 +61,5 @@ public class LEAP_RECORDING_PARAMETERS extends Structure
 	public eLeapRecordingFlags[] getMode()
 	{
 		return Enums.parseMask(mode, eLeapRecordingFlags.class);
-	}
-
-
-	public static class ByValue extends LEAP_RECORDING_PARAMETERS
-			implements Structure.ByValue
-	{
-		public ByValue(eLeapRecordingFlags... flags)
-		{
-			super(flags);
-		}
 	}
 }

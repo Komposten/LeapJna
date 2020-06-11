@@ -867,7 +867,7 @@ public interface LeapC extends Library
 	 *      API - LeapRecordingOpen</a>
 	 */
 	public eLeapRS LeapRecordingOpen(LEAP_RECORDING ppRecording, String filePath,
-			LEAP_RECORDING_PARAMETERS.ByValue params);
+			LEAP_RECORDING_PARAMETERS params);
 
 
 	/**
