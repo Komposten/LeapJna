@@ -432,7 +432,7 @@ public class StructTests
 			struct.getFormat();
 
 			expected = eLeapImageFormat.IR;
-			struct.type = expected.value;
+			struct.format = expected.value;
 			assertThat(struct.getFormat()).isSameAs(expected);
 		}
 	}
