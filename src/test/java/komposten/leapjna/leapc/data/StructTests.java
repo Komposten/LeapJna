@@ -18,6 +18,8 @@ import komposten.leapjna.leapc.enums.eLeapDevicePID;
 import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
+import komposten.leapjna.leapc.enums.eLeapImageFormat;
+import komposten.leapjna.leapc.enums.eLeapImageType;
 
 
 public class StructTests
@@ -357,6 +359,81 @@ public class StructTests
 						.usingElementComparator(new IdentityComparator<>())
 						.containsExactly(expected);
 			}
+		}
+	}
+	
+	
+	@Nested
+	class LEAP_IMAGE_PROPERTIES_TEST
+	{
+		private LEAP_IMAGE_PROPERTIES struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_IMAGE_PROPERTIES();
+		}
+
+
+		@Test
+		void getType_validType_correctConstant()
+		{
+			eLeapImageType expected = eLeapImageType.Raw;
+			struct.type = expected.value;
+
+			assertThat(struct.getType()).isSameAs(expected);
+		}
+
+
+		@Test
+		void getType_invalidType_correctConstant()
+		{
+			struct.type = -1234;
+			assertThat(struct.getType()).isSameAs(eLeapImageType.Unknown);
+		}
+
+
+		@Test
+		void getType_typeChanged_correctConstant()
+		{
+			eLeapImageType expected = eLeapImageType.Raw;
+			struct.type = expected.value;
+			struct.getType();
+
+			expected = eLeapImageType.Default;
+			struct.type = expected.value;
+			assertThat(struct.getType()).isSameAs(expected);
+		}
+
+
+		@Test
+		void getFormat_validFormat_correctConstant()
+		{
+			eLeapImageFormat expected = eLeapImageFormat.RGBIr;
+			struct.format = expected.value;
+
+			assertThat(struct.getFormat()).isSameAs(expected);
+		}
+
+
+		@Test
+		void getFormat_invalidFormat_correctConstant()
+		{
+			struct.format = -1234;
+			assertThat(struct.getFormat()).isSameAs(eLeapImageFormat.Unknown);
+		}
+
+
+		@Test
+		void getFormat_formatChanged_correctConstant()
+		{
+			eLeapImageFormat expected = eLeapImageFormat.RGBIr;
+			struct.format = expected.value;
+			struct.getFormat();
+
+			expected = eLeapImageFormat.IR;
+			struct.type = expected.value;
+			assertThat(struct.getFormat()).isSameAs(expected);
 		}
 	}
 	
