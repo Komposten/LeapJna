@@ -31,6 +31,7 @@ import komposten.leapjna.leapc.data.LEAP_DISTORTION_MATRIX;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
+import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.Enums;
@@ -1059,5 +1060,40 @@ public class LeapCTest
 		float[] expected = { -2, -3, -4 };
 		
 		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	/**
+	 * LeapTelemetryProfiling() cannot change the data in <code>telemetryData</code>
+	 * due to it being passed with a <code>const</code> constraint, so instead we
+	 * set up the parameters here and rely on MockLeapC to validate the data
+	 * and only return <code>eLeapRS.Success</code> if the data is correct.
+	 */
+	@Test
+	void LeapTelemetryProfiling_mappedCorrectly()
+	{
+		LEAP_TELEMETRY_DATA telemetryData = new LEAP_TELEMETRY_DATA();
+
+		telemetryData.thread_id = 1;
+		telemetryData.start_time = 2;
+		telemetryData.end_time = 3;
+		telemetryData.zone_depth = 4;
+		telemetryData.file_name = "file";
+		telemetryData.line_number = 5;
+		telemetryData.zone_name = "zone";
+		
+		eLeapRS result = LeapC.INSTANCE.LeapTelemetryProfiling(getConnectionHandle(),
+				telemetryData);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+	
+	
+	@Test
+	void LeapTelemetryGetNow_correctValue()
+	{
+		long telemetryNow = LeapC.INSTANCE.LeapTelemetryGetNow();
+		
+		assertThat(telemetryNow).isEqualTo(124);
 	}
 }
