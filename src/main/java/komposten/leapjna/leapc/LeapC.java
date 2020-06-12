@@ -45,7 +45,7 @@ import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
-import komposten.leapjna.leapc.util.Configurations;
+import komposten.leapjna.util.Configurations;
 import komposten.leapjna.util.LeapTypeMapper;
 
 
@@ -557,7 +557,7 @@ public interface LeapC extends Library
 	 * Causes the client to commit a configuration change to the Leap Motion service.
 	 * </p>
 	 * <p>
-	 * The change is performed asynchronously – and may fail.
+	 * The change is performed asynchronously ï¿½ and may fail.
 	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} returns a
 	 * {@link LEAP_CONFIG_CHANGE_EVENT} structure when the request has been processed. Use
 	 * the <code>pRequestID</code> value to correlate the response to the originating

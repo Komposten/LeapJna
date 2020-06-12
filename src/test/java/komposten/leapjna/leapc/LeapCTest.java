@@ -70,7 +70,7 @@ import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
-import komposten.leapjna.leapc.util.Configurations;
+import komposten.leapjna.util.Configurations;
 
 
 public class LeapCTest
