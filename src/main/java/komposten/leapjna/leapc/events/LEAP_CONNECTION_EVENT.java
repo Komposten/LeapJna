@@ -49,6 +49,6 @@ public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 	 */
 	public eLeapServiceDisposition getFlags()
 	{
-		return Enums.parse(flags, eLeapServiceDisposition.None);
+		return Enums.parse(flags, eLeapServiceDisposition.Unknown);
 	}
 }

@@ -13,6 +13,12 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 public enum eLeapServiceDisposition implements IntEnum
 {
+	/**
+	 * Indicates that an unknown flag, i.e. one which doesn't match any of the
+	 * constants, was encountered.
+	 */
+	Unknown(-1),
+	
 	/** No flags. */
 	None(0),
 	
