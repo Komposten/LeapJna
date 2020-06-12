@@ -2,9 +2,12 @@ name: Java CI
 
 on: 
   push:
-    branches: [ master ]
+    branches:
+      - master
+      
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build:
@@ -22,14 +25,54 @@ jobs:
       with:
         fetch-depth: 0
       
-    - name: Build
+    - name: Build LeapJna
       run: mvn -B compile --file pom.xml
-        
-    - name: Test
-      run: mvn -B test --file pom.xml
+      
+      
+  test:
+    name: Test
+    runs-on: windows-latest
+    needs: build
 
+    steps:
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        
+    - name: Checkout LeapJna
+      uses: actions/checkout@v2
+      with:
+        path: 'LeapJna'
+        fetch-depth: 0
+        
+    - name: Checkout MockLeapC
+      uses: actions/checkout@v2
+      with:
+        repository: 'komposten/MockLeapC'
+        path: 'MockLeapC'
+        token: ${{ secrets.GH_TOKEN }}
+        
+    - name: Build MockLeapC
+      run: |
+        cmake -S MockLeapC/. -B MockLeapC/out/build
+        cmake --build MockLeapC/out/build --config Release
+        
+    - name: Copy MockLeapC.dll to LeapJna/lib
+      run: |
+        MKDIR LeapJna\lib
+        COPY MockLeapC\out\build\Release\MockLeapC.dll LeapJna\lib
+        TREE LeapJna\lib /F
+        
+    - name: Test LeapJna
+      run: |
+        CD LeapJna
+        mvn -B test --file pom.xml
+        
     - name: SonarCloud analysis
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify sonar:sonar --file pom.xml
+      run: |
+        CD LeapJna
+        mvn -B verify sonar:sonar --file pom.xml

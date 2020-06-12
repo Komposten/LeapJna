@@ -87,13 +87,6 @@ public enum eLeapDeviceStatus implements IntFlagEnum<eLeapDeviceStatus>
 
 
 	@Override
-	public boolean useDefaultParseMask()
-	{
-		return false;
-	}
-
-
-	@Override
 	public eLeapDeviceStatus[] parseMask(int mask)
 	{
 		List<eLeapDeviceStatus> flags = new ArrayList<>();

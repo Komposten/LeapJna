@@ -36,7 +36,7 @@ import com.sun.jna.Structure;
  * 
  * @param <T> The structure type contained in the array.
  */
-public class ArrayPointer<T extends Structure> extends Memory implements Disposable
+public class ArrayPointer<T extends Structure> extends Memory
 {
 	private int elementSize;
 	private int size;

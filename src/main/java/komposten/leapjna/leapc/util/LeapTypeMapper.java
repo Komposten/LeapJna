@@ -9,7 +9,14 @@
  */
 package komposten.leapjna.leapc.util;
 
-public interface Disposable
+import com.sun.jna.DefaultTypeMapper;
+
+import komposten.leapjna.leapc.enums.eLeapRS;
+
+public class LeapTypeMapper extends DefaultTypeMapper
 {
-	public void dispose();
+	public LeapTypeMapper()
+	{
+		addTypeConverter(eLeapRS.class, new eLeapRSConverter());
+	}
 }

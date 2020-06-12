@@ -18,7 +18,14 @@ import komposten.leapjna.leapc.enums.eLeapValueType;
 
 
 /**
+ * <p>
  * A variant data type used to get and set service configuration values.
+ * </p>
+ * <p>
+ * <code>type</code> is not meant to be mutable. If it is changed it will lead to
+ * undefined behaviour <i>unless</i> <code>union.setType()</code> is called to update the
+ * type the value union expects.
+ * </p>
  * 
  * @see <a href=
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___v_a_r_i_a_n_t">LeapC

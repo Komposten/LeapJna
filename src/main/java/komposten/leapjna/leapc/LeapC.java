@@ -45,14 +45,14 @@ import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
-import komposten.leapjna.leapc.util.Configurations;
-import komposten.leapjna.util.LeapTypeMapper;
+import komposten.leapjna.leapc.util.LeapTypeMapper;
+import komposten.leapjna.util.Configurations;
 
 
 public interface LeapC extends Library
 {
 	public LeapC INSTANCE = (LeapC) Native
-			.synchronizedLibrary(Native.load("LeapC", LeapC.class, new HashMap<String, Object>()
+			.synchronizedLibrary(Native.load(LeapCConfig.getDllName(), LeapC.class, new HashMap<String, Object>()
 			{
 				{
 					put(Library.OPTION_TYPE_MAPPER, new LeapTypeMapper());
@@ -260,7 +260,7 @@ public interface LeapC extends Library
 	 * </p>
 	 * <p>
 	 * To ensure resources are properly freed, users must call
-	 * {@link #LeapOpenDevice(Pointer)} when finished with the device, even if the retrieved
+	 * {@link #LeapCloseDevice(Pointer)} when finished with the device, even if the retrieved
 	 * device has problems or cannot stream.
 	 * </p>
 	 * 
@@ -300,7 +300,7 @@ public interface LeapC extends Library
 	 * will return {@link eLeapRS#InsufficientBuffer}, but LeapC still sets the
 	 * <code>serial_length</code> field of the struct to the required length. You can then
 	 * allocate memory for the string (using e.g.
-	 * {@link LEAP_DEVICE_INFO#allocateSerialBuffer(int)}, set the serial field, and call
+	 * {@link LEAP_DEVICE_INFO#allocateSerialBuffer(int)}), set the serial field, and call
 	 * this function again.
 	 * </p>
 	 * 
@@ -450,7 +450,6 @@ public interface LeapC extends Library
 	 * measurements in the application with time measurements in the Leap Motion service.
 	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
-	 * TODO Test this to make sure everything is working.
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
@@ -558,7 +557,7 @@ public interface LeapC extends Library
 	 * Causes the client to commit a configuration change to the Leap Motion service.
 	 * </p>
 	 * <p>
-	 * The change is performed asynchronously – and may fail.
+	 * The change is performed asynchronously ï¿½ and may fail.
 	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} returns a
 	 * {@link LEAP_CONFIG_CHANGE_EVENT} structure when the request has been processed. Use
 	 * the <code>pRequestID</code> value to correlate the response to the originating
@@ -868,7 +867,7 @@ public interface LeapC extends Library
 	 *      API - LeapRecordingOpen</a>
 	 */
 	public eLeapRS LeapRecordingOpen(LEAP_RECORDING ppRecording, String filePath,
-			LEAP_RECORDING_PARAMETERS.ByValue params);
+			LEAP_RECORDING_PARAMETERS params);
 
 
 	/**

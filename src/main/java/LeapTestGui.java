@@ -289,7 +289,7 @@ public class LeapTestGui extends JFrame
 		// Open the recording.
 		LEAP_RECORDING ppRecording = new LEAP_RECORDING();
 		String filePath = "recording.lmt";
-		LEAP_RECORDING_PARAMETERS.ByValue params = new LEAP_RECORDING_PARAMETERS.ByValue(
+		LEAP_RECORDING_PARAMETERS params = new LEAP_RECORDING_PARAMETERS(
 				eLeapRecordingFlags.Reading);
 		eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(ppRecording, filePath, params);
 
@@ -690,7 +690,7 @@ public class LeapTestGui extends JFrame
 		if (recording == null)
 		{
 			recording = new LEAP_RECORDING();
-			LEAP_RECORDING_PARAMETERS.ByValue params = new LEAP_RECORDING_PARAMETERS.ByValue(
+			LEAP_RECORDING_PARAMETERS params = new LEAP_RECORDING_PARAMETERS(
 					eLeapRecordingFlags.Writing);
 			String filePath = "recording_" + System.currentTimeMillis() + ".lmt";
 

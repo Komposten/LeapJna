@@ -78,8 +78,8 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 		super(pointer, ALIGN_NONE);
 		read();
 	}
-	
-	
+
+
 	@Override
 	public void read()
 	{
@@ -93,7 +93,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 */
 	public eLeapEventType getType()
 	{
-		return Enums.parse(type, eLeapEventType.None);
+		return Enums.parse(type, eLeapEventType.Unknown);
 	}
 
 

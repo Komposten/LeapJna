@@ -11,17 +11,15 @@ LeapJna is a library that provides Java bindings for the [Leap Motion](https://w
 ## Supported API features
 LeapJna includes Java bindings for all functionality in the Leap Motion C API from Orion SDK v4.0.0+52173.
 
-However, some of these bindings have not been fully tested and some appear to not function as expected in the LeapC API itself. More information about these are found below.
-
 ### Untested API bindings
-LeapJna's bindings for some of the API features have not been tested. Those are as follows:
+LeapJna's bindings for some of the API features have not been tested with an actual Leap Motion device. Those are as follows:
 * Device failure events (I don't have a failing device to test this)
 * Point mappings (I'm not sure what they are and how to enable them)
-* Head pose (I'm not sure how to enable it)
+
+These _should_ still work, as I have tested the bindings using a mock Leap C API, but I can't guarantee it.
 
 ### Broken API features
-Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see,
-which means that they won't work as expected in LeapJna either.
+Some features specified in the Leap Motion API are broken or non-functional in the C API as far as I can see, which means that they won't work as expected in LeapJna either.
 
 A list of these features can be found here: [Broken API Features](BROKEN_API_FEATURES.md).
 
