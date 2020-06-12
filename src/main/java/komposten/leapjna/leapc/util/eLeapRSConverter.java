@@ -48,10 +48,7 @@ public class eLeapRSConverter implements TypeConverter
 		{
 			eLeapRS enumValue = (eLeapRS) value;
 
-			if (enumValue != null)
-			{
-				result = enumValue.getValue();
-			}
+			result = enumValue.getValue();
 		}
 
 		return result;
