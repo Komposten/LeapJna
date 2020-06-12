@@ -18,7 +18,7 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
 
 
-public class EnumsTest
+class EnumsTest
 {
 	@Test
 	void parse_intEnumValidValue_enumConstant()

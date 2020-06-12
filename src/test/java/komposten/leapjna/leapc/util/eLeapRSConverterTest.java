@@ -22,7 +22,7 @@ import com.sun.jna.FromNativeContext;
 import komposten.leapjna.leapc.enums.eLeapRS;
 
 
-public class eLeapRSConverterTest
+class eLeapRSConverterTest
 {
 	private eLeapRSConverter converter;
 	private FromNativeContext eLeapRSContext;

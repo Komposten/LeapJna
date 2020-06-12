@@ -82,7 +82,7 @@ import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
 
-public class LeapCTest
+class LeapCTest
 {
 	private static final Offset<Float> PRECISION = Offset.offset(0.001f);;
 

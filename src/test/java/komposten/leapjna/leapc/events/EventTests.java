@@ -22,7 +22,7 @@ import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 
 
-public class EventTests
+class EventTests
 {
 	@Nested
 	class LEAP_CONNECTION_EVENT_TEST

@@ -34,7 +34,7 @@ import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapValueType;
 
 
-public class StructTests
+class StructTests
 {
 	@Nested
 	class LEAP_CONNECTION_INFO_TEST
