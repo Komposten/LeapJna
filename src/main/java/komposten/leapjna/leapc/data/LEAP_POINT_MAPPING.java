@@ -23,7 +23,6 @@ import komposten.leapjna.leapc.LeapC;
  * <p>
  * It contains the entire set of points being mapped.
  * </p>
- * TODO Test this mapping!
  * 
  * @see <a href=
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___p_o_i_n_t___m_a_p_p_i_n_g">LeapC

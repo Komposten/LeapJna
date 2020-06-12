@@ -29,9 +29,6 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
  * message containing this event when a new device is detected. You can use the handle
  * provided by the device filed to open a device so that you can access its properties.
  * </p>
- * <p>
- * TODO Test this mapping!
- * </p>
  * 
  * @see <a href=
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___d_e_v_i_c_e___f_a_i_l_u_r_e___e_v_e_n_t">LeapC
