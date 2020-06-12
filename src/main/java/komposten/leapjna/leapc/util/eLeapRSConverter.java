@@ -16,33 +16,48 @@ import com.sun.jna.TypeConverter;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapRS;
 
+
 public class eLeapRSConverter implements TypeConverter
 {
 	@Override
 	public Object fromNative(Object nativeValue, FromNativeContext context)
 	{
-		Integer value = (Integer)nativeValue;
-		Class<?> targetClass = context.getTargetType();
+		eLeapRS result = null;
 		
-		if (!eLeapRS.class.isAssignableFrom(targetClass)) {
-			return null;
+		if (nativeValue instanceof Integer)
+		{
+			Integer value = (Integer) nativeValue;
+			Class<?> targetClass = context.getTargetType();
+	
+			if (eLeapRS.class.isAssignableFrom(targetClass))
+			{
+				result = Enums.parse(value, eLeapRS.Unknown);
+			}
 		}
 		
-		return Enums.parse(value, eLeapRS.Unknown);
+		return result;
 	}
 
 
 	@Override
 	public Object toNative(Object value, ToNativeContext context)
 	{
-		eLeapRS enumValue = (eLeapRS) value;
+		Integer result = null;
 		
-		if (enumValue == null)
-			return null;
-		return enumValue.getValue();
+		if (value instanceof eLeapRS)
+		{
+			eLeapRS enumValue = (eLeapRS) value;
+
+			if (enumValue != null)
+			{
+				result = enumValue.getValue();
+			}
+		}
+
+		return result;
 	}
 
-	
+
 	@Override
 	public Class<?> nativeType()
 	{
