@@ -7,7 +7,7 @@
  * it under the terms of the MIT license as written in the LICENSE file in the root
  * of this project.
  */
-package komposten.leapjna.util;
+package komposten.leapjna.leapc.util;
 
 import com.sun.jna.DefaultTypeMapper;
 

@@ -45,8 +45,8 @@ import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.leapc.util.LeapTypeMapper;
 import komposten.leapjna.util.Configurations;
-import komposten.leapjna.util.LeapTypeMapper;
 
 
 public interface LeapC extends Library
