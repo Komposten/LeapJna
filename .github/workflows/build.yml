@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - master
-      - unit-testing
       
   pull_request:
     branches:
       - master
-      - unit-testing
 
 jobs:
   build:
