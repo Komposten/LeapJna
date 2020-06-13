@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
 import com.sun.jna.Pointer;
@@ -104,6 +105,44 @@ class ArrayPointerTest
 		assertMemoryContains(arrayPointer, 40, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 60, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 80, 5, 4.5, 4);
+	}
+	
+	
+	@Test
+	void fromPointer_nullPointer_nullPointerException()
+	{
+		assertThatNullPointerException().as("null passed instead of pointer")
+				.isThrownBy(() -> ArrayPointer.fromPointer(null, StructureWithCtors.class, 1));
+
+		assertThatNullPointerException().as("null pointer passed").isThrownBy(
+				() -> ArrayPointer.fromPointer(new Pointer(0), StructureWithCtors.class, 1));
+	}
+	
+	
+	@Test
+	void fromPointer_validPointer_elementsCorrect()
+	{
+		// Create an array of structures
+		StructureWithCtors expected1 = new StructureWithCtors(1, 1.5, 2);
+		StructureWithCtors expected2 = new StructureWithCtors(-1, 5.2, 7);
+		StructureWithCtors[] expectedArray = { expected1, expected2 };
+		
+		// Write those structures to some point in memory.
+		Pointer expectedPointer = ArrayPointer.fromArray(expectedArray);
+		
+		// Use fromPointer to create an ArrayPointer based on the pointer from above.
+		ArrayPointer<StructureWithCtors> array = ArrayPointer.fromPointer(expectedPointer,
+				StructureWithCtors.class, expectedArray.length);
+		
+		assertThat(array.getArraySize()).isEqualTo(expectedArray.length);
+		for (int i = 0; i < array.getArraySize(); i++)
+		{
+			StructureWithCtors actual = array.getElement(i);
+			StructureWithCtors expected = expectedArray[i];
+			assertThat(actual.a).isEqualTo(expected.a);
+			assertThat(actual.b).isCloseTo(expected.b, Offset.offset(0.001));
+			assertThat(actual.c).isEqualTo(expected.c);
+		}
 	}
 
 

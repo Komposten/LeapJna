@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 
@@ -120,6 +122,46 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 		return result;
 	}
+	
+	
+	/**
+	 * <p>
+	 * Creates an <code>ArrayPointer</code> based on the provided pointer, element
+	 * type and array size.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: All elements will be assumed to have the same size, calculated
+	 * using {@link Structure#getSize(Class)}!
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: This instance is not registered in
+	 * {@link Memory#allocatedMemory} and will therefore not be disposed by
+	 * {@link Memory#disposeAll()}. It will still be disposed when GC'd, though.
+	 * </p>
+	 * <p>
+	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access
+	 * the array data. <br />
+	 * Use {@link #setElement(int, Structure)} or
+	 * {@link #setElements(int, Structure[])} to write data to the array.
+	 * </p>
+	 * 
+	 * @param pointer A pointer to the memory block of an existing array of
+	 *          <code>clazz</code> structs.
+	 * @param clazz The type of the structs stored in the array.
+	 * @param arraySize The number of elements in the array.
+	 * @throws IllegalArgumentException If the specified type has no public no-arg
+	 *           constructor.
+	 */
+	public static <T extends Structure> ArrayPointer<T> fromPointer(Pointer pointer, Class<T> clazz, int arraySize)
+	{
+		if (pointer == null || Pointer.nativeValue(pointer) == 0)
+		{
+			throw new NullPointerException("pointer must not be null or a null pointer!");
+		}
+		
+		int elementSize = Structure.newInstance(clazz).size();
+		return new ArrayPointer<>(pointer, clazz, elementSize, arraySize);
+	}
 
 
 	/**
@@ -144,6 +186,37 @@ public class ArrayPointer<T extends Structure> extends Memory
 		// Clear the memory to get rid of garbage data.
 		int memorySize = (int) size();
 		write(0, new byte[memorySize], 0, memorySize);
+	}
+	
+	
+	/**
+	 * <p>
+	 * Creates a new <code>ArrayPointer</code> based on the provided type, located
+	 * at the specified pointer.
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: All elements will be assumed to have the same size!
+	 * </p>
+	 * <p>
+	 * <b>Note</b>: This instance is not registered in
+	 * {@link Memory#allocatedMemory} and will therefore not be disposed by
+	 * {@link Memory#disposeAll()}. It will still be disposed when GC'd, though.
+	 * </p>
+	 * 
+	 * @param pointer A pointer to an existing memory block to use for the array.
+	 * @param clazz The type to store in the array.
+	 * @param elementSize The size, in bytes, each element needs.
+	 * @param arraySize The number of elements to allocate space for.
+	 */
+	private ArrayPointer(Pointer pointer, Class<T> clazz, int elementSize, int arraySize)
+	{
+		super();
+		this.elementSize = elementSize;
+		this.clazz = clazz;
+		this.arraySize = arraySize;
+		
+		peer = Pointer.nativeValue(pointer);
+		size = (long)arraySize * elementSize;
 	}
 
 
