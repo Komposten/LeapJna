@@ -39,7 +39,7 @@ import com.sun.jna.Structure;
 public class ArrayPointer<T extends Structure> extends Memory
 {
 	private int elementSize;
-	private int size;
+	private int arraySize;
 	private Class<T> clazz;
 
 	/**
@@ -114,7 +114,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 			throw new NullPointerException("At least one value in values must be non-null!");
 		}
 
-		ArrayPointer<T> result = new ArrayPointer<T>((Class<T>) nonNullValue.getClass(),
+		ArrayPointer<T> result = new ArrayPointer<>((Class<T>) nonNullValue.getClass(),
 				nonNullValue.size(), values.length);
 		result.setElements(0, values);
 
@@ -136,10 +136,10 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	private ArrayPointer(Class<T> clazz, int elementSize, int arraySize)
 	{
-		super(arraySize * elementSize);
+		super((long)arraySize * elementSize);
 		this.elementSize = elementSize;
 		this.clazz = clazz;
-		size = arraySize;
+		this.arraySize = arraySize;
 
 		// Clear the memory to get rid of garbage data.
 		int memorySize = (int) size();
@@ -152,7 +152,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	public int getArraySize()
 	{
-		return size;
+		return arraySize;
 	}
 
 
@@ -168,7 +168,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	public void setElement(int index, T value)
 	{
-		if (index < 0 || index >= size)
+		if (index < 0 || index >= arraySize)
 		{
 			throw new ArrayIndexOutOfBoundsException(index);
 		}
@@ -180,7 +180,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 			value.getPointer().read(0, buffer, 0, elementSize);
 		}
 
-		write(index * elementSize, buffer, 0, elementSize);
+		write((long)index * elementSize, buffer, 0, elementSize);
 	}
 
 
@@ -202,11 +202,11 @@ public class ArrayPointer<T extends Structure> extends Memory
 			throw new ArrayIndexOutOfBoundsException(msg);
 		}
 
-		if (offset + values.length > size)
+		if (offset + values.length > arraySize)
 		{
 			String msg = String.format(
 					"offset + values.length cannot be larger than the array size: %d > %d",
-					offset + values.length, size);
+					offset + values.length, arraySize);
 			throw new ArrayIndexOutOfBoundsException(msg);
 		}
 
@@ -218,7 +218,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 			else
 				Arrays.fill(buffer, (byte) 0);
 
-			write((offset + i) * elementSize, buffer, 0, elementSize);
+			write(((long)offset + i) * elementSize, buffer, 0, elementSize);
 		}
 	}
 
@@ -232,7 +232,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	public T getElement(int index)
 	{
-		return Structure.newInstance(clazz, share(index * elementSize));
+		return Structure.newInstance(clazz, share((long)index * elementSize));
 	}
 
 
@@ -247,9 +247,9 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	public T[] getElements(T[] array)
 	{
-		List<T> list = new ArrayList<>(size);
+		List<T> list = new ArrayList<>(arraySize);
 
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < arraySize; i++)
 		{
 			T element = getElement(i);
 			list.add(element);
