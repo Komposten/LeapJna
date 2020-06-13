@@ -46,7 +46,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 	/**
 	 * <p>
-	 * Creates an empty <code>ArrayByReference</code> based on the provided type and array
+	 * Creates an empty <code>ArrayPointer</code> based on the provided type and array
 	 * size.
 	 * </p>
 	 * <p>
@@ -74,9 +74,13 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 	/**
 	 * <p>
-	 * Creates an <code>ArrayByReference</code> based on the provided array. The elements in
+	 * Creates an <code>ArrayPointer</code> based on the provided array. The elements in
 	 * the provided array will be copied from native memory, so ensure that they have been
 	 * {@link Structure#write() written} before calling this method.
+	 * </p>
+	 * <p>
+	 * Since all elements are stored in a contiguous memory block, <code>null</code>
+	 * elements will be replaced by "empty" elements (all values set to 0).
 	 * </p>
 	 * <p>
 	 * <b>Note</b>: All elements will be assumed to have the same size, calculated using
@@ -113,7 +117,8 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 		if (nonNullValue == null)
 		{
-			throw new NullPointerException("At least one value in values must be non-null!");
+			throw new NullPointerException("At least one value in values must be non-null!"
+					+ " Use ArrayPointer.empty() if you want to create an empty array.");
 		}
 
 		ArrayPointer<T> result = new ArrayPointer<>((Class<T>) nonNullValue.getClass(),
@@ -166,7 +171,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 	/**
 	 * <p>
-	 * Creates a new <code>ArrayByReference</code> based on the provided type.
+	 * Creates a new <code>ArrayPointer</code> based on the provided type.
 	 * </p>
 	 * <p>
 	 * <b>Note</b>: All elements will be assumed to have the same size!
@@ -230,9 +235,17 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 
 	/**
-	 * Updates a single element in the array referenced by this object. The element will be
-	 * copied from native memory, so ensure that it has been {@link Structure#write()
-	 * written} before calling this method.
+	 * <p>
+	 * Updates a single element in the array referenced by this object. The
+	 * element will be copied from native memory, so ensure that it has been
+	 * {@link Structure#write() written} before calling this method.
+	 * </p>
+	 * <p>
+	 * <b>Note:</b> If <code>value</code> is <code>null</code>, the memory block
+	 * at the given index will only be cleared with zeros. This means that calling
+	 * <code>getElement</code> on that index will return an "empty" structure (all
+	 * values are 0) rather than <code>null</code>.
+	 * </p>
 	 * 
 	 * @param index The array index of the element to update.
 	 * @param value The new value. May be <code>null</code>.
@@ -258,14 +271,23 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 
 	/**
-	 * Copies the provided elements into the array referenced by this object. The provided
-	 * elements will be copied from native memory, so ensure that they have been
-	 * {@link Structure#write() written} before calling this method.
+	 * <p>
+	 * Copies the provided elements into the array referenced by this object. The
+	 * provided elements will be copied from native memory, so ensure that they
+	 * have been {@link Structure#write() written} before calling this method.
+	 * </p>
+	 * <p>
+	 * <b>Note:</b> If any of the values are <code>null</code>, the memory block
+	 * at those indices will only be cleared with zeros. This means that calling
+	 * <code>getElement</code> on those indices will return "empty" structures
+	 * (all values are 0) rather than <code>null</code>.
+	 * </p>
 	 * 
 	 * @param offset The array index to copy the elements to.
 	 * @param values The new elements. May contain <code>null</code> values.
-	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the offset plus
-	 *           the array size is larger than {@link #getArraySize()}.
+	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the
+	 *           offset plus the array size is larger than
+	 *           {@link #getArraySize()}.
 	 */
 	public void setElements(int offset, T[] values)
 	{
