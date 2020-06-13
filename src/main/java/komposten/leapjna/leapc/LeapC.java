@@ -782,7 +782,7 @@ public interface LeapC extends Library
 	 *      API - LeapPixelToRectilinear</a>
 	 */
 	public LEAP_VECTOR.ByValue LeapPixelToRectilinear(Pointer hConnection, int camera,
-			LEAP_VECTOR pixel);
+			LEAP_VECTOR.ByValue pixel);
 
 
 	/**
@@ -823,7 +823,7 @@ public interface LeapC extends Library
 	 *      API - LeapRectilinearToPixel</a>
 	 */
 	public LEAP_VECTOR.ByValue LeapRectilinearToPixel(Pointer hConnection, int camera,
-			LEAP_VECTOR rectilinear);
+			LEAP_VECTOR.ByValue rectilinear);
 
 
 	/**
