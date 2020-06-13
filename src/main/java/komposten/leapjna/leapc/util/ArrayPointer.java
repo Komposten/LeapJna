@@ -12,9 +12,9 @@ package komposten.leapjna.leapc.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.sun.jna.Memory;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
@@ -329,6 +329,96 @@ public class ArrayPointer<T extends Structure> extends Memory
 		}
 
 		return list.toArray(array);
+	}
+	
+	
+	@Override
+	public int hashCode()
+	{
+		int elementHash = 1;
+		for (int i = 0; i < arraySize; i++)
+		{
+			elementHash = 31 * elementHash + getElement(i).hashCode();
+		}
+		
+		return Objects.hash(arraySize, elementSize, clazz, elementHash);
+	}
+	
+	
+	/**
+	 * <p>
+	 * Checks whether this <code>ArrayPointer</code> is equal to another object.
+	 * <code>other</code> is considered equal if and only if it is an
+	 * <code>ArrayPointer</code> with the same array size, element size and
+	 * element type, and its elements are equal to the elements in this
+	 * <code>ArrayPointer</code>.
+	 * </p>
+	 * <p>
+	 * <p>
+	 * Element equality is tested using the elements' <code>equals()</code>
+	 * methods.
+	 * </p>
+	 * Use {@link #shallowEquals(Object)} instead if you want to compare the
+	 * native peer values (i.e. memory addresses) instead of the actual elements.
+	 * </p>
+	 */
+	@Override
+	public boolean equals(Object other)
+	{
+		if (!(other instanceof ArrayPointer))
+		{
+			return false;
+		}
+
+		ArrayPointer<?> otherArray = (ArrayPointer<?>) other;
+
+		if (other != this)
+		{
+			if (otherArray.clazz != clazz || otherArray.elementSize != elementSize
+					|| otherArray.arraySize != arraySize)
+			{
+				return false;
+			}
+
+			for (int i = 0; i < arraySize; i++)
+			{
+				if (!getElement(i).equals(otherArray.getElement(i)))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+	
+	
+	/**
+	 * <p>
+	 * Checks whether this <code>ArrayPointer</code> is "shallowly" equal to another
+	 * object. <code>other</code> is considered "shallowly" equal if and only if it
+	 * is an <code>ArrayPointer</code> with the same array size, element size,
+	 * element type and native peer value.
+	 * </p>
+	 */
+	public boolean shallowEquals(Object other)
+	{
+		if (other instanceof ArrayPointer)
+		{
+			ArrayPointer<?> otherArray = (ArrayPointer<?>) other;
+
+			if (other == this)
+			{
+				return true;
+			}
+			if (otherArray.clazz == clazz && otherArray.elementSize == elementSize
+					&& otherArray.arraySize == arraySize && otherArray.peer == peer)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 

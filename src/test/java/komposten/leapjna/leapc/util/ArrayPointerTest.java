@@ -15,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Objects;
+
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
@@ -341,6 +343,97 @@ class ArrayPointerTest
 			assertThat(value.c).isEqualTo(4);
 		});
 	}
+	
+	
+	@Test
+	void equals_sameObject_true()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
+				.empty(StructureWithCtors.class, 5);
+		assertThat(arrayPointer1.equals(arrayPointer1)).isTrue();
+	}
+	
+	
+	@Test
+	void equals_differentArrayPointer_false()
+	{
+		ArrayPointer<?> arrayPointer = ArrayPointer.empty(StructureWithCtors.class, 5);
+		ArrayPointer<?> differentPeer = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentSize = ArrayPointer.fromPointer(arrayPointer, StructureWithCtors.class, 4);
+		ArrayPointer<?> differentType = ArrayPointer.fromPointer(arrayPointer, StructureNoPointerCtor.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentValues = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		differentValues.setInt(0, 1);
+
+		// Compare to array with same class, size and values but different peer.
+		assertThat(arrayPointer.equals(differentPeer)).isTrue();
+		// Compare to array with same class, values and peer but different size.
+		assertThat(arrayPointer.equals(differentSize)).isFalse();
+		// Compare to array with same values, peer and size but different class.
+		assertThat(arrayPointer.equals(differentType)).isFalse();
+		// Compare to array with same class, peer and size but different values.
+		assertThat(arrayPointer.equals(differentValues)).isFalse();
+	}
+	
+	
+	@Test
+	void shallowEquals_sameObject_true()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
+				.empty(StructureWithCtors.class, 5);
+		assertThat(arrayPointer1.equals(arrayPointer1)).isTrue();
+	}
+	
+	
+	@Test
+	void shallowEquals_differentArrayPointer_false()
+	{
+		ArrayPointer<?> arrayPointer = ArrayPointer.empty(StructureWithCtors.class, 5);
+		ArrayPointer<?> differentPeer = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentSize = ArrayPointer.fromPointer(arrayPointer, StructureWithCtors.class, 4);
+		ArrayPointer<?> differentType = ArrayPointer.fromPointer(arrayPointer, StructureNoPointerCtor.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentValues = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		differentValues.setInt(0, 1);
+
+		// Compare to array with same class, size and values but different peer.
+		assertThat(arrayPointer.shallowEquals(differentPeer)).isFalse();
+		// Compare to array with same class, values and peer but different size.
+		assertThat(arrayPointer.shallowEquals(differentSize)).isFalse();
+		// Compare to array with same values, peer and size but different class.
+		assertThat(arrayPointer.shallowEquals(differentType)).isFalse();
+		// Compare to array with same class, peer and size but different values.
+		assertThat(arrayPointer.shallowEquals(differentValues)).isFalse();
+	}
+	
+	
+	@Test
+	void equals_nonArrayPointer_false()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
+				.empty(StructureWithCtors.class, 5);
+		assertThat(arrayPointer1.equals("string")).isFalse();
+		assertThat(arrayPointer1.equals(null)).isFalse();
+	}
+	
+	
+	@Test
+	void hashCode_calculatedProperly()
+	{
+		ArrayPointer<?> arrayPointer = ArrayPointer.empty(StructureWithCtors.class, 5);
+		ArrayPointer<?> differentPeer = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentSize = ArrayPointer.fromPointer(arrayPointer, StructureWithCtors.class, 4);
+		ArrayPointer<?> differentType = ArrayPointer.fromPointer(arrayPointer, StructureNoPointerCtor.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentValues = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		differentValues.setInt(0, 1);
+
+		// Compare to array with same class, size and values but different peer.
+		assertThat(arrayPointer.hashCode()).isEqualTo(differentPeer.hashCode());
+		// Compare to array with same class, values and peer but different size.
+		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentSize.hashCode());
+		// Compare to array with same values, peer and size but different class.
+		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentType.hashCode());
+		// Compare to array with same class, peer and size but different values.
+		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentValues.hashCode());
+	}
 
 
 	public static class StructureNoCtors extends Structure
@@ -368,6 +461,27 @@ class ArrayPointerTest
 		{
 			this.a = a;
 			write();
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(a);
+		}
+		
+		
+		@Override
+		public boolean equals(Object o)
+		{
+			if (o instanceof StructureNoPointerCtor)
+			{
+				StructureNoPointerCtor o2 = (StructureNoPointerCtor)o;
+				
+				return o2.a == a;
+			}
+			
+			return false;
 		}
 	}
 
@@ -399,6 +513,27 @@ class ArrayPointerTest
 		{
 			super(pointer, ALIGN_NONE);
 			read();
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(a, b, c);
+		}
+		
+		
+		@Override
+		public boolean equals(Object o)
+		{
+			if (o instanceof StructureWithCtors)
+			{
+				StructureWithCtors o2 = (StructureWithCtors)o;
+				
+				return o2.a == a && o2.b == b && o2.c == c;
+			}
+			
+			return false;
 		}
 	}
 }
