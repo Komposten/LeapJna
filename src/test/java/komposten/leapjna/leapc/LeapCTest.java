@@ -1073,7 +1073,7 @@ public class LeapCTest
 	void LeapPixelToRectilinear_correctValues()
 	{
 		int camera = 1;
-		LEAP_VECTOR pixel = new LEAP_VECTOR(1, 2, 3);
+		LEAP_VECTOR.ByValue pixel = new LEAP_VECTOR.ByValue(1, 2, 3);
 		
 		LEAP_VECTOR actual = LeapC.INSTANCE.LeapPixelToRectilinear(getConnectionHandle(),
 				camera, pixel);
@@ -1094,7 +1094,7 @@ public class LeapCTest
 	void LeapRectilinearToPixel_correctValues()
 	{
 		int camera = 1;
-		LEAP_VECTOR rectilinear = new LEAP_VECTOR(1, 2, 3);
+		LEAP_VECTOR.ByValue rectilinear = new LEAP_VECTOR.ByValue(1, 2, 3);
 		
 		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixel(getConnectionHandle(),
 				camera, rectilinear);

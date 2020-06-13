@@ -77,5 +77,11 @@ public class LEAP_VECTOR extends Structure
 		{
 			super();
 		}
+
+
+		public ByValue(float x, float y, float z)
+		{
+			super(x, y, z);
+		}
 	}
 }
