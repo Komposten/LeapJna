@@ -172,6 +172,21 @@ class ArrayPointerTest
 		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
 		assertMemoryContains(arrayPointer, 20, 0, 0, 0);
 	}
+	
+	
+	@Test
+	void setElement_outOfBounds_arrayOutOfBoundsException()
+	{
+		StructureWithCtors[] values = new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatThrownBy(() -> arrayPointer.setElement(-1, null))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(() -> arrayPointer.setElement(values.length, null))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+	}
 
 
 	@Test
@@ -203,6 +218,40 @@ class ArrayPointerTest
 		assertMemoryContains(arrayPointer, 20, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 40, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 60, 6, 5, 4);
+	}
+
+
+	@Test
+	void setElements_noValues_keepExisting()
+	{
+		StructureWithCtors[] values = new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(3, 5, 6),
+				new StructureWithCtors(9, 8, 7), new StructureWithCtors(6, 5, 4) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		arrayPointer.setElements(1, new StructureWithCtors[0]);
+		arrayPointer.setElements(2, null);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
+		assertMemoryContains(arrayPointer, 20, 3, 5, 6);
+		assertMemoryContains(arrayPointer, 40, 9, 8, 7);
+		assertMemoryContains(arrayPointer, 60, 6, 5, 4);
+	}
+	
+	
+	@Test
+	void setElements_outOfBounds_arrayOutOfBoundsException()
+	{
+		StructureWithCtors[] values = new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatThrownBy(() -> arrayPointer.setElements(-1, new StructureWithCtors[1]))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(values.length, new StructureWithCtors[3]))
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
 	}
 
 
@@ -342,6 +391,21 @@ class ArrayPointerTest
 			assertThat(value.b).isEqualTo(4.5d);
 			assertThat(value.c).isEqualTo(4);
 		});
+	}
+	
+	
+	@Test
+	void getElement_outOfBounds_arrayIndexOutOfBoundsException()
+	{
+		StructureWithCtors[] values = new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatThrownBy(() -> arrayPointer.getElement(-1))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(() -> arrayPointer.getElement(values.length))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
 	}
 	
 	

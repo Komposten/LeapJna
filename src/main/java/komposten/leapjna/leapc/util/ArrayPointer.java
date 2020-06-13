@@ -291,6 +291,11 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	public void setElements(int offset, T[] values)
 	{
+		if (values == null || values.length == 0)
+		{
+			return;
+		}
+		
 		if (offset < 0)
 		{
 			String msg = String.format("The offset must be zero or positive: %d < 0", offset);
@@ -327,6 +332,11 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 */
 	public T getElement(int index)
 	{
+		if (index < 0 || index >= arraySize)
+		{
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+		
 		return Structure.newInstance(clazz, share((long)index * elementSize));
 	}
 
