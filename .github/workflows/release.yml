@@ -5,6 +5,24 @@ on:
     types: [published]
 
 jobs:
+  package:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+        
+    - name: Checkout LeapJna
+      uses: actions/checkout@v2
+    
+    - name: Publish package
+      run: mvn -B deploy --file pom.xml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   javadoc:
     name: Publish JavaDocs
     runs-on: ubuntu-latest
