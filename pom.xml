@@ -10,9 +10,13 @@
 	<packaging>jar</packaging>
 
 	<properties>
+		<!-- General properties -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Unit testing -->
 		<junit.jupiter.version>5.6.2</junit.jupiter.version>
 		<junit.platform.version>1.1.0</junit.platform.version>
-		<jgrapht.version>1.2.0</jgrapht.version>
+		<assertj.version>3.11.1</assertj.version>
 
 		<!-- Sonar cloud settings -->
 		<sonar.projectKey>Komposten_LeapJna</sonar.projectKey>
@@ -36,7 +40,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.11.1</version>
+			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
