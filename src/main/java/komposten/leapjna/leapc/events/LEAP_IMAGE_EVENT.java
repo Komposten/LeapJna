@@ -28,7 +28,7 @@ import komposten.leapjna.leapc.data.LEAP_IMAGE;
  * <p>
  * {@link LeapC#LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} produces this
  * message when an image is available. The struct contains image properties, the
- * distortion grid, and a pointer to the buffer containing the image data – which was
+ * distortion grid, and a pointer to the buffer containing the image data -- which was
  * allocated using the allocator function passed to LeapC using the
  * {@link LeapC#LeapSetAllocator(Pointer, LEAP_ALLOCATOR)}.
  * </p>

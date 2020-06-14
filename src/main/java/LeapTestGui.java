@@ -486,11 +486,11 @@ public class LeapTestGui extends JFrame
 							System.out.format("  Caps: %s%n", Arrays.toString(info.getCapabilities()));
 							System.out.format("  PID: %s (%d)%n",
 									LeapC.INSTANCE.LeapDevicePIDToString(info.pid), info.pid);
-							System.out.format("  Baseline: %d µm%n", info.baseline);
+							System.out.format("  Baseline: %d \u00b5m%n", info.baseline);
 							System.out.format("  Serial: %s%n", info.serial);
-							System.out.format("  FoV: %.02f°x%.02f° (HxV)%n",
+							System.out.format("  FoV: %.02f\u00b0 x %.02f\u00b0 (HxV)%n",
 									Math.toDegrees(info.h_fov), Math.toDegrees(info.v_fov));
-							System.out.format("  Range: %d µm%n", info.range);
+							System.out.format("  Range: %d \u00b5m%n", info.range);
 
 							LeapC.INSTANCE.LeapCloseDevice(phDevice.handle);
 						}
