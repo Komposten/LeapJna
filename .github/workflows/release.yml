@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Publish package
-      run: mvn -B deploy --file pom.xml
+      run: mvn -B -DskipTests deploy --file pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
