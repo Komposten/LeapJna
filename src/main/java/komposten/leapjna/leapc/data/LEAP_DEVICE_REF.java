@@ -15,6 +15,7 @@ import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.IntByReference;
 
 import komposten.leapjna.leapc.LeapC;
+import komposten.leapjna.leapc.util.ArrayPointer;
 
 
 /**
@@ -23,7 +24,7 @@ import komposten.leapjna.leapc.LeapC;
  * </p>
  * <p>
  * Get a <code>LEAP_DEVICE_REF</code> by calling
- * {@link LeapC#LeapGetDeviceList(Pointer, LEAP_DEVICE_REF, IntByReference)}. Access a
+ * {@link LeapC#LeapGetDeviceList(Pointer, ArrayPointer, IntByReference)}. Access a
  * device by calling {@link LeapC#LeapOpenDevice(LEAP_DEVICE_REF, LEAP_DEVICE)} with this
  * reference. <code>LeapOpenDevice()</code> provides a {@link LEAP_DEVICE} struct, which
  * is a handle to an open device.

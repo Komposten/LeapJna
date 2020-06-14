@@ -34,6 +34,7 @@ public class LEAP_ALLOCATOR extends Structure
 		 * @param size The amount of bytes to allocate.
 		 * @param typeHint The data buffer type. One of the {@link eLeapAllocatorType}
 		 *          constants.
+		 * @param state [undocumented]
 		 * @return A pointer to the allocated data buffer.
 		 */
 		Pointer invoke(int size, int typeHint, Pointer state);
@@ -43,6 +44,7 @@ public class LEAP_ALLOCATOR extends Structure
 	{
 		/**
 		 * @param ptr A pointer to the data buffer to deallocate.
+		 * @param state [undocumented]
 		 */
 		void invoke(Pointer ptr, Pointer state);
 	}

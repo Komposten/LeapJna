@@ -36,8 +36,16 @@ public class LEAP_VECTOR extends Structure
 	}
 
 
+	/**
+	 * Creates a new <code>LEAP_VECTOR</code> to the specified coordinate.
+	 * 
+	 * @param x The x-coordinate of the vector.
+	 * @param y The y-coordinate of the vector.
+	 * @param z The z-coordinate of the vector.
+	 */
 	public LEAP_VECTOR(float x, float y, float z)
 	{
+		this();
 		set(x, y, z);
 	}
 
@@ -60,6 +68,10 @@ public class LEAP_VECTOR extends Structure
 
 	/**
 	 * Sets the values in this vector and writes them to native memory.
+	 * 
+	 * @param x The new x-coordinate of the vector.
+	 * @param y The new y-coordinate of the vector.
+	 * @param z The new z-coordinate of the vector.
 	 */
 	public void set(float x, float y, float z)
 	{

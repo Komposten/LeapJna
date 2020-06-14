@@ -21,9 +21,6 @@ import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
  * <p>
  * Read/Write mode for opening a {@link LEAP_RECORDING}.
  * </p>
- * <p>
- * Use {@link #handle} when interacting with the Leap API methods.
- * </p>
  * 
  * @see <a href=
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___r_e_c_o_r_d_i_n_g___p_a_r_a_m_e_t_e_r_s">LeapC

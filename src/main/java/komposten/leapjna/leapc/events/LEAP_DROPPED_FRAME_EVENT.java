@@ -15,7 +15,6 @@ import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
-import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 
 
 /**
@@ -24,10 +23,6 @@ import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 @FieldOrder({ "frame_id", "type" })
 public class LEAP_DROPPED_FRAME_EVENT extends Structure implements LEAP_EVENT
 {
-	/**
-	 * The type of message. Use {@link #getSeverity()} to get the severity as an
-	 * {@link eLeapLogSeverity} value.
-	 */
 	public long frame_id;
 
 	/**

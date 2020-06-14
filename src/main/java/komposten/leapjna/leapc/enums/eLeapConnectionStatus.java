@@ -22,7 +22,7 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * </p>
  * <p>
  * These codes can be read from the {@link LEAP_CONNECTION_INFO} struct created by a call
- * to {@link LeapC#LeapGetConnectionInfo(Pointer, LEAP_CONNECTION_INFO.ByReference)}
+ * to {@link LeapC#LeapGetConnectionInfo(Pointer, LEAP_CONNECTION_INFO)}
  * </p>
  */
 public enum eLeapConnectionStatus implements IntEnum

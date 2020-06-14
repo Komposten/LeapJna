@@ -51,7 +51,7 @@ public class LEAP_POINT_MAPPING extends Structure
 	public Pointer pPoints;
 
 	/**
-	 * A pointer an array with the IDs of the points being mapped. Use {@link #getIDs()} to
+	 * A pointer an array with the IDs of the points being mapped. Use {@link #getIds()} to
 	 * obtain the array itself.
 	 */
 	public Pointer pIDs;

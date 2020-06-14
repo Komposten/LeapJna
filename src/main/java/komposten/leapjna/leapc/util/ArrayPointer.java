@@ -26,7 +26,7 @@ import com.sun.jna.Structure;
  * </p>
  * <p>
  * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
- * data. <br />
+ * data. <br>
  * Use {@link #setElement(int, Structure)} or {@link #setElements(Structure[], int)} to
  * write data to the array.
  * </p>
@@ -55,13 +55,15 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * </p>
 	 * <p>
 	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
-	 * data. <br />
+	 * data. <br>
 	 * Use {@link #setElement(int, Structure)} or {@link #setElements(Structure[], int)} to
 	 * write data to the array.
 	 * </p>
 	 * 
 	 * @param clazz The type to store in the array.
 	 * @param arraySize The number of elements to allocate space for.
+	 * @param <T> The structure type the array should store.
+	 * @return An {@link ArrayPointer} of the specified size pointing to an "empty" memory block.
 	 * @throws IllegalArgumentException If the specified type has no public no-arg
 	 *           constructor, if its size is zero, or if its size cannot be determined.
 	 */
@@ -88,12 +90,14 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * </p>
 	 * <p>
 	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
-	 * data. <br />
+	 * data. <br>
 	 * Use {@link #setElement(int, Structure)} or {@link #setElements(Structure[], int)} to
 	 * write data to the array.
 	 * </p>
 	 * 
 	 * @param values The elements to store in the array.
+	 * @param <T> The structure type the array should store.
+	 * @return An {@link ArrayPointer} containing copies of the provided values.
 	 * @throws IllegalArgumentException If <code>values</code> is zero-length.
 	 * @throws NullPointerException If all of the elements in <code>values</code> is null.
 	 */
@@ -136,7 +140,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * </p>
 	 * <p>
 	 * <b>Note</b>: All elements will be assumed to have the same size, calculated
-	 * using {@link Structure#getSize(Class)}!
+	 * using {@link Structure#size()}!
 	 * </p>
 	 * <p>
 	 * <b>Note</b>: This instance is not registered in
@@ -145,7 +149,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * </p>
 	 * <p>
 	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access
-	 * the array data. <br />
+	 * the array data. <br>
 	 * Use {@link #setElement(int, Structure)} or
 	 * {@link #setElements(Structure[], int)} to write data to the array.
 	 * </p>
@@ -154,6 +158,9 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 *          <code>clazz</code> structs.
 	 * @param clazz The type of the structs stored in the array.
 	 * @param arraySize The number of elements in the array.
+	 * @param <T> The structure type the array should store.
+	 * @return An {@link ArrayPointer} of the specified size pointing to the
+	 *         provided memory block.
 	 * @throws IllegalArgumentException If the specified type has no public no-arg
 	 *           constructor.
 	 */
@@ -249,8 +256,8 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * 
 	 * @param index The array index of the element to update.
 	 * @param value The new value. May be <code>null</code>.
-	 * @throws ArrayIndexOutOfBoundsException If the index is negative or
-	 *           <code>>= </code>{@link #getArraySize()}.
+	 * @throws ArrayIndexOutOfBoundsException If the index is negative, or
+	 *           greater than or equal to {@link #getArraySize()}.
 	 */
 	public void setElement(int index, T value)
 	{
@@ -445,10 +452,10 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * <code>ArrayPointer</code>.
 	 * </p>
 	 * <p>
-	 * <p>
 	 * Element equality is tested using the elements' <code>equals()</code>
 	 * methods.
 	 * </p>
+	 * <p>
 	 * Use {@link #shallowEquals(Object)} instead if you want to compare the
 	 * native peer values (i.e. memory addresses) instead of the actual elements.
 	 * </p>
@@ -486,11 +493,15 @@ public class ArrayPointer<T extends Structure> extends Memory
 	
 	/**
 	 * <p>
-	 * Checks whether this <code>ArrayPointer</code> is "shallowly" equal to another
-	 * object. <code>other</code> is considered "shallowly" equal if and only if it
-	 * is an <code>ArrayPointer</code> with the same array size, element size,
-	 * element type and native peer value.
+	 * Checks whether this <code>ArrayPointer</code> is "shallowly" equal to
+	 * another object. <code>other</code> is considered "shallowly" equal if and
+	 * only if it is an <code>ArrayPointer</code> with the same array size,
+	 * element size, element type and native peer value.
 	 * </p>
+	 * 
+	 * @param other The reference object with which to compare.
+	 * @return <code>true</code> if this object is the same as the other object;
+	 *         <code>false</code> otherwise.
 	 */
 	public boolean shallowEquals(Object other)
 	{

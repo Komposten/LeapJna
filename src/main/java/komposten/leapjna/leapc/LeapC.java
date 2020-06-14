@@ -224,7 +224,7 @@ public interface LeapC extends Library
 	 * create an array of {@link LEAP_DEVICE_REF} structs large enough to hold the number of
 	 * connected devices. Finally, call <code>LeapGetDeviceList()</code> with this array and
 	 * known count to get the list of Leap devices. A device must be opened with
-	 * {@link #LeapOpenDevice(LEAP_DEVICE_REF, Pointer)} before device properties can be
+	 * {@link #LeapOpenDevice(LEAP_DEVICE_REF, LEAP_DEVICE)} before device properties can be
 	 * queried.
 	 * </p>
 	 * 
@@ -483,10 +483,10 @@ public interface LeapC extends Library
 	 * @param clear A bitwise combination of flags to be cleared. Set to 0 if not clearing
 	 *          any flags.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see eLeapPolicyFlag#createMask(eLeapPolicyFlag...)
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab57050814a0763ec07ed088e3d2de7f2">LeapC
 	 *      API - LeapSetPolicyFlags</a>
-	 * @see {@link eLeapPolicyFlag#createMask(eLeapPolicyFlag...)}
 	 */
 	public eLeapRS LeapSetPolicyFlags(Pointer hConnection, long set, long clear);
 
@@ -596,6 +596,7 @@ public interface LeapC extends Library
 	 *          {@link #LeapGetPointMappingSize(Pointer, LongByReference)} to get the
 	 *          required size, and then {@link LEAP_POINT_MAPPING#LEAP_POINT_MAPPING(int)}
 	 *          to create the struct and allocate memory.
+	 * @param pSize A pointer to the size of <code>pointMapping</code>.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 */
 	public eLeapRS LeapGetPointMapping(Pointer hConnection, LEAP_POINT_MAPPING pointMapping,
@@ -604,14 +605,15 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
-	 * Samples the universal clock used by the system to timestamp image and tracking
-	 * frames. The returned counter value is given in microseconds since an epoch time.
+	 * Samples the universal clock used by the system to timestamp image and
+	 * tracking frames. The returned counter value is given in microseconds since
+	 * an epoch time.
+	 * </p>
 	 * <p>
-	 * <p>
-	 * The clock used for the counter itself is implementation-defined, but generally
-	 * speaking, it is global, monotonic, and makes use of the most accurate
-	 * high-performance counter available on the system.
-	 * <p>
+	 * The clock used for the counter itself is implementation-defined, but
+	 * generally speaking, it is global, monotonic, and makes use of the most
+	 * accurate high-performance counter available on the system.
+	 * </p>
 	 * 
 	 * @return microseconds since an unspecified epoch
 	 * @see <a href=
@@ -651,8 +653,8 @@ public interface LeapC extends Library
 	 * </p>
 	 * <p>
 	 * Pass the filled-in {@link LEAP_CLOCK_REBASER} object to calls to
-	 * {@link #LeapUpdateRebase(LEAP_CLOCK_REBASER, long, long)},
-	 * {@link #LeapRebaseClock(LEAP_CLOCK_REBASER, long, LongByReference)}, and
+	 * {@link #LeapUpdateRebase(Pointer, long, long)},
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)}, and
 	 * {@link #LeapDestroyClockRebaser(Pointer)}.
 	 * </p>
 	 * 
@@ -690,7 +692,7 @@ public interface LeapC extends Library
 	 * </p>
 	 * <p>
 	 * Use this function to translate your application clock to the Leap Motion clock when
-	 * interpolating frames. {@link #LeapUpdateRebase(LEAP_CLOCK_REBASER, long, long)} must
+	 * interpolating frames. {@link #LeapUpdateRebase(Pointer, long, long)} must
 	 * be called for every rendered frame for the relationship between the two clocks to
 	 * remain synchronised.
 	 * </p>
@@ -934,7 +936,7 @@ public interface LeapC extends Library
 	 * {@link #LeapRecordingRead(Pointer, LEAP_TRACKING_EVENT, long)}.
 	 * </p>
 	 * 
-	 * @param hConnection The recording being read from. Use {@link LEAP_RECORDING#handle}
+	 * @param pRecording The recording being read from. Use {@link LEAP_RECORDING#handle}
 	 *          to obtain the handle from the recording object.
 	 * @param pncbEvent A pointer that receives the number of bytes required to store the
 	 *          next frame.
