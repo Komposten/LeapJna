@@ -27,7 +27,7 @@ import com.sun.jna.Structure;
  * <p>
  * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
  * data. <br />
- * Use {@link #setElement(int, Structure)} or {@link #setElements(int, Structure[])} to
+ * Use {@link #setElement(int, Structure)} or {@link #setElements(Structure[], int)} to
  * write data to the array.
  * </p>
  * <p>
@@ -56,7 +56,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * <p>
 	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
 	 * data. <br />
-	 * Use {@link #setElement(int, Structure)} or {@link #setElements(int, Structure[])} to
+	 * Use {@link #setElement(int, Structure)} or {@link #setElements(Structure[], int)} to
 	 * write data to the array.
 	 * </p>
 	 * 
@@ -89,7 +89,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * <p>
 	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access the array
 	 * data. <br />
-	 * Use {@link #setElement(int, Structure)} or {@link #setElements(int, Structure[])} to
+	 * Use {@link #setElement(int, Structure)} or {@link #setElements(Structure[], int)} to
 	 * write data to the array.
 	 * </p>
 	 * 
@@ -123,7 +123,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 
 		ArrayPointer<T> result = new ArrayPointer<>((Class<T>) nonNullValue.getClass(),
 				nonNullValue.size(), values.length);
-		result.setElements(0, values);
+		result.setElements(values, 0);
 
 		return result;
 	}
@@ -147,7 +147,7 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * Use {@link #getElement(int)} or {@link #getElements(Structure[])} to access
 	 * the array data. <br />
 	 * Use {@link #setElement(int, Structure)} or
-	 * {@link #setElements(int, Structure[])} to write data to the array.
+	 * {@link #setElements(Structure[], int)} to write data to the array.
 	 * </p>
 	 * 
 	 * @param pointer A pointer to the memory block of an existing array of
@@ -282,43 +282,102 @@ public class ArrayPointer<T extends Structure> extends Memory
 	 * <code>getElement</code> on those indices will return "empty" structures
 	 * (all values are 0) rather than <code>null</code>.
 	 * </p>
+	 * @param source The new elements. May contain <code>null</code> values.
+	 * @param destOffset The array index to copy the elements to.
 	 * 
-	 * @param offset The array index to copy the elements to.
-	 * @param values The new elements. May contain <code>null</code> values.
 	 * @throws ArrayIndexOutOfBoundsException If the offset is negative or the
 	 *           offset plus the array size is larger than
 	 *           {@link #getArraySize()}.
 	 */
-	public void setElements(int offset, T[] values)
+	public void setElements(T[] source, int destOffset)
 	{
-		if (values == null || values.length == 0)
+		setElements(source, 0, destOffset, source != null ? source.length : 0);
+	}
+	
+	
+	/**
+	 * <p>
+	 * Copies the provided elements into the array referenced by this object. The
+	 * provided elements will be copied from native memory, so ensure that they
+	 * have been {@link Structure#write() written} before calling this method.
+	 * </p>
+	 * <p>
+	 * <b>Note:</b> If any of the values are <code>null</code>, the memory block
+	 * at those indices will only be cleared with zeros. This means that calling
+	 * <code>getElement</code> on those indices will return "empty" structures
+	 * (all values are 0) rather than <code>null</code>.
+	 * </p>
+	 * 
+	 * @param source The source array to copy elements from.
+	 * @param sourceOffset The offset into <code>source</code> to start copying
+	 *          from.
+	 * @param destOffset The offset into this <code>ArrayPointer</code> to copy
+	 *          to.
+	 * @param count The number of objects to copy.
+	 * @throws NullPointerException If <code>source</code> is <code>null</code>.
+	 * @throws IllegalArgumentException If <code>count</code> is negative.
+	 * @throws ArrayIndexOutOfBoundsException If the specified source or
+	 *           destination range exceeds the source or destination bounds.
+	 */
+	public void setElements(T[] source, int sourceOffset, int destOffset, int count)
+	{
+		if (source == null)
 		{
-			return;
+			throw new NullPointerException("source must not be null");
 		}
 		
-		if (offset < 0)
-		{
-			String msg = String.format("The offset must be zero or positive: %d < 0", offset);
-			throw new ArrayIndexOutOfBoundsException(msg);
-		}
-
-		if (offset + values.length > arraySize)
-		{
-			String msg = String.format(
-					"offset + values.length cannot be larger than the array size: %d > %d",
-					offset + values.length, arraySize);
-			throw new ArrayIndexOutOfBoundsException(msg);
-		}
+		boundsCheck(source, sourceOffset, destOffset, count);
 
 		byte[] buffer = new byte[elementSize];
-		for (int i = 0; i < values.length; i++)
+		for (int i = 0; i < count; i++)
 		{
-			if (values[i] != null)
-				values[i].getPointer().read(0, buffer, 0, elementSize);
+			int si = i + sourceOffset;
+			int di = i + destOffset;
+			
+			if (source[si] != null)
+				source[si].getPointer().read(0, buffer, 0, elementSize);
 			else
 				Arrays.fill(buffer, (byte) 0);
 
-			write(((long)offset + i) * elementSize, buffer, 0, elementSize);
+			write(((long)di) * elementSize, buffer, 0, elementSize);
+		}
+	}
+
+
+	private void boundsCheck(T[] source, int sourceOffset, int destOffset, int count)
+	{
+		if (count < 0)
+		{
+			String msg = String.format("count must be positive: %d < 0", count);
+			throw new IllegalArgumentException(msg);
+		}
+
+		if (sourceOffset < 0)
+		{
+			String msg = String.format("sourceOffset must be positive: %d < 0", sourceOffset);
+			throw new ArrayIndexOutOfBoundsException(msg);
+		}
+		
+		if (sourceOffset + count > source.length)
+		{
+			String msg = String.format(
+					"sourceOffset + count must not exceed the source length: %d > %d", sourceOffset,
+					source.length);
+			throw new ArrayIndexOutOfBoundsException(msg);
+		}
+		
+		if (destOffset < 0)
+		{
+			String msg = String.format("destOffset must be positive: %d < 0", destOffset);
+			throw new ArrayIndexOutOfBoundsException(msg);
+		}
+		
+		if (destOffset + count > getArraySize())
+		{
+			String msg = String.format(
+					"destOffset + count must not exceed the destination length: %d > %d", getArraySize(),
+					source.length);
+			throw new ArrayIndexOutOfBoundsException(msg);
 		}
 	}
 

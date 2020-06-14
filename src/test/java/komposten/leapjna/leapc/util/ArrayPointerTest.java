@@ -29,9 +29,14 @@ class ArrayPointerTest
 {
 	private void assertMemoryContains(Pointer pointer, int offset, int a, double b, long c)
 	{
-		assertThat(pointer.getInt(offset)).isEqualTo(a);
-		assertThat(pointer.getDouble(offset + 4)).isEqualTo(b);
-		assertThat(pointer.getLong(offset + 12)).isEqualTo(c);
+		assertMemoryContains(pointer, offset, a, b, c, null);
+	}
+	private void assertMemoryContains(Pointer pointer, int offset, int a, double b, long c,
+			String description)
+	{
+		assertThat(pointer.getInt(offset)).as(description).isEqualTo(a);
+		assertThat(pointer.getDouble(offset + 4)).as(description).isEqualTo(b);
+		assertThat(pointer.getLong(offset + 12)).as(description).isEqualTo(c);
 	}
 
 
@@ -190,68 +195,106 @@ class ArrayPointerTest
 
 
 	@Test
-	void setElements_newValues_overwriteExisting()
+	void setElements_subsetOfSource_overwriteCorrectValues()
+	{
+		StructureWithCtors[] initialElements = { new StructureWithCtors(1, 2, 3),
+				new StructureWithCtors(4, 5, 6), new StructureWithCtors(7, 8, 9),
+				new StructureWithCtors(10, 11, 12) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
+				.fromArray(initialElements);
+
+		StructureWithCtors[] newElements = { null, new StructureWithCtors(9, 8, 7), null,
+				new StructureWithCtors(5, 4, 3), null, null };
+		
+		arrayPointer.setElements(newElements, 1, 1, 3);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3, "First element unchanged");
+		assertMemoryContains(arrayPointer, 20, 9, 8, 7, "Second element new values");
+		assertMemoryContains(arrayPointer, 40, 0, 0, 0, "Third element cleared (set to null)");
+		assertMemoryContains(arrayPointer, 60, 5, 4, 3, "Fourth element new values");
+	}
+
+
+	@Test
+	void setElements_countIsZero_doNothing()
+	{
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		arrayPointer.setElements(new StructureWithCtors[5], 0, 0, 0);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
+	}
+	
+	
+	@Test
+	void setElements_negativeCount_illegalArgumentException()
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
-				.empty(StructureWithCtors.class, 4);
+				.empty(StructureWithCtors.class, 1);
 
-		arrayPointer.setElements(1, new StructureWithCtors[] {
-				new StructureWithCtors(7, 8, 9), new StructureWithCtors(5, 4, 3) });
-		assertMemoryContains(arrayPointer, 0, 0, 0, 0);
-		assertMemoryContains(arrayPointer, 20, 7, 8, 9);
-		assertMemoryContains(arrayPointer, 40, 5, 4, 3);
-		assertMemoryContains(arrayPointer, 60, 0, 0, 0);
-	}
-
-
-	@Test
-	void setElements_nullValues_clearExisting()
-	{
-		StructureWithCtors[] values = new StructureWithCtors[] {
-				new StructureWithCtors(1, 2, 3), new StructureWithCtors(3, 5, 6),
-				new StructureWithCtors(9, 8, 7), new StructureWithCtors(6, 5, 4) };
-
-		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
-
-		arrayPointer.setElements(1, new StructureWithCtors[2]);
-		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
-		assertMemoryContains(arrayPointer, 20, 0, 0, 0);
-		assertMemoryContains(arrayPointer, 40, 0, 0, 0);
-		assertMemoryContains(arrayPointer, 60, 6, 5, 4);
-	}
-
-
-	@Test
-	void setElements_noValues_keepExisting()
-	{
-		StructureWithCtors[] values = new StructureWithCtors[] {
-				new StructureWithCtors(1, 2, 3), new StructureWithCtors(3, 5, 6),
-				new StructureWithCtors(9, 8, 7), new StructureWithCtors(6, 5, 4) };
-
-		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
-
-		arrayPointer.setElements(1, new StructureWithCtors[0]);
-		arrayPointer.setElements(2, null);
-		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
-		assertMemoryContains(arrayPointer, 20, 3, 5, 6);
-		assertMemoryContains(arrayPointer, 40, 9, 8, 7);
-		assertMemoryContains(arrayPointer, 60, 6, 5, 4);
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> arrayPointer.setElements(new StructureWithCtors[1], 0, 0, -1));
 	}
 	
 	
 	@Test
 	void setElements_outOfBounds_arrayOutOfBoundsException()
 	{
-		StructureWithCtors[] values = new StructureWithCtors[] {
-				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3),
+				new StructureWithCtors(4, 5, 6) };
 
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
 
-		assertThatThrownBy(() -> arrayPointer.setElements(-1, new StructureWithCtors[1]))
-				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
 		assertThatThrownBy(
-				() -> arrayPointer.setElements(values.length, new StructureWithCtors[3]))
+				() -> arrayPointer.setElements(new StructureWithCtors[1], -1, 0, 1))
+						.as("Negative source offset")
 						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[1], 0, -1, 1))
+						.as("Negative destination offset")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[1], 1, 0, 1))
+						.as("Offset + count exceeds source bounds")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[5], 1, 0, 3))
+						.as("Offset + count exceeds destination bounds")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+	}
+
+
+	@Test
+	void setElements_entireSource_overwriteCorrectValues()
+	{
+		StructureWithCtors[] initialElements = { new StructureWithCtors(1, 2, 3),
+				new StructureWithCtors(4, 5, 6), new StructureWithCtors(7, 8, 9),
+				new StructureWithCtors(10, 11, 12) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
+				.fromArray(initialElements);
+
+		StructureWithCtors[] newElements = { new StructureWithCtors(9, 8, 7), null,
+				new StructureWithCtors(5, 4, 3) };
+		
+		arrayPointer.setElements(newElements, 1);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3, "First element unchanged");
+		assertMemoryContains(arrayPointer, 20, 9, 8, 7, "Second element new values");
+		assertMemoryContains(arrayPointer, 40, 0, 0, 0, "Third element cleared (set to null)");
+		assertMemoryContains(arrayPointer, 60, 5, 4, 3, "Fourth element new values");
+	}
+
+
+	@Test
+	void setElements_sourceIsEmpty_doNothing()
+	{
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		arrayPointer.setElements(new StructureWithCtors[0], 0);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
 	}
 
 
@@ -286,8 +329,8 @@ class ArrayPointerTest
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
 				.empty(StructureWithCtors.class, 4);
 
-		arrayPointer.setElements(1, new StructureWithCtors[] {
-				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) });
+		arrayPointer.setElements(new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) }, 1);
 
 		StructureWithCtors[] values = arrayPointer
 				.getElements(new StructureWithCtors[arrayPointer.getArraySize()]);
