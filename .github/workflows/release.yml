@@ -1,4 +1,4 @@
-name: Prepare release
+name: Publish package and docs
 
 on:
   release:
