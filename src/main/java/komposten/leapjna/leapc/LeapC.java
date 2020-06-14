@@ -9,8 +9,6 @@
  */
 package komposten.leapjna.leapc;
 
-import java.util.HashMap;
-
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -45,19 +43,13 @@ import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
-import komposten.leapjna.leapc.util.LeapTypeMapper;
 import komposten.leapjna.util.Configurations;
 
 
 public interface LeapC extends Library
 {
-	public LeapC INSTANCE = (LeapC) Native
-			.synchronizedLibrary(Native.load(LeapCConfig.getDllName(), LeapC.class, new HashMap<String, Object>()
-			{
-				{
-					put(Library.OPTION_TYPE_MAPPER, new LeapTypeMapper());
-				}
-			}));
+	final LeapC INSTANCE = (LeapC) Native.synchronizedLibrary(Native
+			.load(LeapCConfig.getDllName(), LeapC.class, LeapCConfig.getLibraryOptions()));
 
 
 	/**

@@ -15,6 +15,9 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Objects;
+
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
 import com.sun.jna.Pointer;
@@ -26,9 +29,14 @@ class ArrayPointerTest
 {
 	private void assertMemoryContains(Pointer pointer, int offset, int a, double b, long c)
 	{
-		assertThat(pointer.getInt(offset)).isEqualTo(a);
-		assertThat(pointer.getDouble(offset + 4)).isEqualTo(b);
-		assertThat(pointer.getLong(offset + 12)).isEqualTo(c);
+		assertMemoryContains(pointer, offset, a, b, c, null);
+	}
+	private void assertMemoryContains(Pointer pointer, int offset, int a, double b, long c,
+			String description)
+	{
+		assertThat(pointer.getInt(offset)).as(description).isEqualTo(a);
+		assertThat(pointer.getDouble(offset + 4)).as(description).isEqualTo(b);
+		assertThat(pointer.getLong(offset + 12)).as(description).isEqualTo(c);
 	}
 
 
@@ -105,6 +113,44 @@ class ArrayPointerTest
 		assertMemoryContains(arrayPointer, 60, 0, 0, 0);
 		assertMemoryContains(arrayPointer, 80, 5, 4.5, 4);
 	}
+	
+	
+	@Test
+	void fromPointer_nullPointer_nullPointerException()
+	{
+		assertThatNullPointerException().as("null passed instead of pointer")
+				.isThrownBy(() -> ArrayPointer.fromPointer(null, StructureWithCtors.class, 1));
+
+		assertThatNullPointerException().as("null pointer passed").isThrownBy(
+				() -> ArrayPointer.fromPointer(new Pointer(0), StructureWithCtors.class, 1));
+	}
+	
+	
+	@Test
+	void fromPointer_validPointer_elementsCorrect()
+	{
+		// Create an array of structures
+		StructureWithCtors expected1 = new StructureWithCtors(1, 1.5, 2);
+		StructureWithCtors expected2 = new StructureWithCtors(-1, 5.2, 7);
+		StructureWithCtors[] expectedArray = { expected1, expected2 };
+		
+		// Write those structures to some point in memory.
+		Pointer expectedPointer = ArrayPointer.fromArray(expectedArray);
+		
+		// Use fromPointer to create an ArrayPointer based on the pointer from above.
+		ArrayPointer<StructureWithCtors> array = ArrayPointer.fromPointer(expectedPointer,
+				StructureWithCtors.class, expectedArray.length);
+		
+		assertThat(array.getArraySize()).isEqualTo(expectedArray.length);
+		for (int i = 0; i < array.getArraySize(); i++)
+		{
+			StructureWithCtors actual = array.getElement(i);
+			StructureWithCtors expected = expectedArray[i];
+			assertThat(actual.a).isEqualTo(expected.a);
+			assertThat(actual.b).isCloseTo(expected.b, Offset.offset(0.001));
+			assertThat(actual.c).isEqualTo(expected.c);
+		}
+	}
 
 
 	@Test
@@ -131,37 +177,124 @@ class ArrayPointerTest
 		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
 		assertMemoryContains(arrayPointer, 20, 0, 0, 0);
 	}
-
-
+	
+	
 	@Test
-	void setElements_newValues_overwriteExisting()
+	void setElement_outOfBounds_arrayOutOfBoundsException()
 	{
-		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
-				.empty(StructureWithCtors.class, 4);
+		StructureWithCtors[] values = new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
 
-		arrayPointer.setElements(1, new StructureWithCtors[] {
-				new StructureWithCtors(7, 8, 9), new StructureWithCtors(5, 4, 3) });
-		assertMemoryContains(arrayPointer, 0, 0, 0, 0);
-		assertMemoryContains(arrayPointer, 20, 7, 8, 9);
-		assertMemoryContains(arrayPointer, 40, 5, 4, 3);
-		assertMemoryContains(arrayPointer, 60, 0, 0, 0);
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatThrownBy(() -> arrayPointer.setElement(-1, null))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(() -> arrayPointer.setElement(values.length, null))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
 	}
 
 
 	@Test
-	void setElements_nullValues_clearExisting()
+	void setElements_subsetOfSource_overwriteCorrectValues()
 	{
-		StructureWithCtors[] values = new StructureWithCtors[] {
-				new StructureWithCtors(1, 2, 3), new StructureWithCtors(3, 5, 6),
-				new StructureWithCtors(9, 8, 7), new StructureWithCtors(6, 5, 4) };
+		StructureWithCtors[] initialElements = { new StructureWithCtors(1, 2, 3),
+				new StructureWithCtors(4, 5, 6), new StructureWithCtors(7, 8, 9),
+				new StructureWithCtors(10, 11, 12) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
+				.fromArray(initialElements);
+
+		StructureWithCtors[] newElements = { null, new StructureWithCtors(9, 8, 7), null,
+				new StructureWithCtors(5, 4, 3), null, null };
+		
+		arrayPointer.setElements(newElements, 1, 1, 3);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3, "First element unchanged");
+		assertMemoryContains(arrayPointer, 20, 9, 8, 7, "Second element new values");
+		assertMemoryContains(arrayPointer, 40, 0, 0, 0, "Third element cleared (set to null)");
+		assertMemoryContains(arrayPointer, 60, 5, 4, 3, "Fourth element new values");
+	}
+
+
+	@Test
+	void setElements_countIsZero_doNothing()
+	{
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3) };
 
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
 
-		arrayPointer.setElements(1, new StructureWithCtors[2]);
+		arrayPointer.setElements(new StructureWithCtors[5], 0, 0, 0);
 		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
-		assertMemoryContains(arrayPointer, 20, 0, 0, 0);
-		assertMemoryContains(arrayPointer, 40, 0, 0, 0);
-		assertMemoryContains(arrayPointer, 60, 6, 5, 4);
+	}
+	
+	
+	@Test
+	void setElements_negativeCount_illegalArgumentException()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
+				.empty(StructureWithCtors.class, 1);
+
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> arrayPointer.setElements(new StructureWithCtors[1], 0, 0, -1));
+	}
+	
+	
+	@Test
+	void setElements_outOfBounds_arrayOutOfBoundsException()
+	{
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3),
+				new StructureWithCtors(4, 5, 6) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[1], -1, 0, 1))
+						.as("Negative source offset")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[1], 0, -1, 1))
+						.as("Negative destination offset")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[1], 1, 0, 1))
+						.as("Offset + count exceeds source bounds")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(
+				() -> arrayPointer.setElements(new StructureWithCtors[5], 1, 0, 3))
+						.as("Offset + count exceeds destination bounds")
+						.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+	}
+
+
+	@Test
+	void setElements_entireSource_overwriteCorrectValues()
+	{
+		StructureWithCtors[] initialElements = { new StructureWithCtors(1, 2, 3),
+				new StructureWithCtors(4, 5, 6), new StructureWithCtors(7, 8, 9),
+				new StructureWithCtors(10, 11, 12) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
+				.fromArray(initialElements);
+
+		StructureWithCtors[] newElements = { new StructureWithCtors(9, 8, 7), null,
+				new StructureWithCtors(5, 4, 3) };
+		
+		arrayPointer.setElements(newElements, 1);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3, "First element unchanged");
+		assertMemoryContains(arrayPointer, 20, 9, 8, 7, "Second element new values");
+		assertMemoryContains(arrayPointer, 40, 0, 0, 0, "Third element cleared (set to null)");
+		assertMemoryContains(arrayPointer, 60, 5, 4, 3, "Fourth element new values");
+	}
+
+
+	@Test
+	void setElements_sourceIsEmpty_doNothing()
+	{
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		arrayPointer.setElements(new StructureWithCtors[0], 0);
+		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
 	}
 
 
@@ -196,8 +329,8 @@ class ArrayPointerTest
 		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer
 				.empty(StructureWithCtors.class, 4);
 
-		arrayPointer.setElements(1, new StructureWithCtors[] {
-				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) });
+		arrayPointer.setElements(new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) }, 1);
 
 		StructureWithCtors[] values = arrayPointer
 				.getElements(new StructureWithCtors[arrayPointer.getArraySize()]);
@@ -302,6 +435,112 @@ class ArrayPointerTest
 			assertThat(value.c).isEqualTo(4);
 		});
 	}
+	
+	
+	@Test
+	void getElement_outOfBounds_arrayIndexOutOfBoundsException()
+	{
+		StructureWithCtors[] values = new StructureWithCtors[] {
+				new StructureWithCtors(1, 2, 3), new StructureWithCtors(5, 4.5, 4) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatThrownBy(() -> arrayPointer.getElement(-1))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+		assertThatThrownBy(() -> arrayPointer.getElement(values.length))
+				.isInstanceOf(ArrayIndexOutOfBoundsException.class);
+	}
+	
+	
+	@Test
+	void equals_sameObject_true()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
+				.empty(StructureWithCtors.class, 5);
+		assertThat(arrayPointer1.equals(arrayPointer1)).isTrue();
+	}
+	
+	
+	@Test
+	void equals_differentArrayPointer_false()
+	{
+		ArrayPointer<?> arrayPointer = ArrayPointer.empty(StructureWithCtors.class, 5);
+		ArrayPointer<?> differentPeer = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentSize = ArrayPointer.fromPointer(arrayPointer, StructureWithCtors.class, 4);
+		ArrayPointer<?> differentType = ArrayPointer.fromPointer(arrayPointer, StructureNoPointerCtor.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentValues = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		differentValues.setInt(0, 1);
+
+		// Compare to array with same class, size and values but different peer.
+		assertThat(arrayPointer.equals(differentPeer)).isTrue();
+		// Compare to array with same class, values and peer but different size.
+		assertThat(arrayPointer.equals(differentSize)).isFalse();
+		// Compare to array with same values, peer and size but different class.
+		assertThat(arrayPointer.equals(differentType)).isFalse();
+		// Compare to array with same class, peer and size but different values.
+		assertThat(arrayPointer.equals(differentValues)).isFalse();
+	}
+	
+	
+	@Test
+	void shallowEquals_sameObject_true()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
+				.empty(StructureWithCtors.class, 5);
+		assertThat(arrayPointer1.equals(arrayPointer1)).isTrue();
+	}
+	
+	
+	@Test
+	void shallowEquals_differentArrayPointer_false()
+	{
+		ArrayPointer<?> arrayPointer = ArrayPointer.empty(StructureWithCtors.class, 5);
+		ArrayPointer<?> differentPeer = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentSize = ArrayPointer.fromPointer(arrayPointer, StructureWithCtors.class, 4);
+		ArrayPointer<?> differentType = ArrayPointer.fromPointer(arrayPointer, StructureNoPointerCtor.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentValues = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		differentValues.setInt(0, 1);
+
+		// Compare to array with same class, size and values but different peer.
+		assertThat(arrayPointer.shallowEquals(differentPeer)).isFalse();
+		// Compare to array with same class, values and peer but different size.
+		assertThat(arrayPointer.shallowEquals(differentSize)).isFalse();
+		// Compare to array with same values, peer and size but different class.
+		assertThat(arrayPointer.shallowEquals(differentType)).isFalse();
+		// Compare to array with same class, peer and size but different values.
+		assertThat(arrayPointer.shallowEquals(differentValues)).isFalse();
+	}
+	
+	
+	@Test
+	void equals_nonArrayPointer_false()
+	{
+		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
+				.empty(StructureWithCtors.class, 5);
+		assertThat(arrayPointer1.equals("string")).isFalse();
+		assertThat(arrayPointer1.equals(null)).isFalse();
+	}
+	
+	
+	@Test
+	void hashCode_calculatedProperly()
+	{
+		ArrayPointer<?> arrayPointer = ArrayPointer.empty(StructureWithCtors.class, 5);
+		ArrayPointer<?> differentPeer = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentSize = ArrayPointer.fromPointer(arrayPointer, StructureWithCtors.class, 4);
+		ArrayPointer<?> differentType = ArrayPointer.fromPointer(arrayPointer, StructureNoPointerCtor.class, arrayPointer.getArraySize());
+		ArrayPointer<?> differentValues = ArrayPointer.empty(StructureWithCtors.class, arrayPointer.getArraySize());
+		differentValues.setInt(0, 1);
+
+		// Compare to array with same class, size and values but different peer.
+		assertThat(arrayPointer.hashCode()).isEqualTo(differentPeer.hashCode());
+		// Compare to array with same class, values and peer but different size.
+		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentSize.hashCode());
+		// Compare to array with same values, peer and size but different class.
+		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentType.hashCode());
+		// Compare to array with same class, peer and size but different values.
+		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentValues.hashCode());
+	}
 
 
 	public static class StructureNoCtors extends Structure
@@ -329,6 +568,27 @@ class ArrayPointerTest
 		{
 			this.a = a;
 			write();
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(a);
+		}
+		
+		
+		@Override
+		public boolean equals(Object o)
+		{
+			if (o instanceof StructureNoPointerCtor)
+			{
+				StructureNoPointerCtor o2 = (StructureNoPointerCtor)o;
+				
+				return o2.a == a;
+			}
+			
+			return false;
 		}
 	}
 
@@ -360,6 +620,27 @@ class ArrayPointerTest
 		{
 			super(pointer, ALIGN_NONE);
 			read();
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(a, b, c);
+		}
+		
+		
+		@Override
+		public boolean equals(Object o)
+		{
+			if (o instanceof StructureWithCtors)
+			{
+				StructureWithCtors o2 = (StructureWithCtors)o;
+				
+				return o2.a == a && o2.b == b && o2.c == c;
+			}
+			
+			return false;
 		}
 	}
 }
