@@ -46,4 +46,9 @@ public class LEAP_BONE extends Structure
 	 * </p>
 	 */
 	public LEAP_QUATERNION rotation;
+
+	public LEAP_BONE()
+	{
+		super(ALIGN_NONE);
+	}
 }

@@ -36,6 +36,12 @@ public class LEAP_QUATERNION extends Structure
 
 	/** The z-coefficient of the vector portion of the quaternion. */
 	public float z;
+	
+	public LEAP_QUATERNION()
+	{
+		super(ALIGN_NONE);
+	}
+	
 
 	/**
 	 * @return The quaternion's values as an array in the order: w, x, y, z.

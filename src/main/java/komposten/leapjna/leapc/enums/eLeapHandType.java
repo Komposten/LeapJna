@@ -10,7 +10,7 @@
 package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.leapc.data.LEAP_HAND;
-import komposten.leapjna.leapc.enums.Enums.ByteEnum;
+import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 
 /**
@@ -25,22 +25,22 @@ import komposten.leapjna.leapc.enums.Enums.ByteEnum;
  *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga6d751aedb178355c21ec1cac4706e044">LeapC
  *      API - eLeapHandType</a>
  */
-public enum eLeapHandType implements ByteEnum
+public enum eLeapHandType implements IntEnum
 {
-	Left((byte) 0x000),
-	Right((byte) 0x001),
-	Unknown((byte) -0x001);
+	Left(0x000),
+	Right(0x001),
+	Unknown(-0x001);
 
-	public final byte value;
+	public final int value;
 
-	private eLeapHandType(byte value)
+	private eLeapHandType(int value)
 	{
 		this.value = value;
 	}
 
 
 	@Override
-	public byte getValue()
+	public int getValue()
 	{
 		return value;
 	}
