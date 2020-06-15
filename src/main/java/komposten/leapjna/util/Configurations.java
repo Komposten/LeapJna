@@ -379,6 +379,9 @@ public class Configurations
 		 * </p>
 		 */
 		public static final String WSS_PORT = "";
+
+		private WebSocket()
+		{}
 	}
 
 	private Configurations()
