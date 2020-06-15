@@ -1,28 +1,21 @@
 #!/bin/bash
 
-# Extract version number from GITHUB_REF
-VERSION=${GITHUB_REF##*/}
+MAJOR=$(echo $VERSION | grep -Eo "^[0-9]+")
+echo "Detected major version $MAJOR"
 
-# Check if version matches format major.minor.patch+build
-if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(\+[0-9]+)?$ ]]
-then
-  MAJOR=$(echo $VERSION | grep -Eo "^[0-9]+")
-  echo "Detected version $VERSION"
-else
-  echo "Invalid version format: $VERSION"
-  exit 1
-fi
+# Clone komposten.github.io
+git config --global user.email $GITHUB_EMAIL
+git config --global user.name $GITHUB_USER
+git clone --depth 1 https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/komposten/komposten.github.io.git
 
 # Copy docs into the komposten.github.io repo
 TARGET="komposten.github.io/leapjna/v$MAJOR"
 echo "Copying javadocs to $TARGET" 
 cp -r LeapJna/target/site/apidocs/. $TARGET
 
-# Enter the repo folder
-cd komposten.github.io
-
 # Create a new branch, commit and push
 echo "Creating a new branch and committing the docs"
+cd komposten.github.io
 git checkout -b docs/leapjna-release-$VERSION
 git add .
 git commit -m ":pencil: Update LeapJna javadocs to ${VERSION}"

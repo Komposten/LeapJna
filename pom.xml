@@ -5,11 +5,19 @@
 	<artifactId>LeapJna</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
 	<scm>
 		<developerConnection>scm:git:https://github.com/Komposten/LeapJna</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Komposten Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/komposten/leapjna</url>
+		</repository>
+	</distributionManagement>
 
 	<properties>
 		<!-- General properties -->
@@ -115,6 +123,7 @@
 					<scmReleaseCommitComment>:bookmark: Release @{releaseLabel}</scmReleaseCommitComment>
 					<scmRollbackCommitComment>:rewind: Rollback release @{releaseLabel}</scmRollbackCommitComment>
 					<scmDevelopmentCommitComment>:camera_flash: Prepare for next development iteration</scmDevelopmentCommitComment>
+					<pushChanges>false</pushChanges>
 				</configuration>
 			</plugin>
 		</plugins>
