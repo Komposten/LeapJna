@@ -296,6 +296,18 @@ class ArrayPointerTest
 		arrayPointer.setElements(new StructureWithCtors[0], 0);
 		assertMemoryContains(arrayPointer, 0, 1, 2, 3);
 	}
+	
+	
+	@Test
+	void setElements_sourceIsNull_nullPointerException()
+	{
+		StructureWithCtors[] values = { new StructureWithCtors(1, 2, 3) };
+
+		ArrayPointer<StructureWithCtors> arrayPointer = ArrayPointer.fromArray(values);
+
+		assertThatNullPointerException().isThrownBy(() -> arrayPointer.setElements(null, 1));
+		assertThatNullPointerException().isThrownBy(() -> arrayPointer.setElements(null, 1, 1, 1));
+	}
 
 
 	@Test
