@@ -53,35 +53,56 @@ public class LEAP_QUATERNION extends Structure
 
 
 	/**
-	 * @return The roll (x-axis rotation) in radians.
+	 * Calculates the roll, or rotation around the z-axis, described by this
+	 * quaternion.
+	 * @return The roll in radians.
 	 */
 	public float getRoll()
 	{
-		double nominator = 2 * (w * x + y * z);
-		double denominator = 1 - 2 * (x * x + y * y);
-
-		return (float) Math.atan2(nominator, denominator);
+//		double nominator = 2 * (w * z + x * y);
+//		double denominator = 1 - 2 * (y * y + z * z);
+//		
+//		return (float) Math.atan2(nominator, denominator);
+		
+		double nominator = 2 * (w * z + x * y);
+		double denominator = 1 - 2 * (z * z + x * x);
+		
+		return (float) -Math.atan2(nominator, denominator);
 	}
 
 
 	/**
-	 * @return The yaw (y-axis rotation) in radians.
+	 * Calculates the roll, or rotation around the y-axis, described by this
+	 * quaternion.
+	 * @return The yaw in radians.
 	 */
 	public float getYaw()
 	{
-		return (float) Math.asin(2 * (w * y - z * x));
+//		return (float) Math.asin(2 * (w * y - z * x));
+		double nominator = 2 * (w * -y + z * -x);
+		double denominator = 1 - 2 * (x * x + y * y);
+		
+		return (float) Math.atan2(nominator, denominator);
 	}
 
 
 	/**
-	 * @return The pitch (z-axis rotation) in radians.
+	 * Calculates the roll, or rotation around the x-axis, described by this
+	 * quaternion.
+	 * @return The pitch in radians.
 	 */
 	public float getPitch()
 	{
-		double nominator = 2 * (w * z + x * y);
-		double denominator = 1 - 2 * (y * y + z * z);
-
-		return (float) Math.atan2(nominator, denominator);
+//		double nominator = 2 * (w * x + y * z);
+//		double denominator = 1 - 2 * (x * x + y * y);
+//
+//		return (float) Math.atan2(nominator, denominator);
+		float sinp = -2 * (w * -x + y * z);
+		
+		if (Math.abs(sinp) >= 1)
+			return (float) (sinp > 0 ? Math.PI / 2 : -Math.PI / 2);
+		else
+			return (float) Math.asin(sinp);
 	}
 
 
