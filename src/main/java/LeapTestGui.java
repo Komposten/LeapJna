@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2020 Jakob Hjelm (Komposten)
  *
@@ -8,7 +9,9 @@
  * of this project.
  */
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
@@ -19,58 +22,68 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.Arrays;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
-import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 
 import komposten.leapjna.leapc.LeapC;
-import komposten.leapjna.leapc.data.LEAP_CLOCK_REBASER;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_INFO;
 import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
-import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
 import komposten.leapjna.leapc.data.LEAP_DIGIT;
 import komposten.leapjna.leapc.data.LEAP_HAND;
 import komposten.leapjna.leapc.data.LEAP_IMAGE;
-import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
-import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
-import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
-import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
-import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
-import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
-import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.util.Configurations;
+
 
 public class LeapTestGui extends JFrame
 {
 	private static final int FRAME_RATE = 60;
 	private static final float FRAME_TIME = 1000f / FRAME_RATE;
 	private RenderPanel renderPanel;
+	private LogPanel logPanel;
 	private Thread leapJnaThread;
+
 	private LEAP_CONNECTION leapConnection;
+	private LEAP_RECORDING recording;
+
+	LongByReference imagesRequestId = new LongByReference();
+
+	private boolean imagesAllowed;
+	private boolean imagesEnabled;
 
 	private boolean isPaused;
-	private LEAP_RECORDING recording;
 
 	public LeapTestGui()
 	{
@@ -97,9 +110,17 @@ public class LeapTestGui extends JFrame
 				{
 					requestRecording();
 				}
-				else if (e.getKeyCode() == KeyEvent.VK_S && recording != null)
+				else if (e.getKeyCode() == KeyEvent.VK_S)
 				{
 					requestRecordingStatus();
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_I)
+				{
+					toggleImages();
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_F1)
+				{
+					displayHelp();
 				}
 			}
 		});
@@ -123,9 +144,18 @@ public class LeapTestGui extends JFrame
 		setLocationRelativeTo(null);
 
 		renderPanel = new RenderPanel();
-		setContentPane(renderPanel);
+		logPanel = new LogPanel();
+
+		JSplitPane pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		pane.setTopComponent(renderPanel);
+		pane.setBottomComponent(logPanel);
+
+		setContentPane(pane);
 
 		setVisible(true);
+
+		pane.setDividerLocation(0.75);
+		pane.setResizeWeight(0.75);
 	}
 
 
@@ -136,227 +166,34 @@ public class LeapTestGui extends JFrame
 		leapConnection = new LEAP_CONNECTION();
 		eLeapRS result = LeapC.INSTANCE.LeapCreateConnection(null, leapConnection);
 
-		printStatus(leapConnection);
 		if (result == eLeapRS.Success)
 		{
+			logPanel.pushSeparator();
 			printHeader("Opening connection");
 			result = LeapC.INSTANCE.LeapOpenConnection(leapConnection.handle);
 			printStatus(leapConnection);
 
 			if (result == eLeapRS.Success)
 			{
+				logPanel.pushSeparator();
 				renderPanel.setStage(RenderPanel.Stage.Running);
 				printHeader("Polling connection");
+				logPanel.pushSeparator();
 
-				// doInterpolateLoop(leapConnection);
-				// doReadRecording(leapConnection);
 				doPollLoop(leapConnection);
-				// doRebaseTest(leapConnection);
 			}
-		}
-	}
-
-
-	private void doRebaseTest(LEAP_CONNECTION leapConnection)
-	{
-		// Initial poll to open the connection.
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
-
-		LEAP_CLOCK_REBASER rebaser = new LEAP_CLOCK_REBASER();
-		long userClock = System.nanoTime() / 1000;
-		long leapClock = LeapC.INSTANCE.LeapGetNow();
-		eLeapRS result = LeapC.INSTANCE.LeapCreateClockRebaser(rebaser);
-		System.out.format("User clock: %d, Leap clock: %d, Diff: %d%n", userClock, leapClock,
-				userClock - leapClock);
-
-		if (result != eLeapRS.Success)
-		{
-			System.out.println("Failed to create rebaser: " + result);
-			return;
-		}
-		result = LeapC.INSTANCE.LeapUpdateRebase(rebaser.handle, userClock, leapClock);
-		if (result != eLeapRS.Success)
-		{
-			System.out.println("Failed to update rebaser: " + result);
-			return;
-		}
-
-		try
-		{
-			Thread.sleep(250);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-
-		userClock = System.nanoTime() / 1000;
-		leapClock = LeapC.INSTANCE.LeapGetNow();
-		System.out.format("User clock: %d, Leap clock: %d, Diff: %d%n", userClock, leapClock,
-				userClock - leapClock);
-
-		LongByReference pLeapClock = new LongByReference();
-		result = LeapC.INSTANCE.LeapRebaseClock(rebaser.handle, userClock, pLeapClock);
-		if (result != eLeapRS.Success)
-		{
-			System.out.println("Failed to rebase clock: " + result);
-			return;
-		}
-
-		System.out.format("Rebased: %d, Leap clock: %d, Diff: %d%n", pLeapClock.getValue(),
-				leapClock, pLeapClock.getValue() - leapClock);
-
-		LeapC.INSTANCE.LeapDestroyClockRebaser(rebaser.handle);
-	}
-
-
-	private void doInterpolateLoop(LEAP_CONNECTION leapConnection)
-	{
-		double timer = 0;
-		long lastTime = System.nanoTime();
-		double frameTimer = 0;
-		int framerate = 0;
-
-		while (true)
-		{
-			// Actively poll the connection to keep up to date with the frames.
-			// This is required for interpolation to work.
-			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-			LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
-
-			long currentTime = System.nanoTime();
-			double deltaTime = (currentTime - lastTime) / 1E6;
-			timer += deltaTime;
-			frameTimer += deltaTime;
-			lastTime = currentTime;
-
-			LongByReference pFrameSize = new LongByReference();
-
-			// Get an interpolated frame at a certain rate.
-			if (timer > FRAME_TIME)
+			else
 			{
-				framerate++;
-				timer -= FRAME_TIME;
-
-				long timestamp = LeapC.INSTANCE.LeapGetNow();
-				eLeapRS frameSizeResult = LeapC.INSTANCE.LeapGetFrameSize(leapConnection.handle,
-						timestamp, pFrameSize);
-
-				if (frameSizeResult == eLeapRS.Success)
-				{
-					LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT(
-							(int) pFrameSize.getValue());
-					eLeapRS frameResult = LeapC.INSTANCE.LeapInterpolateFrame(leapConnection.handle,
-							timestamp, pEvent, pFrameSize.getValue());
-
-					if (frameResult == eLeapRS.Success)
-					{
-						renderPanel.setFrameData(pEvent);
-					}
-					else
-					{
-						System.out.println("Failed to interpolate frame: " + frameResult);
-					}
-				}
-				else
-				{
-					System.out.println("Failed to get frame size: " + frameSizeResult);
-				}
+				logPanel.pushError("Failed to open a connection to the Leap Motion service: %s",
+						result);
 			}
-
-			if (frameTimer > 1000)
-			{
-				frameTimer -= 1000;
-				renderPanel.setFramerate(framerate);
-				framerate = 0;
-			}
-
-			if (Thread.interrupted())
-			{
-				break;
-			}
-		}
-	}
-
-
-	private void doReadRecording(LEAP_CONNECTION leapConnection)
-	{
-		// Poll once to open the connection.
-		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
-		LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30, message);
-
-		// Open the recording.
-		LEAP_RECORDING ppRecording = new LEAP_RECORDING();
-		String filePath = "recording.lmt";
-		LEAP_RECORDING_PARAMETERS params = new LEAP_RECORDING_PARAMETERS(
-				eLeapRecordingFlags.Reading);
-		eLeapRS result = LeapC.INSTANCE.LeapRecordingOpen(ppRecording, filePath, params);
-
-		if (result == eLeapRS.Success)
-		{
-			while (true)
-			{
-				double deltaTime = System.nanoTime();
-				LongByReference pFrameSize = new LongByReference();
-
-				// Get an interpolated frame at a certain rate.
-				result = LeapC.INSTANCE.LeapRecordingReadSize(ppRecording.handle, pFrameSize);
-
-				if (result == eLeapRS.Success)
-				{
-					LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT(
-							(int) pFrameSize.getValue());
-					result = LeapC.INSTANCE.LeapRecordingRead(ppRecording.handle, pEvent,
-							pFrameSize.getValue());
-
-					if (result == eLeapRS.Success)
-					{
-						renderPanel.setFrameData(pEvent);
-					}
-					else
-					{
-						System.out.println("Failed to read frame: " + result);
-						break;
-					}
-				}
-				else
-				{
-					System.out.println("Failed to get frame size: " + result);
-					break;
-				}
-
-				deltaTime = (System.nanoTime() - deltaTime) / 1E6;
-
-				try
-				{
-					int sleepTime = (int) (FRAME_TIME - deltaTime);
-					if (sleepTime < 0)
-						sleepTime = 0;
-					Thread.sleep(sleepTime);
-				}
-				catch (InterruptedException e)
-				{
-					Thread.currentThread().interrupt();
-				}
-
-				if (Thread.interrupted())
-				{
-					break;
-				}
-			}
-
-			System.out.println("Closing recording!");
-			LeapC.INSTANCE.LeapRecordingClose(ppRecording);
 		}
 		else
 		{
-			System.out.println("Failed to open recording: " + result);
+			logPanel.pushError("Failed to create a connection to the Leap Motion service: %s",
+					result);
 		}
 
-		System.out.println("Closing connection!");
-		LeapC.INSTANCE.LeapCloseConnection(leapConnection.handle);
-		LeapC.INSTANCE.LeapDestroyConnection(leapConnection.handle);
 		leapJnaThread = null;
 	}
 
@@ -370,7 +207,6 @@ public class LeapTestGui extends JFrame
 		int framerate = 0;
 
 		boolean firstIteration = true;
-		LongByReference pRequestID = new LongByReference();
 
 		while (true)
 		{
@@ -378,60 +214,20 @@ public class LeapTestGui extends JFrame
 			eLeapRS result = LeapC.INSTANCE.LeapPollConnection(leapConnection.handle, 30,
 					message);
 
-			if (result != eLeapRS.Success)
-			{
-				System.out.format("Polling failed with result %s for event type %s%n", result,
-						message.getType());
-			}
-			else
-			{
-				// System.out.format("Received event of type %s%n", message.getType());
-			}
-
 			if (firstIteration)
 			{
-				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle,
-						eLeapPolicyFlag.createMask(eLeapPolicyFlag.AllowPauseResume,
-								eLeapPolicyFlag.Images, eLeapPolicyFlag.MapPoints),
-						0);
+				// Enable the images and pause policies
+				LeapC.INSTANCE.LeapSetPolicyFlags(leapConnection.handle, eLeapPolicyFlag
+						.createMask(eLeapPolicyFlag.Images, eLeapPolicyFlag.AllowPauseResume), 0);
 
-				LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle, "images_mode",
-						pRequestID);
-				System.out.println("Images mode get request: " + pRequestID.getValue());
-				LeapC.INSTANCE.LeapSaveConfigValue(leapConnection.handle, "images_mode",
-						new LEAP_VARIANT(2), pRequestID);
-				System.out.println("Images mode change request: " + pRequestID.getValue());
+				firstIteration = false;
+			}
 
-				LongByReference pSize = new LongByReference();
-				result = LeapC.INSTANCE.LeapGetPointMappingSize(leapConnection.handle, pSize);
-				if (result == eLeapRS.Success)
-				{
-					System.out.println("Point mapping size: " + pSize.getValue());
-					LEAP_POINT_MAPPING pointMapping = new LEAP_POINT_MAPPING(
-							(int) pSize.getValue());
-					result = LeapC.INSTANCE.LeapGetPointMapping(leapConnection.handle, pointMapping,
-							pSize);
-
-					if (result == eLeapRS.Success)
-					{
-						System.out.format("Point mapping: Frame %d at time %d with %d points:%n",
-								pointMapping.frame_id, pointMapping.timestamp, pointMapping.nPoints);
-						System.out.print("  Points:");
-						for (LEAP_VECTOR point : pointMapping.getPoints())
-							System.out.format(" [%.02f, %.02f, %.02f]", point.x, point.y, point.z);
-						System.out.print("  IDs:");
-						for (int id : pointMapping.getIds())
-							System.out.format(" %d", id);
-					}
-					else
-					{
-						System.out.println("Failed to retrieve point mapping: " + result);
-					}
-				}
-				else
-				{
-					System.out.println("Failed to retrieve point mapping size " + result);
-				}
+			if (result != eLeapRS.Success)
+			{
+				logPanel.pushError("Polling failed with result %s for event type %s", result,
+						message.getType());
+				logPanel.pushSeparator();
 			}
 
 			long currentTime = System.nanoTime();
@@ -441,173 +237,32 @@ public class LeapTestGui extends JFrame
 			frameTimer += deltaTime;
 			lastTime = currentTime;
 
-			if (message.type == eLeapEventType.Connection.value)
+			boolean handled = handleInformationalEvents(message, leapConnection);
+
+			if (!handled)
 			{
-				System.out.println("Connection flags: " + message.getConnectionEvent().flags);
-			}
-			else if (message.type == eLeapEventType.ConnectionLost.value)
-			{
-				System.out.println("Connection lost!");
-			}
-			else if (message.type == eLeapEventType.Device.value)
-			{
-				LEAP_DEVICE_EVENT deviceEvent = message.getDeviceEvent();
-				System.out.format("Device detected: %d | %s (%x)%n", deviceEvent.device.id,
-						Arrays.toString(deviceEvent.getStatus()), deviceEvent.status);
-
-				IntByReference pnArray = new IntByReference();
-				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, null, pnArray);
-				System.out.println("Device count: " + pnArray.getValue());
-
-				ArrayPointer<LEAP_DEVICE_REF> pArray = ArrayPointer.empty(LEAP_DEVICE_REF.class,
-						pnArray.getValue());
-				LeapC.INSTANCE.LeapGetDeviceList(leapConnection.handle, pArray, pnArray);
-
-				System.out.println(
-						Arrays.toString(pArray.getElements(new LEAP_DEVICE_REF[pnArray.getValue()])));
-
-				LEAP_DEVICE phDevice = new LEAP_DEVICE();
-				result = LeapC.INSTANCE.LeapOpenDevice(deviceEvent.device, phDevice);
-
-				if (result == eLeapRS.Success)
+				if (trackingTimer > FRAME_TIME && message.type == eLeapEventType.Tracking.value)
 				{
-					LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
-					result = LeapC.INSTANCE.LeapGetDeviceInfo(phDevice.handle, info);
+					LEAP_TRACKING_EVENT trackingEvent = message.getTrackingEvent();
 
-					if (result == eLeapRS.InsufficientBuffer || result == eLeapRS.Success)
+					if (recording != null)
 					{
-						info.allocateSerialBuffer(info.serial_length);
-						result = LeapC.INSTANCE.LeapGetDeviceInfo(phDevice.handle, info);
-
-						if (result == eLeapRS.Success)
-						{
-							System.out.format("Device info for device %d:%n", deviceEvent.device.id);
-							System.out.format("  Status: %s%n", Arrays.toString(info.getStatus()));
-							System.out.format("  Caps: %s%n", Arrays.toString(info.getCapabilities()));
-							System.out.format("  PID: %s (%d)%n",
-									LeapC.INSTANCE.LeapDevicePIDToString(info.pid), info.pid);
-							System.out.format("  Baseline: %d \u00b5m%n", info.baseline);
-							System.out.format("  Serial: %s%n", info.serial);
-							System.out.format("  FoV: %.02f\u00b0 x %.02f\u00b0 (HxV)%n",
-									Math.toDegrees(info.h_fov), Math.toDegrees(info.v_fov));
-							System.out.format("  Range: %d \u00b5m%n", info.range);
-
-							LeapC.INSTANCE.LeapCloseDevice(phDevice.handle);
-						}
-						else
-						{
-							System.out.println("Failed to read device info: " + result);
-						}
+						result = LeapC.INSTANCE.LeapRecordingWrite(recording.handle, trackingEvent,
+								null);
 					}
-					else
-					{
-						System.out
-								.println("Failed to read device info to get serial length: " + result);
-					}
+
+					renderPanel.setFrameData(trackingEvent);
+
+					trackingTimer = 0;
+					framerate++;
 				}
-				else
+
+				if (imageTimer > FRAME_TIME && message.type == eLeapEventType.Image.value)
 				{
-					System.out.println("Failed to open device: " + result);
+					renderPanel.setImageData(message.getImageEvent());
+
+					imageTimer = 0;
 				}
-			}
-			else if (message.type == eLeapEventType.DeviceStatusChange.value)
-			{
-				LEAP_DEVICE_STATUS_CHANGE_EVENT deviceEvent = message
-						.getDeviceStatusChangeEvent();
-				System.out.format("Device changed: %d | From %s (%x) to %s (%x)%n",
-						deviceEvent.device.id, Arrays.toString(deviceEvent.getLastStatus()),
-						deviceEvent.last_status, Arrays.toString(deviceEvent.getStatus()),
-						deviceEvent.status);
-			}
-			else if (message.type == eLeapEventType.Policy.value)
-			{
-				System.out.println(
-						"Policies: " + Arrays.toString(message.getPolicyEvent().getCurrentPolicy()));
-			}
-			else if (message.type == eLeapEventType.LogEvent.value)
-			{
-				LEAP_LOG_EVENT logEvent = message.getLogEvent();
-				System.out.println(logEvent.getSeverity() + ": " + logEvent.message);
-			}
-			else if (message.type == eLeapEventType.LogEvents.value)
-			{
-				LEAP_LOG_EVENTS logEvents = message.getLogEvents();
-
-				System.out.println("Multiple log events: " + logEvents.nEvents);
-				for (LEAP_LOG_EVENT logEvent : logEvents.getEvents())
-				{
-					System.out.println(logEvent.getSeverity() + ": " + logEvent.message);
-				}
-			}
-			else if (message.type == eLeapEventType.DeviceFailure.value)
-			{
-				System.out.println(message.getDeviceFailureEvent().status);
-			}
-			else if (message.type == eLeapEventType.DeviceLost.value)
-			{
-				System.out.println("Device was lost: " + message.getDeviceLostEvent().device);
-			}
-			else if (message.type == eLeapEventType.ConfigResponse.value)
-			{
-				LEAP_CONFIG_RESPONSE_EVENT responseEvent = message.getConfigResponseEvent();
-				System.out.println("Config response: " + responseEvent.requestID + " | "
-						+ responseEvent.value.getValue() + " (" + responseEvent.value.getType()
-						+ ")");
-			}
-			else if (message.type == eLeapEventType.ConfigChange.value)
-			{
-				LEAP_CONFIG_CHANGE_EVENT changeEvent = message.getConfigChangeEvent();
-				System.out.println(
-						"Config change: " + changeEvent.requestID + " | " + changeEvent.status);
-
-				if (changeEvent.requestID == pRequestID.getValue())
-				{
-					LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle, "images_mode",
-							pRequestID);
-					System.out.println("Images mode get request: " + pRequestID.getValue());
-				}
-			}
-			else if (message.type == eLeapEventType.DroppedFrame.value)
-			{
-				LEAP_DROPPED_FRAME_EVENT droppedEvent = message.getDroppedFrameEvent();
-				System.out.format("Dropped frame: %d (%s)%n", droppedEvent.frame_id,
-						droppedEvent.getType());
-			}
-			else if (message.type == eLeapEventType.HeadPose.value)
-			{
-				LEAP_HEAD_POSE_EVENT headEvent = message.getHeadPoseEvent();
-				System.out.format("Head pose: %d, %s, %s%n", headEvent.timestamp,
-						Arrays.toString(headEvent.head_position.asArray()),
-						Arrays.toString(headEvent.head_orientation.asArray()));
-			}
-			else if (message.type == eLeapEventType.PointMappingChange.value)
-			{
-				LEAP_POINT_MAPPING_CHANGE_EVENT mappingEvent = message
-						.getPointMappingChangeEvent();
-				System.out.format("Point mapping change: Frame %d at time %d, %d points%n",
-						mappingEvent.frame_id, mappingEvent.timestamp, mappingEvent.nPoints);
-			}
-
-			if (trackingTimer > FRAME_TIME && message.type == eLeapEventType.Tracking.value)
-			{
-				LEAP_TRACKING_EVENT trackingEvent = message.getTrackingEvent();
-				if (recording != null)
-				{
-					result = LeapC.INSTANCE.LeapRecordingWrite(recording.handle, trackingEvent,
-							null);
-				}
-
-				renderPanel.setFrameData(trackingEvent);
-
-				trackingTimer = 0;
-				framerate++;
-			}
-
-			if (imageTimer > FRAME_TIME && message.type == eLeapEventType.Image.value)
-			{
-				renderPanel.setImageData(message.getImageEvent());
-
-				imageTimer = 0;
 			}
 
 			if (frameTimer > 1000)
@@ -622,11 +277,10 @@ public class LeapTestGui extends JFrame
 			{
 				break;
 			}
-
-			firstIteration = false;
 		}
 
-		System.out.println("Closing connection!");
+		logPanel.pushLog("Closing connection!");
+		logPanel.pushSeparator();
 		LeapC.INSTANCE.LeapCloseConnection(leapConnection.handle);
 		printStatus(leapConnection);
 		LeapC.INSTANCE.LeapDestroyConnection(leapConnection.handle);
@@ -634,21 +288,200 @@ public class LeapTestGui extends JFrame
 	}
 
 
+	private boolean handleInformationalEvents(LEAP_CONNECTION_MESSAGE message,
+			LEAP_CONNECTION leapConnection)
+	{
+		boolean handled = true;
+
+		switch (message.getType())
+		{
+			case Connection :
+				handleConnectionEvent(message.getConnectionEvent());
+				break;
+			case ConnectionLost :
+				handleConnectionLostEvent();
+				break;
+			case Device :
+				handleDeviceEvent(message.getDeviceEvent());
+				break;
+			case DeviceStatusChange :
+				handleDeviceStatusChangeEvent(message.getDeviceStatusChangeEvent());
+				break;
+			case DeviceLost :
+				handleDeviceLostEvent(message.getDeviceLostEvent());
+				break;
+			case DeviceFailure :
+				handleDeviceFailureEvent(message.getDeviceFailureEvent());
+				break;
+			case Policy :
+				handlePolicyEvent(message.getPolicyEvent(), leapConnection);
+				break;
+			case ConfigResponse :
+				handleConfigResponseEvent(message);
+				break;
+			case LogEvent :
+				handleLogEvent(message.getLogEvent());
+				break;
+			case LogEvents :
+				handleLogEvents(message.getLogEvents());
+				break;
+			default :
+				handled = false;
+				break;
+		}
+
+		return handled;
+	}
+
+
+	private void handleConnectionEvent(LEAP_CONNECTION_EVENT event)
+	{
+		logPanel.pushLog("Connection flags: " + event.getFlags());
+		logPanel.pushSeparator();
+	}
+
+
+	private void handleConnectionLostEvent()
+	{
+		logPanel.pushLog("Connection lost!");
+		logPanel.pushSeparator();
+	}
+
+
+	private void handleDeviceEvent(LEAP_DEVICE_EVENT event)
+	{
+		eLeapRS result;
+
+		// Print device info.
+		printHeader("Device detected");
+		logPanel.pushLog("  Id: %d", event.device.id);
+
+		// Open the device to retrieve information about it.
+		LEAP_DEVICE phDevice = new LEAP_DEVICE();
+		result = LeapC.INSTANCE.LeapOpenDevice(event.device, phDevice);
+
+		if (result == eLeapRS.Success)
+		{
+			// Read the length of the device's serial string
+			LEAP_DEVICE_INFO info = new LEAP_DEVICE_INFO();
+			result = LeapC.INSTANCE.LeapGetDeviceInfo(phDevice.handle, info);
+
+			if (result == eLeapRS.InsufficientBuffer || result == eLeapRS.Success)
+			{
+				// Allocate space for the serial and read device info
+				info.allocateSerialBuffer(info.serial_length);
+				result = LeapC.INSTANCE.LeapGetDeviceInfo(phDevice.handle, info);
+
+				if (result == eLeapRS.Success)
+				{
+					logPanel.pushLog("  Status: %s", Arrays.toString(info.getStatus()));
+					logPanel.pushLog("  Baseline: %d \u00b5m", info.baseline);
+					logPanel.pushLog("  FoV: %.02f\u00b0 x %.02f\u00b0 (HxV)",
+							Math.toDegrees(info.h_fov), Math.toDegrees(info.v_fov));
+					logPanel.pushLog("  Range: %d \u00b5m", info.range);
+					logPanel.pushLog("  Serial: %s", info.serial);
+					logPanel.pushLog("  Product ID: %s (%d)",
+							LeapC.INSTANCE.LeapDevicePIDToString(info.pid), info.pid);
+					logPanel.pushLog("  Capabilities: %s", Arrays.toString(info.getCapabilities()));
+
+					// Close the device since we no longer need it.
+					LeapC.INSTANCE.LeapCloseDevice(phDevice.handle);
+				}
+				else
+				{
+					logPanel.pushError("Failed to read device info: " + result);
+				}
+			}
+			else
+			{
+				logPanel.pushError("Failed to read device info to get serial length: " + result);
+			}
+		}
+		else
+		{
+			logPanel.pushError("Failed to open device: " + result);
+		}
+
+		logPanel.pushSeparator();
+	}
+
+
+	private void handleDeviceStatusChangeEvent(LEAP_DEVICE_STATUS_CHANGE_EVENT event)
+	{
+		logPanel.pushLog("Device status changed: %d | From %s to %s", event.device.id,
+				Arrays.toString(event.getLastStatus()), Arrays.toString(event.getStatus()));
+		logPanel.pushSeparator();
+	}
+
+
+	private void handlePolicyEvent(LEAP_POLICY_EVENT event, LEAP_CONNECTION leapConnection)
+	{
+		logPanel.pushLog("Active policies: " + Arrays.toString(event.getCurrentPolicy()));
+		logPanel.pushSeparator();
+
+		// Request the current images_mode setting to check if images were activated
+		// through the Leap Motion control panel.
+		LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle,
+				Configurations.Tracking.IMAGES_MODE, imagesRequestId);
+	}
+
+
+	private void handleLogEvent(LEAP_LOG_EVENT event)
+	{
+		logPanel.pushLog("[LOG] " + event.getSeverity() + ": " + event.message);
+		logPanel.pushSeparator();
+	}
+
+
+	private void handleLogEvents(LEAP_LOG_EVENTS events)
+	{
+		for (LEAP_LOG_EVENT logEvent : events.getEvents())
+		{
+			handleLogEvent(logEvent);
+		}
+	}
+
+
+	private void handleDeviceFailureEvent(LEAP_DEVICE_FAILURE_EVENT event)
+	{
+		logPanel.pushLog("Device failure: %s", Arrays.toString(event.getStatus()));
+		logPanel.pushSeparator();
+	}
+
+
+	private void handleDeviceLostEvent(LEAP_DEVICE_EVENT event)
+	{
+		logPanel.pushLog("Device was lost:");
+		logPanel.pushLog("  Id: %d", event.device.id);
+		logPanel.pushLog("  Status: %d", Arrays.toString(event.getStatus()));
+		logPanel.pushSeparator();
+	}
+
+
+	private void handleConfigResponseEvent(LEAP_CONNECTION_MESSAGE message)
+	{
+		LEAP_CONFIG_RESPONSE_EVENT responseEvent = message.getConfigResponseEvent();
+
+		if (responseEvent.requestID == imagesRequestId.getValue())
+		{
+			imagesAllowed = responseEvent.value.getInt() == 2;
+		}
+	}
+
+
 	private eLeapRS printStatus(LEAP_CONNECTION leapConnection)
 	{
-		printHeader("Connection status");
-
 		LEAP_CONNECTION_INFO connectionStatus = new LEAP_CONNECTION_INFO();
 		eLeapRS result = LeapC.INSTANCE.LeapGetConnectionInfo(leapConnection.handle,
 				connectionStatus);
 
 		if (result == eLeapRS.Success)
 		{
-			System.out.format("Status: %s%n", connectionStatus.getStatus());
+			logPanel.pushLog("Status: %s", connectionStatus.getStatus());
 		}
 		else
 		{
-			System.out.format("Failed to get status: %s%n", result);
+			logPanel.pushError("Failed to get status: %s", result);
 		}
 		return result;
 	}
@@ -656,16 +489,7 @@ public class LeapTestGui extends JFrame
 
 	private void printHeader(String text)
 	{
-		System.out.println();
-		System.out.println("===" + text + "===");
-
-		try
-		{
-			Thread.sleep(250);
-		}
-		catch (InterruptedException e)
-		{
-		}
+		logPanel.pushLog(text, true, Color.BLACK, new Object[0]);
 	}
 
 
@@ -676,12 +500,14 @@ public class LeapTestGui extends JFrame
 		if (result == eLeapRS.Success)
 		{
 			isPaused = !isPaused;
-			System.out.println(isPaused ? "Paused" : "Resumed");
+			logPanel.pushLog(isPaused ? "Paused" : "Resumed");
 		}
 		else
 		{
-			System.out.println("Pause/resume failed: " + result);
+			logPanel.pushError("Failed to " + (isPaused ? "resume" : "pause") + ": " + result);
 		}
+
+		logPanel.pushSeparator();
 	}
 
 
@@ -699,11 +525,11 @@ public class LeapTestGui extends JFrame
 			if (result != eLeapRS.Success)
 			{
 				recording = null;
-				System.out.println("Failed to start recording: " + result);
+				logPanel.pushError("Failed to start recording: " + result);
 			}
 			else
 			{
-				System.out.println("Recording to " + filePath);
+				logPanel.pushLog("Recording to " + filePath);
 			}
 		}
 		else
@@ -712,31 +538,69 @@ public class LeapTestGui extends JFrame
 
 			if (result != eLeapRS.Success)
 			{
-				System.out.println("Failed to close recording: " + result);
+				logPanel.pushError("Failed to close recording: " + result);
 			}
 			else
 			{
-				System.out.println("Stopped recording!");
+				logPanel.pushLog("Stopped recording!");
 				recording = null;
 			}
 		}
+
+		logPanel.pushSeparator();
 	}
 
 
 	private void requestRecordingStatus()
 	{
-		LEAP_RECORDING_STATUS pStatus = new LEAP_RECORDING_STATUS();
-		eLeapRS result = LeapC.INSTANCE.LeapRecordingGetStatus(recording.handle, pStatus);
-
-		if (result != eLeapRS.Success)
+		if (recording != null)
 		{
-			System.out.println("Failed to get recording status: " + result);
+			LEAP_RECORDING_STATUS pStatus = new LEAP_RECORDING_STATUS();
+			eLeapRS result = LeapC.INSTANCE.LeapRecordingGetStatus(recording.handle, pStatus);
+
+			if (result != eLeapRS.Success)
+			{
+				logPanel.pushError("Failed to get recording status: " + result);
+			}
+			else
+			{
+				logPanel.pushLog(
+						"Status of current recording: " + Arrays.toString(pStatus.getMode()));
+			}
 		}
 		else
 		{
-			System.out
-					.println("Status of current recording: " + Arrays.toString(pStatus.getMode()));
+			logPanel.pushLog("Status of current recording: Not recording");
 		}
+
+		logPanel.pushSeparator();
+	}
+
+
+	private void toggleImages()
+	{
+		if (imagesAllowed)
+		{
+			imagesEnabled = !imagesEnabled;
+			renderPanel.setDrawImages(imagesEnabled);
+		}
+		else
+		{
+			logPanel.pushError("Images are not enabled in the Leap Motion control panel.");
+			logPanel.pushSeparator();
+		}
+	}
+
+
+	private void displayHelp()
+	{
+		String title = "LeapJna - 2D visualiser Help";
+		String message = "Available keyboard commands:" + "\nEscape: Close the program"
+				+ "\nP: Pause tracking (must be resumed from the control panel)"
+				+ "\nR: Start recording tracking data" + "\nS: Print status of current recording"
+				+ "\nI: Toggle drawing of the camera images";
+
+		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 
@@ -777,14 +641,21 @@ class RenderPanel extends JPanel
 
 	private Stage stage = Stage.Startup;
 	private LEAP_TRACKING_EVENT data;
-	private LEAP_IMAGE image;
-	private BufferedImage texture;
+	private BufferedImage textureLeft;
+	private BufferedImage textureRight;
 	private int framerate;
+	private boolean drawImages;
 
 	public void setStage(Stage stage)
 	{
 		this.stage = stage;
 		repaint();
+	}
+
+
+	public void setDrawImages(boolean drawImages)
+	{
+		this.drawImages = drawImages;
 	}
 
 
@@ -797,16 +668,20 @@ class RenderPanel extends JPanel
 
 	public void setImageData(LEAP_IMAGE_EVENT data)
 	{
-		this.image = data.image[0];
-		createTexture(image);
+		textureRight = createTexture(data.image[0], textureRight);
+		textureLeft = createTexture(data.image[1], textureLeft);
 		SwingUtilities.invokeLater(this::repaint);
 	}
 
 
-	private void createTexture(LEAP_IMAGE image)
+	@SuppressWarnings("null")
+	private BufferedImage createTexture(LEAP_IMAGE image, BufferedImage texture)
 	{
-		boolean newTexture = (texture == null || texture.getWidth() != image.properties.width
-				|| texture.getHeight() != image.properties.height);
+		int width = image.properties.width;
+		int height = image.properties.height;
+
+		boolean newTexture = (texture == null || texture.getWidth() != width
+				|| texture.getHeight() != height);
 
 		byte[] imageData = image.getData();
 
@@ -814,14 +689,15 @@ class RenderPanel extends JPanel
 		{
 			if (newTexture)
 			{
-				texture = new BufferedImage(image.properties.width, image.properties.height,
-						BufferedImage.TYPE_BYTE_GRAY);
+				texture = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 			}
 
 			byte[] textureData = ((DataBufferByte) texture.getRaster().getDataBuffer())
 					.getData();
 			System.arraycopy(imageData, 0, textureData, 0, imageData.length);
 		}
+
+		return texture;
 	}
 
 
@@ -843,25 +719,29 @@ class RenderPanel extends JPanel
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 
-		drawImage(g2d);
+		if (drawImages)
+		{
+			drawImages(g2d);
+		}
 
 		g2d.setColor(Color.BLACK);
+		g2d.drawString("Press F1 for help", 10, getHeight() - 30);
 		g2d.drawString("Press ESC to exit", 10, getHeight() - 10);
 
 		if (stage == Stage.Startup)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString("Press ENTER to start tracking", 10, 10);
+			g2d.drawString("Press ENTER to start tracking", 10, 15);
 		}
 		else if (stage == Stage.Connecting)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString("Connecting...", 10, 10);
+			g2d.drawString("Connecting...", 10, 15);
 		}
 		else if (stage == Stage.Running)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString(String.format("Drawing FPS: %d", framerate), 10, 10);
+			g2d.drawString(String.format("Drawing FPS: %d", framerate), 10, 15);
 
 			if (data != null)
 			{
@@ -877,16 +757,37 @@ class RenderPanel extends JPanel
 	}
 
 
-	private void drawImage(Graphics2D g2d)
+	private void drawImages(Graphics2D g2d)
 	{
-		if (texture != null)
-		{
-			float ratio = texture.getWidth() / (float) texture.getHeight();
-			int width = getWidth();
-			int height = (int) (getHeight() / ratio);
-			int y = (int) (getHeight() / 2f - height / 2f);
+		float ratio;
 
-			g2d.drawImage(texture, 0, y, width, height, null);
+		if (textureLeft != null)
+		{
+			ratio = textureLeft.getWidth() / (float) textureLeft.getHeight();
+		}
+		else if (textureRight != null)
+		{
+			ratio = textureRight.getWidth() / (float) textureRight.getHeight();
+		}
+		else
+		{
+			return;
+		}
+
+		int width = getWidth() / 2;
+		int height = (int) (getHeight() / ratio);
+		int y = (int) (getHeight() / 2f - height / 2f);
+
+		if (textureLeft != null)
+		{
+			g2d.drawImage(textureLeft, width, y, 0, y + height, 0, 0, textureLeft.getWidth(),
+					textureLeft.getHeight(), null);
+		}
+
+		if (textureRight != null)
+		{
+			g2d.drawImage(textureRight, width + width, y, width, y + height, 0, 0,
+					textureRight.getWidth(), textureRight.getHeight(), null);
 		}
 	}
 
@@ -960,5 +861,75 @@ class RenderPanel extends JPanel
 			g2d.drawString(String.format("Yaw (y): %.02f", Math.toDegrees(yaw)), 10, y);
 			y += lineHeight * 2;
 		}
+	}
+}
+
+
+
+class LogPanel extends JPanel
+{
+	private JPanel logView;
+	private JScrollPane scrollPane;
+
+	public LogPanel()
+	{
+		super(new BorderLayout());
+		logView = createLogView();
+		scrollPane = new JScrollPane(logView);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+		add(scrollPane, BorderLayout.CENTER);
+	}
+
+
+	private JPanel createLogView()
+	{
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		return panel;
+	}
+
+
+	public void pushLog(String log, Object... args)
+	{
+		pushLog(log, false, Color.BLACK, args);
+	}
+
+
+	public void pushError(String error, Object... args)
+	{
+		pushLog(error, true, Color.RED, args);
+	}
+
+
+	public void pushLog(String log, boolean bold, Color color, Object... args)
+	{
+		JLabel label = new JLabel(String.format(log, args));
+		label.setBorder(new EmptyBorder(2, 6, 2, 6));
+		label.setForeground(color);
+
+		if (bold)
+		{
+			label.setFont(label.getFont().deriveFont(Font.BOLD));
+		}
+		else
+		{
+			label.setFont(label.getFont().deriveFont(Font.PLAIN));
+		}
+
+		logView.add(label);
+		logView.revalidate();
+		SwingUtilities.invokeLater(() -> {
+			JScrollBar scrollbar = scrollPane.getVerticalScrollBar();
+			scrollbar.setValue(scrollbar.getMaximum());
+		});
+	}
+
+
+	public void pushSeparator()
+	{
+		JSeparator separator = new JSeparator();
+		logView.add(separator);
 	}
 }
