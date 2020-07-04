@@ -123,6 +123,9 @@
 				<configuration>
 					<additionalOptions>-html5</additionalOptions>
 					<excludePackageNames>komposten.leapjna.example:komposten.leapjna.example.*</excludePackageNames>
+					<links>
+						<link>http://java-native-access.github.io/jna/5.5.0/javadoc/</link>
+					</links>
 				</configuration>
 			</plugin>
 			<plugin>
