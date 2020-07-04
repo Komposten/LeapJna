@@ -122,6 +122,7 @@
 				<version>3.1.0</version>
 				<configuration>
 					<additionalOptions>-html5</additionalOptions>
+					<excludePackageNames>komposten.leapjna.example:komposten.leapjna.example.*</excludePackageNames>
 				</configuration>
 			</plugin>
 			<plugin>
