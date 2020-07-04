@@ -1,7 +1,12 @@
+## 1.0.2
+**Fixes**
+- Removed `komposten.leapjna.example` from the official javadocs.
+
+
 ## 1.0.1
-**Bugs**
+**Fixes**
 - `LEAP_TRACKING_EVENT` now calculates `LEAP_HAND`'s native size dynamically instead of relying on a constant.
-- Fix Euler calculations in `LEAP_QUATERNION` and add unit tests for them.
+- Fixed Euler calculations in `LEAP_QUATERNION` and added unit tests for them.
 
 **Other**
 - Moved the 2D visualiser application into an example package and re-wrote most of the code.
