@@ -265,9 +265,9 @@ class RenderPanel extends JPanel
 
 			g2d.drawString(String.format("Hand %d: %s", i, hand.getType()), 10, y);
 			y += lineHeight;
-			g2d.drawString(String.format("Roll (x): %.02f", Math.toDegrees(roll)), 10, y);
+			g2d.drawString(String.format("Roll (z): %.02f", Math.toDegrees(roll)), 10, y);
 			y += lineHeight;
-			g2d.drawString(String.format("Pitch (z): %.02f", Math.toDegrees(pitch)), 10, y);
+			g2d.drawString(String.format("Pitch (x): %.02f", Math.toDegrees(pitch)), 10, y);
 			y += lineHeight;
 			g2d.drawString(String.format("Yaw (y): %.02f", Math.toDegrees(yaw)), 10, y);
 			y += lineHeight * 2;
