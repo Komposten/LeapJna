@@ -30,10 +30,6 @@ import komposten.leapjna.leapc.enums.eLeapHandType;
 		"grab_angle", "pinch_strength", "grab_strength", "palm", "digits", "arm" })
 public class LEAP_HAND extends Structure
 {
-	// FIXME Calculate this size dynamically. Is a must to work on
-	// e.g. 32-bit systems (pointers are 4 bytes instead of 8).
-	public static final int SIZE = 1084;
-
 	/**
 	 * A struct to store the digits of a hand.
 	 */
@@ -45,6 +41,11 @@ public class LEAP_HAND extends Structure
 		public LEAP_DIGIT middle;
 		public LEAP_DIGIT ring;
 		public LEAP_DIGIT pinky;
+		
+		public DigitStruct()
+		{
+			super(ALIGN_NONE);
+		}
 
 		/**
 		 * Bundles the digits in an array to facilitate iteration over them.
@@ -76,7 +77,7 @@ public class LEAP_HAND extends Structure
 	 * The chirality of this hand. Either 0 (left) or 1 (right). Use {@link #getType()} to
 	 * get the type as a {@link eLeapHandType} value.
 	 */
-	public byte type;
+	public int type;
 
 	/**
 	 * <p>
@@ -137,14 +138,14 @@ public class LEAP_HAND extends Structure
 
 	public LEAP_HAND()
 	{
-		super();
+		super(ALIGN_NONE);
 		read();
 	}
 
 
 	public LEAP_HAND(Pointer pointer)
 	{
-		super(pointer);
+		super(pointer, ALIGN_NONE);
 		read();
 	}
 

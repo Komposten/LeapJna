@@ -23,7 +23,7 @@ Some features specified in the Leap Motion API are broken or non-functional in t
 
 A list of these features can be found here: [Broken API Features](BROKEN_API_FEATURES.md).
 
-## Using LeapJna
+## Using LeapJna in your project
 1. Add LeapJna to your classpath.
     * If you don't use Maven/Gradle you will need to add JNA as well.
 2. Download the Leap Motion SDK, put LeapC.dll in a folder "win32-x86-64" and add that folder to your classpath.
@@ -34,6 +34,12 @@ A list of these features can be found here: [Broken API Features](BROKEN_API_FEA
     * All related data structures can be found in the `komposten.leapjna.leapc` packages.
 5. Refer to the official SDK guide for the basics of using the LeapC API.
     * Refer to the documentation of each method and data structure in LeapJna for information on how to use them.
+
+## 2D visualiser example
+LeapJna has an example application which takes the form of a simple visualiser. To launch this:
+1. Clone LeapJna.
+2. Open LeapJna as a Maven project in your preferred IDE.
+3. Launch `komposten.leapjna.example.VisualiserExample`.
 
 ## License
 The license for LeapJna's source code can be found in the [LICENSE](LICENSE) file.

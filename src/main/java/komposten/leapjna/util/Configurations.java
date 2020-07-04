@@ -40,7 +40,7 @@ public class Configurations
 		 * <b>Value type:</b> integer
 		 * </p>
 		 * <p>
-		 * <b>Valid values:</b> 0 (disable), 1 (enable)
+		 * <b>Valid values:</b> 0 (disable), 2 (enable)
 		 * </p>
 		 */
 		public static final String IMAGES_MODE = "images_mode";
@@ -379,6 +379,9 @@ public class Configurations
 		 * </p>
 		 */
 		public static final String WSS_PORT = "";
+
+		private WebSocket()
+		{}
 	}
 
 	private Configurations()

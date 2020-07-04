@@ -36,6 +36,12 @@ public class LEAP_QUATERNION extends Structure
 
 	/** The z-coefficient of the vector portion of the quaternion. */
 	public float z;
+	
+	public LEAP_QUATERNION()
+	{
+		super(ALIGN_NONE);
+	}
+	
 
 	/**
 	 * @return The quaternion's values as an array in the order: w, x, y, z.
@@ -47,32 +53,46 @@ public class LEAP_QUATERNION extends Structure
 
 
 	/**
-	 * @return The roll (x-axis rotation) in radians.
+	 * Calculates the roll, or rotation around the z-axis, described by this
+	 * quaternion.
+	 * @return The roll in radians.
 	 */
 	public float getRoll()
 	{
 		double nominator = 2 * (w * x + y * z);
 		double denominator = 1 - 2 * (x * x + y * y);
-
+		
 		return (float) Math.atan2(nominator, denominator);
 	}
 
 
 	/**
-	 * @return The yaw (y-axis rotation) in radians.
+	 * Calculates the roll, or rotation around the y-axis, described by this
+	 * quaternion.
+	 * @return The yaw in radians.
 	 */
 	public float getYaw()
 	{
-		return (float) Math.asin(2 * (w * y - z * x));
+		float sinp = 2 * (w * y - z * x);
+		float yaw;
+		
+		if (Math.abs(sinp) >= 1)
+			yaw = (float) (sinp > 0 ? Math.PI / 2 : -Math.PI / 2);
+		else
+			yaw = (float) Math.asin(sinp);
+		
+		return yaw;
 	}
 
 
 	/**
-	 * @return The pitch (z-axis rotation) in radians.
+	 * Calculates the roll, or rotation around the x-axis, described by this
+	 * quaternion.
+	 * @return The pitch in radians.
 	 */
 	public float getPitch()
 	{
-		double nominator = 2 * (w * z + x * y);
+		double nominator = -2 * (w * z + x * y);
 		double denominator = 1 - 2 * (y * y + z * z);
 
 		return (float) Math.atan2(nominator, denominator);
@@ -80,8 +100,8 @@ public class LEAP_QUATERNION extends Structure
 
 
 	/**
-	 * @return This rotation represented as Euler angles in radians, ordered: roll (x-axis
-	 *         rotation), yaw (y-axis rotation) and pitch (z-axis rotation).
+	 * @return This rotation represented as Euler angles in radians, ordered: roll (z-axis
+	 *         rotation), yaw (y-axis rotation) and pitch (x-axis rotation).
 	 */
 	public float[] getEuler()
 	{

@@ -57,7 +57,13 @@ public class LEAP_DIGIT extends Structure
 
 	/** Reports whether the finger is more or less straight. */
 	public int is_extended;
+	
+	public LEAP_DIGIT()
+	{
+		super(ALIGN_NONE);
+	}
 
+	
 	/**
 	 * Bundles the bones in an array to facilitate iteration over them.
 	 * 

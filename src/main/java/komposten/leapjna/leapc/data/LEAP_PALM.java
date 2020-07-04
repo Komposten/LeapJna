@@ -69,4 +69,9 @@ public class LEAP_PALM extends Structure
 	 * <code>{normal x direction, -normal, -direction}</code>.
 	 */
 	public LEAP_QUATERNION orientation;
+	
+	public LEAP_PALM()
+	{
+		super(ALIGN_NONE);
+	}
 }

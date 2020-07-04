@@ -76,7 +76,7 @@ public enum eLeapEventType implements IntEnum
 	 * </p>
 	 * <p>
 	 * This can be due to setting a policy with
-	 * {@link LeapC#LeapSetPolicyFlags(Pointer, long, long)} or due to changing or
+	 * {@link LeapC#LeapSetPolicyFlags(Pointer, long, long)} or due to changing
 	 * policy-related config settings, including images_mode. (A user can also change these
 	 * policies using the Leap Motion Control Panel.)
 	 * </p>

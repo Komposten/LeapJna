@@ -448,6 +448,93 @@ class StructTests
 			assertThat(struct.getFormat()).isSameAs(expected);
 		}
 	}
+	
+	
+	@Nested
+	class LEAP_QUATERNION_TEST
+	{
+		private final Offset<Float> PRECISION = Offset.offset(0.001f);
+		private final float SIN35 = (float) Math.sin(Math.toRadians(35));
+		private final float SIN45 = (float) Math.sin(Math.toRadians(45));
+		private final float COS45 = (float) Math.cos(Math.toRadians(45));
+		
+		private LEAP_QUATERNION struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_QUATERNION();
+		}
+		
+		
+		private void setQuaternion(float w, float x, float y, float z)
+		{
+			struct.w = w;
+			struct.x = x;
+			struct.y = y;
+			struct.z = z;
+		}
+
+
+		@Test
+		void asArray_allValuesInOrder()
+		{
+			float[] expected = { 2, 3, 4, 5 };
+			setQuaternion(expected[0], expected[1], expected[2], expected[3]);
+			assertThat(struct.asArray()).containsExactly(expected, PRECISION);
+		}
+
+
+		@Test
+		void getRoll_calculatedCorrectly()
+		{
+			// 90 degree rotation around the z-axis
+			setQuaternion(COS45, SIN45, 0, 0);
+			float expected = (float) Math.toRadians(90);
+			assertThat(struct.getRoll()).isCloseTo(expected, PRECISION);
+
+			setQuaternion(COS45, SIN35*SIN45, SIN35*SIN45, SIN35*SIN45);
+			expected = (float) Math.toRadians(69.25);
+			assertThat(struct.getRoll()).isCloseTo(expected, PRECISION);
+		}
+
+
+		@Test
+		void getYaw_calculatedCorrectly()
+		{
+			// 90 degree rotation around the y-axis
+			setQuaternion(COS45, 0, SIN45, 0);
+			float expected = (float) Math.toRadians(90);
+			assertThat(struct.getYaw()).isCloseTo(expected, PRECISION);
+
+			setQuaternion(COS45, SIN35*SIN45, SIN35*SIN45, SIN35*SIN45);
+			expected = (float) Math.toRadians(14.16);
+			assertThat(struct.getYaw()).isCloseTo(expected, PRECISION);
+		}
+
+
+		@Test
+		void getPitch_calculatedCorrectly()
+		{
+			// 90 degree rotation around the x-axis
+			setQuaternion(COS45, 0, 0, SIN45);
+			float expected = (float) -Math.toRadians(90);
+			assertThat(struct.getPitch()).isCloseTo(expected, PRECISION);
+
+			setQuaternion(COS45, SIN35*SIN45, SIN35*SIN45, SIN35*SIN45);
+			expected = (float) -Math.toRadians(69.25);
+			assertThat(struct.getPitch()).isCloseTo(expected, PRECISION);
+		}
+		
+		
+		@Test
+		void getEuler_orderedCorrectly()
+		{
+			setQuaternion(COS45, SIN35 * SIN45, SIN35 * SIN45, SIN35 * SIN45);
+			float[] expected = { struct.getRoll(), struct.getYaw(), struct.getPitch() };
+			assertThat(struct.getEuler()).containsExactly(expected, PRECISION);
+		}
+	}
 
 
 	@Nested
