@@ -12,7 +12,6 @@ package komposten.leapjna.leapc.data;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Comparator;
 
@@ -455,9 +454,9 @@ class StructTests
 	class LEAP_QUATERNION_TEST
 	{
 		private final Offset<Float> PRECISION = Offset.offset(0.001f);
-		private final float SIN35 = (float) Math.sin(Math.PI / 18 * 3.5);
-		private final float SIN45 = (float) Math.sin(Math.PI / 4);
-		private final float COS45 = (float) Math.cos(Math.PI / 4);
+		private final float SIN35 = (float) Math.sin(Math.toRadians(35));
+		private final float SIN45 = (float) Math.sin(Math.toRadians(45));
+		private final float COS45 = (float) Math.cos(Math.toRadians(45));
 		
 		private LEAP_QUATERNION struct;
 
@@ -490,15 +489,13 @@ class StructTests
 		void getRoll_calculatedCorrectly()
 		{
 			// 90 degree rotation around the z-axis
-			setQuaternion(COS45, 0, 0, SIN45);
-			float expected = (float) -(Math.PI / 2);
-			System.out.format("R: %.02f, E: %.02f%n", struct.getRoll(), expected);
+			setQuaternion(COS45, SIN45, 0, 0);
+			float expected = (float) Math.toRadians(90);
 			assertThat(struct.getRoll()).isCloseTo(expected, PRECISION);
 
 			setQuaternion(COS45, SIN35*SIN45, SIN35*SIN45, SIN35*SIN45);
-			expected = (float) (Math.PI / 2);
-			System.out.format("R2: %.02f, E: %.02f%n", struct.getRoll(), expected);
-			assertThat(struct.getRoll()).isCloseTo(-1.4289f, PRECISION);
+			expected = (float) Math.toRadians(69.25);
+			assertThat(struct.getRoll()).isCloseTo(expected, PRECISION);
 		}
 
 
@@ -507,14 +504,12 @@ class StructTests
 		{
 			// 90 degree rotation around the y-axis
 			setQuaternion(COS45, 0, SIN45, 0);
-			float expected = (float) -(Math.PI / 2);
-			System.out.format("Y: %.02f, E: %.02f%n", struct.getYaw(), expected);
+			float expected = (float) Math.toRadians(90);
 			assertThat(struct.getYaw()).isCloseTo(expected, PRECISION);
 
 			setQuaternion(COS45, SIN35*SIN45, SIN35*SIN45, SIN35*SIN45);
-			expected = (float) (Math.PI / 2);
-			System.out.format("Y2: %.02f, E: %.02f%n", struct.getYaw(), expected);
-			assertThat(struct.getYaw()).isCloseTo(-2.9442F, PRECISION);
+			expected = (float) Math.toRadians(14.16);
+			assertThat(struct.getYaw()).isCloseTo(expected, PRECISION);
 		}
 
 
@@ -522,22 +517,22 @@ class StructTests
 		void getPitch_calculatedCorrectly()
 		{
 			// 90 degree rotation around the x-axis
-			setQuaternion(COS45, SIN45, 0, 0);
-			float expected = (float) (Math.PI / 2);
-			System.out.format("P: %.02f, E: %.02f%n", struct.getPitch(), expected);
+			setQuaternion(COS45, 0, 0, SIN45);
+			float expected = (float) -Math.toRadians(90);
 			assertThat(struct.getPitch()).isCloseTo(expected, PRECISION);
 
 			setQuaternion(COS45, SIN35*SIN45, SIN35*SIN45, SIN35*SIN45);
-			expected = (float) (Math.PI / 2);
-			System.out.format("P2: %.02f, E: %.02f%n", struct.getPitch(), expected);
-			assertThat(struct.getPitch()).isCloseTo(0.8232F, PRECISION);
+			expected = (float) -Math.toRadians(69.25);
+			assertThat(struct.getPitch()).isCloseTo(expected, PRECISION);
 		}
 		
 		
 		@Test
 		void getEuler_orderedCorrectly()
 		{
-			fail("not written");
+			setQuaternion(COS45, SIN35 * SIN45, SIN35 * SIN45, SIN35 * SIN45);
+			float[] expected = { struct.getRoll(), struct.getYaw(), struct.getPitch() };
+			assertThat(struct.getEuler()).containsExactly(expected, PRECISION);
 		}
 	}
 

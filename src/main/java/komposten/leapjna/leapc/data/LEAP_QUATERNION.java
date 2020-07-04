@@ -59,15 +59,10 @@ public class LEAP_QUATERNION extends Structure
 	 */
 	public float getRoll()
 	{
-//		double nominator = 2 * (w * z + x * y);
-//		double denominator = 1 - 2 * (y * y + z * z);
-//		
-//		return (float) Math.atan2(nominator, denominator);
+		double nominator = 2 * (w * x + y * z);
+		double denominator = 1 - 2 * (x * x + y * y);
 		
-		double nominator = 2 * (w * z + x * y);
-		double denominator = 1 - 2 * (z * z + x * x);
-		
-		return (float) -Math.atan2(nominator, denominator);
+		return (float) Math.atan2(nominator, denominator);
 	}
 
 
@@ -78,11 +73,15 @@ public class LEAP_QUATERNION extends Structure
 	 */
 	public float getYaw()
 	{
-//		return (float) Math.asin(2 * (w * y - z * x));
-		double nominator = 2 * (w * -y + z * -x);
-		double denominator = 1 - 2 * (x * x + y * y);
+		float sinp = 2 * (w * y - z * x);
+		float yaw;
 		
-		return (float) Math.atan2(nominator, denominator);
+		if (Math.abs(sinp) >= 1)
+			yaw = (float) (sinp > 0 ? Math.PI / 2 : -Math.PI / 2);
+		else
+			yaw = (float) Math.asin(sinp);
+		
+		return yaw;
 	}
 
 
@@ -93,22 +92,16 @@ public class LEAP_QUATERNION extends Structure
 	 */
 	public float getPitch()
 	{
-//		double nominator = 2 * (w * x + y * z);
-//		double denominator = 1 - 2 * (x * x + y * y);
-//
-//		return (float) Math.atan2(nominator, denominator);
-		float sinp = -2 * (w * -x + y * z);
-		
-		if (Math.abs(sinp) >= 1)
-			return (float) (sinp > 0 ? Math.PI / 2 : -Math.PI / 2);
-		else
-			return (float) Math.asin(sinp);
+		double nominator = -2 * (w * z + x * y);
+		double denominator = 1 - 2 * (y * y + z * z);
+
+		return (float) Math.atan2(nominator, denominator);
 	}
 
 
 	/**
-	 * @return This rotation represented as Euler angles in radians, ordered: roll (x-axis
-	 *         rotation), yaw (y-axis rotation) and pitch (z-axis rotation).
+	 * @return This rotation represented as Euler angles in radians, ordered: roll (z-axis
+	 *         rotation), yaw (y-axis rotation) and pitch (x-axis rotation).
 	 */
 	public float[] getEuler()
 	{
