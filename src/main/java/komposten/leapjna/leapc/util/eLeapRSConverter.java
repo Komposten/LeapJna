@@ -17,24 +17,29 @@ import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapRS;
 
 
+/**
+ * A type converter for converting integer values to and from {@link eLeapRS}
+ * constants. This exists for internal usage by LeapJna wherever
+ * <code>eLeapRS</code> is used as return value.
+ */
 public class eLeapRSConverter implements TypeConverter
 {
 	@Override
 	public Object fromNative(Object nativeValue, FromNativeContext context)
 	{
 		eLeapRS result = null;
-		
+
 		if (nativeValue instanceof Integer)
 		{
 			Integer value = (Integer) nativeValue;
 			Class<?> targetClass = context.getTargetType();
-	
+
 			if (eLeapRS.class.isAssignableFrom(targetClass))
 			{
 				result = Enums.parse(value, eLeapRS.Unknown);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -43,7 +48,7 @@ public class eLeapRSConverter implements TypeConverter
 	public Object toNative(Object value, ToNativeContext context)
 	{
 		Integer result = null;
-		
+
 		if (value instanceof eLeapRS)
 		{
 			eLeapRS enumValue = (eLeapRS) value;
