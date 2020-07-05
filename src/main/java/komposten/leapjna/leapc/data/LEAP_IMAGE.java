@@ -14,6 +14,12 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 
+/**
+ * <p>
+ * Holds an image from one of the Leap Motion Controller's cameras and related
+ * information.
+ * </p>
+ */
 @FieldOrder({ "properties", "matrix_version", "distortion_matrix", "data", "offset" })
 public class LEAP_IMAGE extends Structure
 {

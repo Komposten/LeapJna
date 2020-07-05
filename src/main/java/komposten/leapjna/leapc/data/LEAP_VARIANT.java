@@ -34,6 +34,15 @@ import komposten.leapjna.leapc.enums.eLeapValueType;
 @FieldOrder({ "type", "union" })
 public class LEAP_VARIANT extends Structure
 {
+	/**
+	 * <p>
+	 * A union holding the current value of this <code>LEAP_VARIANT</code>.
+	 * </p>
+	 * <p>
+	 * It is recommended to use the getters in <code>LEAP_VARIANT</code> for
+	 * fetching the value rather than accessing them directly through the union.
+	 * </p>
+	 */
 	public static class ValueUnion extends Union
 	{
 		/** A Boolean value. */

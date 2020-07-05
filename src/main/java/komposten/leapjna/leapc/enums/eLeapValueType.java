@@ -9,8 +9,19 @@
  */
 package komposten.leapjna.leapc.enums;
 
+import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
+
+/**
+ * <p>
+ * Different value types.
+ * </p>
+ * <p>
+ * Used by {@link LEAP_VARIANT} to keep track of the type of value the variant
+ * stores.
+ * </p>
+ */
 public enum eLeapValueType implements IntEnum
 {
 	/** The type is unknown (which is an abnormal condition). */
@@ -26,8 +37,8 @@ public enum eLeapValueType implements IntEnum
 	{
 		this.value = value;
 	}
-	
-	
+
+
 	@Override
 	public int getValue()
 	{

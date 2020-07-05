@@ -13,6 +13,11 @@ import com.sun.jna.DefaultTypeMapper;
 
 import komposten.leapjna.leapc.enums.eLeapRS;
 
+
+/**
+ * A type mapper for internal use by LeapJna to properly map certain native
+ * types to appropriate Java types.
+ */
 public class LeapTypeMapper extends DefaultTypeMapper
 {
 	public LeapTypeMapper()

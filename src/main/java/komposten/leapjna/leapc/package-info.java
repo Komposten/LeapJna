@@ -7,12 +7,8 @@
  * it under the terms of the MIT license as written in the LICENSE file in the root
  * of this project.
  */
-package komposten.leapjna.leapc.events;
 
 /**
- * The common interface for all Leap Motion API event types.
+ * Provides Java mappings for interacting with the Leap Motion C API.
  */
-public interface LEAP_EVENT
-{
-
-}
+package komposten.leapjna.leapc;
