@@ -28,18 +28,24 @@ import komposten.leapjna.leapc.enums.eLeapAllocatorType;
 @FieldOrder({ "allocate", "deallocate", "state" })
 public class LEAP_ALLOCATOR extends Structure
 {
+	/**
+	 * A callback for allocating native memory.
+	 */
 	public static interface allocate extends Callback
 	{
 		/**
 		 * @param size The amount of bytes to allocate.
-		 * @param typeHint The data buffer type. One of the {@link eLeapAllocatorType}
-		 *          constants.
+		 * @param typeHint The data buffer type. One of the
+		 *          {@link eLeapAllocatorType} constants.
 		 * @param state [undocumented]
 		 * @return A pointer to the allocated data buffer.
 		 */
 		Pointer invoke(int size, int typeHint, Pointer state);
 	}
 
+	/**
+	 * A callback for freeing previously allocated native memory.
+	 */
 	public static interface deallocate extends Callback
 	{
 		/**
