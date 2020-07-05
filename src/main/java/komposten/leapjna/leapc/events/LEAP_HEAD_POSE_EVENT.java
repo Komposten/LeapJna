@@ -18,6 +18,10 @@ import komposten.leapjna.leapc.data.LEAP_QUATERNION;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 
 
+/**
+ * A snapshot, or frame of data, containing the head pose data for a single
+ * moment in time.
+ */
 @FieldOrder({ "timestamp", "head_position", "head_orientation" })
 public class LEAP_HEAD_POSE_EVENT extends Structure implements LEAP_EVENT
 {

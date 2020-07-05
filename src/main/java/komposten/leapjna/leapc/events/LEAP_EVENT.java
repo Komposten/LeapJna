@@ -9,6 +9,9 @@
  */
 package komposten.leapjna.leapc.events;
 
+/**
+ * The common interface for all Leap Motion API event types.
+ */
 public interface LEAP_EVENT
 {
 

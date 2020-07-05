@@ -18,7 +18,8 @@ import komposten.leapjna.leapc.data.LEAP_HAND;
 
 
 /**
- * A snapshot, or frame of data, containing the tracking data for a single moment in time.
+ * A snapshot, or frame of data, containing the tracking data for a single
+ * moment in time.
  *
  * @see <a href=
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LeapC
