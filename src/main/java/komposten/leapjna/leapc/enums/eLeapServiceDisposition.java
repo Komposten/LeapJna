@@ -11,6 +11,10 @@ package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
+
+/**
+ * The service status codes/flags.
+ */
 public enum eLeapServiceDisposition implements IntEnum
 {
 	/**
@@ -18,15 +22,18 @@ public enum eLeapServiceDisposition implements IntEnum
 	 * constants, was encountered.
 	 */
 	Unknown(-1),
-	
+
 	/** No flags. */
 	None(0),
-	
-	/** The service cannot receive frames fast enough from the underlying hardware. */
+
+	/**
+	 * The service cannot receive frames fast enough from the underlying hardware.
+	 */
 	LowFpsDetected(1),
 
 	/**
-	 * The service has paused itself due to an insufficient frame rate from the hardware.
+	 * The service has paused itself due to an insufficient frame rate from the
+	 * hardware.
 	 */
 	PoorPerformancePause(2),
 
@@ -39,8 +46,8 @@ public enum eLeapServiceDisposition implements IntEnum
 	{
 		this.value = value;
 	}
-	
-	
+
+
 	@Override
 	public int getValue()
 	{

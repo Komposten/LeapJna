@@ -46,6 +46,16 @@ import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
 
+/**
+ * <p>
+ * The main interface for interacting with the Leap Motion C API.
+ * </p>
+ * <p>
+ * Use {@link #INSTANCE LeapC.INSTANCE} to obtain an instance of this interface
+ * that is linked to the native API using JNA. After that all API methods can be
+ * called on that instance in a similar way to how the C API is used.
+ * </p>
+ */
 public interface LeapC extends Library
 {
 	final LeapC INSTANCE = (LeapC) Native.synchronizedLibrary(Native

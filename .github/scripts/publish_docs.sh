@@ -10,7 +10,9 @@ git clone --depth 1 https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/komposten/
 
 # Copy docs into the komposten.github.io repo
 TARGET="komposten.github.io/leapjna/v$MAJOR"
-echo "Copying javadocs to $TARGET" 
+echo "Copying javadocs to $TARGET"
+rm -rf $TARGET
+mkdir -p $TARGET 
 cp -r LeapJna/target/site/apidocs/. $TARGET
 
 # Create a new branch, commit and push

@@ -13,6 +13,9 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
 
+/**
+ * Holds telemetry configuration information.
+ */
 @FieldOrder({ "thread_id", "start_time", "end_time", "zone_depth", "file_name",
 		"line_number", "zone_name" })
 public class LEAP_TELEMETRY_DATA extends Structure

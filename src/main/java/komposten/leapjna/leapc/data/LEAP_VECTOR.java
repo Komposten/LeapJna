@@ -83,6 +83,15 @@ public class LEAP_VECTOR extends Structure
 	}
 
 
+	/**
+	 * <p>
+	 * A pass-by-value implementation of <code>LEAP_VECTOR</code>.
+	 * </p>
+	 * <p>
+	 * <b>Note:</b> This should only be used with methods that explicitly require
+	 * <code>LEAP_VECTOR.ByValue</code>.
+	 * </p>
+	 */
 	public static class ByValue extends LEAP_VECTOR implements Structure.ByValue
 	{
 		public ByValue()
