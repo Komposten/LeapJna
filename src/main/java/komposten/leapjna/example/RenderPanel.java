@@ -32,9 +32,9 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 class RenderPanel extends JPanel
 {
 	private State state = State.INITIAL;
-	private LEAP_TRACKING_EVENT data;
-	private BufferedImage textureLeft;
-	private BufferedImage textureRight;
+	private transient LEAP_TRACKING_EVENT data;
+	private transient BufferedImage textureLeft;
+	private transient BufferedImage textureRight;
 
 	private long lastFrameUpdate;
 	private int frameCount;
