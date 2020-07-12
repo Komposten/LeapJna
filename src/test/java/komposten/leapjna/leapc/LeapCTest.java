@@ -117,7 +117,7 @@ class LeapCTest
 	private Pointer getDeviceHandle()
 	{
 		Pointer handle = new Pointer(Native.malloc(1));
-		assertThat(Pointer.nativeValue(handle)).as("Failed to allocate handle").isNotEqualTo(0);
+		assertThat(Pointer.nativeValue(handle)).as("Failed to allocate handle").isNotZero();
 		handle.setByte(0, (byte)2);
 		return handle;
 	}
@@ -451,7 +451,7 @@ class LeapCTest
 		
 		assertThat(event.requestID).isEqualTo(1);
 		assertThat(event.value.type).isEqualTo(eLeapValueType.Boolean.value);
-		assertThat(event.value.union.boolValue).isEqualTo(true);
+		assertThat(event.value.union.boolValue).isTrue();
 	}
 
 
@@ -462,7 +462,7 @@ class LeapCTest
 		LEAP_CONFIG_CHANGE_EVENT event = message.getConfigChangeEvent();
 		
 		assertThat(event.requestID).isEqualTo(1);
-		assertThat(event.status).isEqualTo(true);
+		assertThat(event.status).isTrue();
 	}
 
 
@@ -657,7 +657,7 @@ class LeapCTest
 		rDevice.id = 1;
 		rDevice.handle = new Pointer(Native.malloc(1));
 		
-		assertThat(Pointer.nativeValue(rDevice.handle)).as("Failed to allocate handle").isNotEqualTo(0);
+		assertThat(Pointer.nativeValue(rDevice.handle)).as("Failed to allocate handle").isNotZero();
 		rDevice.handle.setByte(0, (byte)5);
 		
 		eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(rDevice, phDevice);

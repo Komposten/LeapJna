@@ -77,7 +77,7 @@ class EnumsTest
 	void createMask_noValues_emptyMask()
 	{
 		int actual = Enums.createMask();
-		assertThat(actual).isEqualTo(0);
+		assertThat(actual).isZero();
 	}
 
 

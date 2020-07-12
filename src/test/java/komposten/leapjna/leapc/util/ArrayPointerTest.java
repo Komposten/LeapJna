@@ -31,6 +31,8 @@ class ArrayPointerTest
 	{
 		assertMemoryContains(pointer, offset, a, b, c, null);
 	}
+	
+	
 	private void assertMemoryContains(Pointer pointer, int offset, int a, double b, long c,
 			String description)
 	{
@@ -349,9 +351,9 @@ class ArrayPointerTest
 
 		assertThat(values).hasSize(4);
 		assertThat(values[0]).satisfies(value -> {
-			assertThat(value.a).isEqualTo(0);
-			assertThat(value.b).isEqualTo(0);
-			assertThat(value.c).isEqualTo(0);
+			assertThat(value.a).isZero();
+			assertThat(value.b).isZero();
+			assertThat(value.c).isZero();
 		});
 		assertThat(values[1]).satisfies(value -> {
 			assertThat(value.a).isEqualTo(1);
@@ -364,9 +366,9 @@ class ArrayPointerTest
 			assertThat(value.c).isEqualTo(4);
 		});
 		assertThat(values[3]).satisfies(value -> {
-			assertThat(value.a).isEqualTo(0);
-			assertThat(value.b).isEqualTo(0);
-			assertThat(value.c).isEqualTo(0);
+			assertThat(value.a).isZero();
+			assertThat(value.b).isZero();
+			assertThat(value.c).isZero();
 		});
 	}
 
@@ -384,9 +386,9 @@ class ArrayPointerTest
 
 		assertThat(values).hasSize(3);
 		assertThat(values[0]).satisfies(value -> {
-			assertThat(value.a).isEqualTo(0);
-			assertThat(value.b).isEqualTo(0);
-			assertThat(value.c).isEqualTo(0);
+			assertThat(value.a).isZero();
+			assertThat(value.b).isZero();
+			assertThat(value.c).isZero();
 		});
 		assertThat(values[1]).satisfies(value -> {
 			assertThat(value.a).isEqualTo(1);
@@ -394,9 +396,9 @@ class ArrayPointerTest
 			assertThat(value.c).isEqualTo(3);
 		});
 		assertThat(values[2]).satisfies(value -> {
-			assertThat(value.a).isEqualTo(0);
-			assertThat(value.b).isEqualTo(0);
-			assertThat(value.c).isEqualTo(0);
+			assertThat(value.a).isZero();
+			assertThat(value.b).isZero();
+			assertThat(value.c).isZero();
 		});
 	}
 
@@ -415,8 +417,8 @@ class ArrayPointerTest
 
 		assertThat(values).hasSize(2);
 
-		assertThat(values[0].a).isEqualTo(0);
-		assertThat(values[1].a).isEqualTo(0);
+		assertThat(values[0].a).isZero();
+		assertThat(values[1].a).isZero();
 
 		values[0].read();
 		values[1].read();
@@ -469,7 +471,7 @@ class ArrayPointerTest
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
 				.empty(StructureWithCtors.class, 5);
-		assertThat(arrayPointer1.equals(arrayPointer1)).isTrue();
+		assertThat(arrayPointer1).isEqualTo(arrayPointer1);
 	}
 	
 	
@@ -484,13 +486,13 @@ class ArrayPointerTest
 		differentValues.setInt(0, 1);
 
 		// Compare to array with same class, size and values but different peer.
-		assertThat(arrayPointer.equals(differentPeer)).isTrue();
+		assertThat(arrayPointer).isEqualTo(differentPeer);
 		// Compare to array with same class, values and peer but different size.
-		assertThat(arrayPointer.equals(differentSize)).isFalse();
+		assertThat(arrayPointer).isNotEqualTo(differentSize);
 		// Compare to array with same values, peer and size but different class.
-		assertThat(arrayPointer.equals(differentType)).isFalse();
+		assertThat(arrayPointer).isNotEqualTo(differentType);
 		// Compare to array with same class, peer and size but different values.
-		assertThat(arrayPointer.equals(differentValues)).isFalse();
+		assertThat(arrayPointer).isNotEqualTo(differentValues);
 	}
 	
 	
@@ -499,7 +501,7 @@ class ArrayPointerTest
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
 				.empty(StructureWithCtors.class, 5);
-		assertThat(arrayPointer1.equals(arrayPointer1)).isTrue();
+		assertThat(arrayPointer1.shallowEquals(arrayPointer1)).isTrue();
 	}
 	
 	
@@ -529,8 +531,8 @@ class ArrayPointerTest
 	{
 		ArrayPointer<StructureWithCtors> arrayPointer1 = ArrayPointer
 				.empty(StructureWithCtors.class, 5);
-		assertThat(arrayPointer1.equals("string")).isFalse();
-		assertThat(arrayPointer1.equals(null)).isFalse();
+		assertThat(arrayPointer1).isNotEqualTo("string");
+		assertThat(arrayPointer1).isNotEqualTo(null);
 	}
 	
 	
@@ -545,7 +547,7 @@ class ArrayPointerTest
 		differentValues.setInt(0, 1);
 
 		// Compare to array with same class, size and values but different peer.
-		assertThat(arrayPointer.hashCode()).isEqualTo(differentPeer.hashCode());
+		assertThat(arrayPointer).hasSameHashCodeAs(differentPeer);
 		// Compare to array with same class, values and peer but different size.
 		assertThat(arrayPointer.hashCode()).isNotEqualTo(differentSize.hashCode());
 		// Compare to array with same values, peer and size but different class.
