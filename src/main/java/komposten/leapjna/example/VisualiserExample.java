@@ -174,6 +174,8 @@ class VisualiserExample extends JFrame
 					break;
 				case CLOSED :
 					closeWindow();
+					leapJnaThread = null;
+					break;
 				case ERROR :
 					leapJnaThread = null;
 					break;

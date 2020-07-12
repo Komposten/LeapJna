@@ -1,8 +1,11 @@
+## 1.0.3
+**Fixes**
+- Fixed minor linter warnings.
+
 ## 1.0.2
 **Fixes**
 - Removed `komposten.leapjna.example` from the official javadocs.
 - Added documentation for all packages and classes.
-
 
 ## 1.0.1
 **Fixes**

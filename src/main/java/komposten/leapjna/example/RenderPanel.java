@@ -245,7 +245,7 @@ class RenderPanel extends JPanel
 	{
 		int size = (int) ((position.z + 200) / 400 * 20 * scale + 5);
 		g2d.fillRect((int) (position.x + offsetX - size / 2f),
-				(int) (-position.y + offsetY - size / 2), size, size);
+				(int) (-position.y + offsetY - size / 2d), size, size);
 	}
 
 
