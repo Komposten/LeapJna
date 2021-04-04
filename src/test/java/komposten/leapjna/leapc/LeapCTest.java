@@ -79,6 +79,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
@@ -316,6 +317,16 @@ class LeapCTest
 		LEAP_POLICY_EVENT event = message.getPolicyEvent();
 		assertThat(event.reserved).isEqualTo(1);
 		assertThat(event.current_policy).isEqualTo(eLeapPolicyFlag.Images.value);
+	}
+	
+	
+	@Test
+	void LeapPollConnection_eventTypeTrackingModeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.TrackingMode);
+		LEAP_TRACKING_MODE_EVENT event = message.getTrackingModeEvent();
+		assertThat(event.reserved).isEqualTo(1);
+		assertThat(event.current_tracking_mode).isEqualTo(eLeapTrackingMode.ScreenTop.value);
 	}
 
 
@@ -580,7 +591,7 @@ class LeapCTest
 	{
 		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
 		message.type = eventType.value;
-
+		
 		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(getConnectionHandle(), 0, message);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(message.type).isEqualTo(eventType.value);
