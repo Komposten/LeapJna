@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2021 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -36,12 +36,14 @@ import komposten.leapjna.leapc.enums.eLeapPerspectiveType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
+import komposten.leapjna.leapc.enums.eLeapTrackingMode;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
@@ -499,6 +501,36 @@ public interface LeapC extends Library
 	 *      API - LeapSetPolicyFlags</a>
 	 */
 	public eLeapRS LeapSetPolicyFlags(Pointer hConnection, long set, long clear);
+	
+	
+	/**
+	 * <p>
+	 * Requests a tracking mode.
+	 * </p>
+	 * <p>
+	 * Changing tracking modes is asynchronous. After you call this function, a subsequent
+	 * call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode. Note that,
+	 * after you call this function, a subsequent call to
+	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_POLICY_EVENT} containing the current tracking mode related policies,
+	 * reflecting any changes. Note that the relevant <code>LEAP_POLICY_EVENT</code> is
+	 * guaranteed to precede the <code>LEAP_TRACKING_MODE_EVENT</code>.
+	 * </p>
+	 * 
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param mode The enum value specifying the requested tracking mode.
+	 * @returns The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.1.0 (Gemini 5.0.0)
+	 */
+	public eLeapRS LeapSetTrackingMode(Pointer hConnection, int mode);
 
 
 	/**

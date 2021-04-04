@@ -62,6 +62,7 @@ import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
+import komposten.leapjna.leapc.enums.eLeapTrackingMode;
 import komposten.leapjna.leapc.enums.eLeapValueType;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
@@ -831,8 +832,17 @@ class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(getConnectionHandle(), set, clear);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
-	
-	
+
+
+	@Test
+	void LeapSetTrackingMode_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetTrackingMode(getConnectionHandle(),
+				eLeapTrackingMode.HMD.getValue());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
 	/**
 	 * LeapSetPause will return <code>eLeapRS.Success</code> if <code>pause</code>
 	 * is 1 (true).
