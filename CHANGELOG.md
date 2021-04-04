@@ -1,3 +1,7 @@
+## 1.1.0
+**API changes**
+- Update to Gemini SDK 5.0.0-preview+52386.
+
 ## 1.0.3
 **Fixes**
 - Fixed minor linter warnings.
