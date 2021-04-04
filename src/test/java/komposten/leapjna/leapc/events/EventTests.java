@@ -20,6 +20,7 @@ import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
+import komposten.leapjna.leapc.enums.eLeapTrackingMode;
 
 
 class EventTests
@@ -375,6 +376,50 @@ class EventTests
 			expected[1] = eLeapPolicyFlag.OptimiseHMD;
 			struct.current_policy = eLeapPolicyFlag.createMask(expected);
 			assertThat(struct.getCurrentPolicy()).containsExactlyInAnyOrder(expected);
+		}
+	}
+
+
+	@Nested
+	class LEAP_TRACKING_MODE_EVENT_TEST
+	{
+		private LEAP_TRACKING_MODE_EVENT struct;
+
+		@BeforeEach
+		void setup()
+		{
+			struct = new LEAP_TRACKING_MODE_EVENT(null);
+		}
+
+
+		@Test
+		void getCurrentTrackingMode_validMode_correctConstant()
+		{
+			eLeapTrackingMode expected = eLeapTrackingMode.ScreenTop;
+			struct.current_tracking_mode = expected.value;
+
+			assertThat(struct.getCurrentTrackingMode()).isSameAs(expected);
+		}
+
+
+		@Test
+		void getCurrentTrackingMode_invalidMode_correctConstant()
+		{
+			struct.current_tracking_mode = -1234;
+			assertThat(struct.getCurrentTrackingMode()).isSameAs(eLeapTrackingMode.Unknown);
+		}
+
+
+		@Test
+		void getCurrentTrackingMode_modeChanged_correctConstant()
+		{
+			eLeapTrackingMode expected = eLeapTrackingMode.ScreenTop;
+			struct.current_tracking_mode = expected.value;
+			struct.getCurrentTrackingMode();
+
+			expected = eLeapTrackingMode.Desktop;
+			struct.current_tracking_mode = expected.value;
+			assertThat(struct.getCurrentTrackingMode()).isSameAs(expected);
 		}
 	}
 }

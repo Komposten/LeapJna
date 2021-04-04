@@ -18,14 +18,16 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
+import javax.swing.WindowConstants;
 
 import komposten.leapjna.example.VisualiserBackend.State;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 
 
-class VisualiserExample extends JFrame
+class VisualiserExample
 {
+	private JFrame window;
 	private VisualiserBackend backend;
 	private RenderPanel renderPanel;
 	private LogPanel logPanel;
@@ -39,7 +41,7 @@ class VisualiserExample extends JFrame
 		backend = new VisualiserBackend(visualiserListener);
 
 		buildUi();
-		addKeyListener(new KeyAdapter()
+		window.addKeyListener(new KeyAdapter()
 		{
 			@Override
 			public void keyPressed(KeyEvent e)
@@ -76,7 +78,7 @@ class VisualiserExample extends JFrame
 			}
 		});
 
-		addWindowListener(new WindowAdapter()
+		window.addWindowListener(new WindowAdapter()
 		{
 			@Override
 			public void windowClosing(WindowEvent e)
@@ -89,10 +91,10 @@ class VisualiserExample extends JFrame
 
 	private void buildUi()
 	{
-		setTitle("LeapJna - 2D visualiser");
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setSize(500, 500);
-		setLocationRelativeTo(null);
+		window = new JFrame("LeapJna - 2D visualiser");
+		window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		window.setSize(500, 500);
+		window.setLocationRelativeTo(null);
 
 		renderPanel = new RenderPanel();
 		logPanel = new LogPanel();
@@ -101,9 +103,8 @@ class VisualiserExample extends JFrame
 		pane.setTopComponent(renderPanel);
 		pane.setBottomComponent(logPanel);
 
-		setContentPane(pane);
-
-		setVisible(true);
+		window.setContentPane(pane);
+		window.setVisible(true);
 
 		pane.setDividerLocation(0.75);
 		pane.setResizeWeight(0.75);
@@ -133,7 +134,7 @@ class VisualiserExample extends JFrame
 				+ "\nR: Start recording tracking data" + "\nS: Print status of current recording"
 				+ "\nI: Toggle drawing of the camera images";
 
-		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(window, message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 
@@ -152,8 +153,8 @@ class VisualiserExample extends JFrame
 
 	private void closeWindow()
 	{
-		setVisible(false);
-		dispose();
+		window.setVisible(false);
+		window.dispose();
 	}
 
 
@@ -174,6 +175,8 @@ class VisualiserExample extends JFrame
 					break;
 				case CLOSED :
 					closeWindow();
+					leapJnaThread = null;
+					break;
 				case ERROR :
 					leapJnaThread = null;
 					break;

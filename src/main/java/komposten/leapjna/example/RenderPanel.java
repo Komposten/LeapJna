@@ -32,9 +32,9 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 class RenderPanel extends JPanel
 {
 	private State state = State.INITIAL;
-	private LEAP_TRACKING_EVENT data;
-	private BufferedImage textureLeft;
-	private BufferedImage textureRight;
+	private transient LEAP_TRACKING_EVENT data;
+	private transient BufferedImage textureLeft;
+	private transient BufferedImage textureRight;
 
 	private long lastFrameUpdate;
 	private int frameCount;
@@ -245,7 +245,7 @@ class RenderPanel extends JPanel
 	{
 		int size = (int) ((position.z + 200) / 400 * 20 * scale + 5);
 		g2d.fillRect((int) (position.x + offsetX - size / 2f),
-				(int) (-position.y + offsetY - size / 2), size, size);
+				(int) (-position.y + offsetY - size / 2d), size, size);
 	}
 
 

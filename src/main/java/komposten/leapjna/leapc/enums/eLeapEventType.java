@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2021 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -150,12 +150,21 @@ public enum eLeapEventType implements IntEnum
 
 	/** Notification that point mapping has changed */
 	PointMappingChange(0x10A),
+	
+	/**
+	 * A tracking mode change has occurred. This can be due to changing the hmd or screentop
+	 * policy with {@link LeapC#LeapSetPolicyFlags(Pointer, long, long)}. or setting the
+	 * tracking mode using {@link LeapC#LeapSetTrackingMode(Pointer, int)}.
+	 * 
+	 * @since 1.1.0 (Gemini 5.0.0)
+	 */
+	TrackingMode(0x10B),
 
 	/** An array of system messages. */
-	LogEvents(0x10B),
+	LogEvents(0x10C),
 
 	/** */
-	HeadPose(0x10C);
+	HeadPose(0x10D);
 
 	public final int value;
 

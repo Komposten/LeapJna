@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>komposten.leapjna</groupId>
 	<artifactId>LeapJna</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<scm>
@@ -22,6 +22,7 @@
 	<properties>
 		<!-- General properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>11</java.version>
 
 		<!-- Unit testing -->
 		<junit.jupiter.version>5.6.2</junit.jupiter.version>
@@ -33,6 +34,8 @@
 		<sonar.organization>komposten-github</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.login>${env.SONAR_TOKEN}</sonar.login>
+		<sonar.java.source>${java.version}</sonar.java.source>
+		<sonar.java.target>${java.version}</sonar.java.target>
 	</properties>
 
 	<dependencies>
@@ -62,7 +65,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-				  <release>11</release>
+				  <release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -766,7 +766,7 @@ class StructTests
 		void getValue_hasValue_returnsValue()
 		{
 			LEAP_VARIANT variant = new LEAP_VARIANT(true);
-			assertThat(variant.getValue()).isEqualTo(true);
+			assertThat(variant.getValue()).isEqualTo(Boolean.TRUE);
 			
 			variant = new LEAP_VARIANT(1);
 			assertThat(variant.getValue()).isEqualTo(1);

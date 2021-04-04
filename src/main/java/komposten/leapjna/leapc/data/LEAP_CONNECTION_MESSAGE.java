@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2021 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -33,6 +33,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 
 
 /**
@@ -190,6 +191,19 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		checkType(eLeapEventType.Tracking);
 		return getOrCreateEvent(LEAP_TRACKING_EVENT::new);
+	}
+	
+	
+	/**
+	 * @return The event data as a tracking mode event.
+	 * @throws IllegalStateException If this event message is not an
+	 *           {@link eLeapEventType#TrackingMode} event.
+	 * @since 1.1.0 (Gemini 5.0.0)
+	 */
+	public LEAP_TRACKING_MODE_EVENT getTrackingModeEvent()
+	{
+		checkType(eLeapEventType.TrackingMode);
+		return getOrCreateEvent(LEAP_TRACKING_MODE_EVENT::new);
 	}
 
 

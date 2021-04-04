@@ -62,6 +62,7 @@ import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
+import komposten.leapjna.leapc.enums.eLeapTrackingMode;
 import komposten.leapjna.leapc.enums.eLeapValueType;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
@@ -78,6 +79,7 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
@@ -117,7 +119,7 @@ class LeapCTest
 	private Pointer getDeviceHandle()
 	{
 		Pointer handle = new Pointer(Native.malloc(1));
-		assertThat(Pointer.nativeValue(handle)).as("Failed to allocate handle").isNotEqualTo(0);
+		assertThat(Pointer.nativeValue(handle)).as("Failed to allocate handle").isNotZero();
 		handle.setByte(0, (byte)2);
 		return handle;
 	}
@@ -316,6 +318,16 @@ class LeapCTest
 		assertThat(event.reserved).isEqualTo(1);
 		assertThat(event.current_policy).isEqualTo(eLeapPolicyFlag.Images.value);
 	}
+	
+	
+	@Test
+	void LeapPollConnection_eventTypeTrackingModeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.TrackingMode);
+		LEAP_TRACKING_MODE_EVENT event = message.getTrackingModeEvent();
+		assertThat(event.reserved).isEqualTo(1);
+		assertThat(event.current_tracking_mode).isEqualTo(eLeapTrackingMode.ScreenTop.value);
+	}
 
 
 	@Test
@@ -451,7 +463,7 @@ class LeapCTest
 		
 		assertThat(event.requestID).isEqualTo(1);
 		assertThat(event.value.type).isEqualTo(eLeapValueType.Boolean.value);
-		assertThat(event.value.union.boolValue).isEqualTo(true);
+		assertThat(event.value.union.boolValue).isTrue();
 	}
 
 
@@ -462,7 +474,7 @@ class LeapCTest
 		LEAP_CONFIG_CHANGE_EVENT event = message.getConfigChangeEvent();
 		
 		assertThat(event.requestID).isEqualTo(1);
-		assertThat(event.status).isEqualTo(true);
+		assertThat(event.status).isTrue();
 	}
 
 
@@ -579,7 +591,7 @@ class LeapCTest
 	{
 		LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
 		message.type = eventType.value;
-
+		
 		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(getConnectionHandle(), 0, message);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(message.type).isEqualTo(eventType.value);
@@ -657,7 +669,7 @@ class LeapCTest
 		rDevice.id = 1;
 		rDevice.handle = new Pointer(Native.malloc(1));
 		
-		assertThat(Pointer.nativeValue(rDevice.handle)).as("Failed to allocate handle").isNotEqualTo(0);
+		assertThat(Pointer.nativeValue(rDevice.handle)).as("Failed to allocate handle").isNotZero();
 		rDevice.handle.setByte(0, (byte)5);
 		
 		eLeapRS result = LeapC.INSTANCE.LeapOpenDevice(rDevice, phDevice);
@@ -831,8 +843,17 @@ class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(getConnectionHandle(), set, clear);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
-	
-	
+
+
+	@Test
+	void LeapSetTrackingMode_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetTrackingMode(getConnectionHandle(),
+				eLeapTrackingMode.HMD.getValue());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
 	/**
 	 * LeapSetPause will return <code>eLeapRS.Success</code> if <code>pause</code>
 	 * is 1 (true).

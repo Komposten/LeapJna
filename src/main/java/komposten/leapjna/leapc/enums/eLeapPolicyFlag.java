@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2021 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -36,7 +36,14 @@ public enum eLeapPolicyFlag implements IntFlagEnum<eLeapPolicyFlag>
 	AllowPauseResume(0x00000008),
 
 	/** The policy allowing an application to receive per-frame map points. */
-	MapPoints(0x00000080);
+	MapPoints(0x00000080),
+
+	/**
+	 * The policy specifying whether to optimize tracking for screen-top device.
+	 * 
+	 * @since 1.1.0 (Gemini 5.0.0)
+	 */
+	OptimizeScreenTop(0x00000100);
 
 	public final int value;
 
