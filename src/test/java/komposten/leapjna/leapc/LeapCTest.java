@@ -551,10 +551,10 @@ class LeapCTest
 
 		assertThat(event.frame_id).isEqualTo(1);
 		assertThat(event.timestamp).isEqualTo(12345);
-		assertThat(event.left_eye_position.asArray()).containsExactly(0.1f, 0.2f, 0.3f);
-		assertThat(event.right_eye_position.asArray()).containsExactly(0.4f, 0.5f, 0.6f);
-		assertThat(event.left_eye_estimated_error).isEqualTo(0.25f);
-		assertThat(event.right_eye_estimated_error).isEqualTo(0.75f);
+		assertThat(event.left_eye_position.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
+		assertThat(event.right_eye_position.asArray()).containsExactly(new float[] { 0.4f, 0.5f, 0.6f }, PRECISION);
+		assertThat(event.left_eye_estimated_error).isEqualTo(0.25f, PRECISION);
+		assertThat(event.right_eye_estimated_error).isEqualTo(0.75f, PRECISION);
 	}
 
 
@@ -568,8 +568,8 @@ class LeapCTest
 		assertThat(event.timestamp_hw).isEqualTo(23456);
 		assertThat(event.getFlags()).containsExactly(eLeapIMUFlag.HasAccelerometer,
 				eLeapIMUFlag.HasGyroscope);
-		assertThat(event.accelerometer.asArray()).containsExactly(0.1f, 0.2f, 0.3f);
-		assertThat(event.gyroscope.asArray()).containsExactly(0.4f, 0.5f, 0.6f);
+		assertThat(event.accelerometer.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
+		assertThat(event.gyroscope.asArray()).containsExactly(new float[] { 0.4f, 0.5f, 0.6f }, PRECISION);
 		assertThat(event.temperature).isEqualTo(1);
 	}
 
@@ -793,7 +793,8 @@ class LeapCTest
 		PrimitiveArrayPointer transform = PrimitiveArrayPointer.floats(16);
 		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceTransform(getDeviceHandle(), transform);
 		assertThat(result).isEqualTo(eLeapRS.Success);
-		assertThat(transform.getFloatArray(0, 16)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		assertThat(transform.getFloatArray(0, 16)).containsExactly(
+				new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, PRECISION);
 	}
 
 
@@ -980,7 +981,7 @@ class LeapCTest
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		
 		float[] expectedHeadPosition = new float[] { 1f, 2f, 3f };
-		float[] expectedHeadOrientation = new float[] {2f, 4f, 6f, 8f };
+		float[] expectedHeadOrientation = new float[] { 2f, 4f, 6f, 8f };
 		assertThat(pEvent.timestamp).isEqualTo(timestamp);
 		assertThat(pEvent.head_position.asArray()).containsExactly(expectedHeadPosition, PRECISION);
 		assertThat(pEvent.head_orientation.asArray()).containsExactly(expectedHeadOrientation, PRECISION);
@@ -1377,15 +1378,15 @@ class LeapCTest
 		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
 		LeapC.INSTANCE.LeapCameraMatrix(getConnectionHandle(), camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
-		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
 	}
 	
 	
@@ -1396,15 +1397,15 @@ class LeapCTest
 		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
 		LeapC.INSTANCE.LeapCameraMatrixEx(getConnectionHandle(), getDeviceHandle(), camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
-		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
 	}
 	
 	
@@ -1415,15 +1416,15 @@ class LeapCTest
 		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
 		LeapC.INSTANCE.LeapExtrinsicCameraMatrix(getConnectionHandle(), camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
-		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
 	}
 
 
@@ -1435,15 +1436,15 @@ class LeapCTest
 		LeapC.INSTANCE.LeapExtrinsicCameraMatrixEx(getConnectionHandle(), getDeviceHandle(),
 				camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
-		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
 	}
 	
 	
@@ -1454,15 +1455,15 @@ class LeapCTest
 		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(8);
 		LeapC.INSTANCE.LeapDistortionCoeffs(getConnectionHandle(), camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
-	}
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+	}                                                         
 
 
 	@ParameterizedTest
@@ -1473,17 +1474,17 @@ class LeapCTest
 		LeapC.INSTANCE.LeapDistortionCoeffsEx(getConnectionHandle(), getDeviceHandle(),
 				camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
 	}
-	
-	
+
+
 	@ParameterizedTest
 	@EnumSource(eLeapPerspectiveType.class)
 	void LeapScaleOffsetMatrix_correctValues(eLeapPerspectiveType camera)
@@ -1491,14 +1492,14 @@ class LeapCTest
 		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
 		LeapC.INSTANCE.LeapScaleOffsetMatrix(getConnectionHandle(), camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
 	}
 
 
@@ -1510,22 +1511,22 @@ class LeapCTest
 		LeapC.INSTANCE.LeapScaleOffsetMatrixEx(getConnectionHandle(), getDeviceHandle(),
 				camera.value, dest);
 
-		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
-		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
-		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
-		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
-		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
-		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
-		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
-		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
 	}
-	
-	
+
+
 	/**
-	 * LeapTelemetryProfiling() cannot change the data in <code>telemetryData</code>
-	 * due to it being passed with a <code>const</code> constraint, so instead we
-	 * set up the parameters here and rely on MockLeapC to validate the data
-	 * and only return <code>eLeapRS.Success</code> if the data is correct.
+	 * LeapTelemetryProfiling() cannot change the data in <code>telemetryData</code> due to
+	 * it being passed with a <code>const</code> constraint, so instead we set up the
+	 * parameters here and rely on MockLeapC to validate the data and only return
+	 * <code>eLeapRS.Success</code> if the data is correct.
 	 */
 	@Test
 	void LeapTelemetryProfiling_mappedCorrectly()

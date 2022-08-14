@@ -12,6 +12,7 @@ package komposten.leapjna.leapc.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -21,6 +22,8 @@ import com.sun.jna.Native;
 
 class PrimitiveArrayPointerTest
 {
+	private static final Offset<Float> PRECISION = Offset.offset(0.001f);;
+	
 	@Test
 	void ints_correctSizeAllocated()
 	{
@@ -132,9 +135,9 @@ class PrimitiveArrayPointerTest
 		float[] values = { 5, 4, 3, 2, 1 };
 		arrayPointer.write(0, values, 0, values.length);
 
-		assertThat(arrayPointer.getFloatAt(1)).isEqualTo(4);
-		assertThat(arrayPointer.getFloatAt(2)).isEqualTo(3);
-		assertThat(arrayPointer.getFloatAt(4)).isEqualTo(1);
+		assertThat(arrayPointer.getFloatAt(1)).isEqualTo(4, PRECISION);
+		assertThat(arrayPointer.getFloatAt(2)).isEqualTo(3, PRECISION);
+		assertThat(arrayPointer.getFloatAt(4)).isEqualTo(1, PRECISION);
 	}
 
 
@@ -176,6 +179,6 @@ class PrimitiveArrayPointerTest
 		float[] values = { 5, 4, 3, 2, 1 };
 		arrayPointer.write(0, values, 0, values.length);
 
-		assertThat(arrayPointer.toFloatArray(new float[0])).containsExactly(values);
+		assertThat(arrayPointer.toFloatArray(new float[0])).containsExactly(values, PRECISION);
 	}
 }
