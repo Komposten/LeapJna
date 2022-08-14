@@ -1323,32 +1323,85 @@ public interface LeapC extends Library
 	 */
 	public LEAP_VECTOR.ByValue LeapRectilinearToPixelEx(Pointer hConnection, Pointer hDevice,
 			int camera, LEAP_VECTOR.ByValue rectilinear);
-	
+
+
 	/**
 	 * Returns an OpenCV-compatible camera matrix.
+	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
-	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType} enumeration
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
 	 * @param dest A pointer to a single-precision float array of size 9
 	 * @since 1.2.0
 	 */
 	public void LeapCameraMatrix(Pointer hConnection, int camera, PrimitiveArrayPointer dest);
-	
+
+
 	/**
 	 * Returns an OpenCV-compatible camera matrix for a particular device.
+	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
 	 *          the handle from the device object.
-	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType} enumeration
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
 	 * @param dest A pointer to a single-precision float array of size 9
 	 * @since 1.2.0 (Gemini 5.4.0)
 	 */
-	public void LeapCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera, Pointer dest);
+	public void LeapCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * This finds the default device and returns the result
+	 * {@link #LeapExtrinsicCameraMatrixEx(Pointer, Pointer, int, Pointer)}.
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @since 1.2.0 (Gemini 5.1.0)
+	 */
+	public void LeapExtrinsicCameraMatrix(Pointer hConnection, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns a transformation matrix from 3D Leap coordinate space to the coordinate
+	 * system of the requested camera This is composed of a 4 x 4 matrix of the form:
+	 * </p>
+	 * 
+	 * <pre>
+	 * R, t
+	 * 0, 1
+	 *
+	 * R is a 3 x 3 rotation matrix
+	 * t is a 3 x 1 translation vector
+	 * </pre>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @since 1.2.0 (Gemini 5.1.0)
+	 */
+	public void LeapExtrinsicCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
 
 
 	/**
