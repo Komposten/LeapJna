@@ -1305,6 +1305,27 @@ class LeapCTest
 	
 	
 	/**
+	 * LeapPixelToRectilinear will return a <code>LEAP_VECTOR</code> equal to
+	 * <code>-(pixel + camera)</code>.
+	 * 
+	 * If the provided connection handle is invalid, an exception is thrown. JNA
+	 * will mask this as an "Invalid memory access" error.
+	 */
+	@Test
+	void LeapPixelToRectilinearEx_correctValues()
+	{
+		int camera = 1;
+		LEAP_VECTOR.ByValue pixel = new LEAP_VECTOR.ByValue(1, 2, 3);
+		
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapPixelToRectilinearEx(getConnectionHandle(),
+				getDeviceHandle(), camera, pixel);
+		float[] expected = { -2, -3, -4 };
+		
+		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	/**
 	 * LeapRectilinearToPixel will return a <code>LEAP_VECTOR</code> equal to
 	 * <code>-(rectilinear + camera)</code>.
 	 * 
@@ -1319,6 +1340,27 @@ class LeapCTest
 		
 		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixel(getConnectionHandle(),
 				camera, rectilinear);
+		float[] expected = { -2, -3, -4 };
+		
+		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	/**
+	 * LeapRectilinearToPixel will return a <code>LEAP_VECTOR</code> equal to
+	 * <code>-(rectilinear + camera)</code>.
+	 * 
+	 * If the provided connection handle is invalid, an exception is thrown. JNA
+	 * will mask this as an "Invalid memory access" error.
+	 */
+	@Test
+	void LeapRectilinearToPixelEx_correctValues()
+	{
+		int camera = 1;
+		LEAP_VECTOR.ByValue rectilinear = new LEAP_VECTOR.ByValue(1, 2, 3);
+		
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixelEx(getConnectionHandle(),
+				getDeviceHandle(), camera, rectilinear);
 		float[] expected = { -2, -3, -4 };
 		
 		assertThat(actual.asArray()).containsExactly(expected, PRECISION);

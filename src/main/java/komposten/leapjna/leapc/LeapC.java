@@ -1202,6 +1202,43 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Provides the corrected camera ray intercepting the specified point on the image for a
+	 * particular device.
+	 * </p>
+	 * <p>
+	 * Given a point on the image, <code>LeapPixelToRectilinearEx()</code> corrects for
+	 * camera distortion and returns the true direction from the camera to the source of
+	 * that image point within the Leap Motion field of view.
+	 * </p>
+	 * <p>
+	 * This direction vector has an x and y component [x, y, 1], with the third element
+	 * always 1. Note that this vector uses the 2D camera coordinate system where the x-axis
+	 * parallels the longer (typically horizontal) dimension and the y-axis parallels the
+	 * shorter (vertical) dimension. The camera coordinate system does not correlate to the
+	 * 3D Leap Motion coordinate system.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration.
+	 * @param pixel A vector containing the position of a pixel in the image.
+	 * @return A vector containing the ray direction (the z-component of the vector is
+	 *         always 1).
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gacc6a5c80f87a60c63889407a45a3344b">LeapC
+	 *      API - LeapPixelToRectilinear</a>
+	 */
+	public LEAP_VECTOR.ByValue LeapPixelToRectilinearEx(Pointer hConnection, Pointer hDevice,
+			int camera, LEAP_VECTOR.ByValue pixel);
+
+
+	/**
+	 * <p>
 	 * Provides the point in the image corresponding to a ray projecting from the camera.
 	 * </p>
 	 * <p>
@@ -1239,6 +1276,50 @@ public interface LeapC extends Library
 	 */
 	public LEAP_VECTOR.ByValue LeapRectilinearToPixel(Pointer hConnection, int camera,
 			LEAP_VECTOR.ByValue rectilinear);
+
+
+	/**
+	 * <p>
+	 * Provides the point in the image corresponding to a ray projecting from the camera for
+	 * a particular device.
+	 * </p>
+	 * <p>
+	 * Given a ray projected from the camera in the specified direction,
+	 * <code>LeapRectilinearToPixelEx()</code> corrects for camera distortion and returns
+	 * the corresponding pixel coordinates in the image.
+	 * </p>
+	 * <p>
+	 * The ray direction is specified in relationship to the camera. The first vector
+	 * element is the tangent of the "horizontal" view angle; the second element is the
+	 * tangent of the "vertical" view angle.
+	 * </p>
+	 * <p>
+	 * The <code>LeapRectilinearToPixelEx()</code> function returns pixel coordinates outside
+	 * of the image bounds if you project a ray toward a point for which there is no
+	 * recorded data.
+	 * </p>
+	 * <p>
+	 * <code>LeapRectilinearToPixelEx()</code> is typically not fast enough for realtime
+	 * distortion correction. For better performance, use a shader program executed on a
+	 * GPU.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration.
+	 * @param rectilinear A vector containing the ray direction.
+	 * @return A vector containing the pixel coordinates [x, y, 1] (with z always 1).
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga0f8c7bb9c7d46fed78efe183244f9812">LeapC
+	 *      API - LeapRectilinearToPixel</a>
+	 */
+	public LEAP_VECTOR.ByValue LeapRectilinearToPixelEx(Pointer hConnection, Pointer hDevice,
+			int camera, LEAP_VECTOR.ByValue rectilinear);
 
 
 	/**
