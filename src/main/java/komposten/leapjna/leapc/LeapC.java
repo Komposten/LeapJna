@@ -386,6 +386,51 @@ public interface LeapC extends Library
 	 */
 	public String LeapDevicePIDToString(int pid);
 	
+
+	/**
+	 * <p>
+	 * Subscribe to event messages based on device.
+	 * </p>
+	 * <p>
+	 * If events from multiple devices are being sent from a service, this function allows
+	 * the client to receive events from the specified device. Clients that claim to be
+	 * multi-device-aware (see {@link eLeapConnectionConfig} and
+	 * {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)}) must
+	 * subscribe to a device to receive various device-specific events.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.4.0)
+	 */
+	public eLeapRS LeapSubscribeEvents(Pointer hConnection, Pointer hDevice);
+	
+	/**
+	 * <p>
+	 * Unsubscribe from event messages based on device.
+	 * </p>
+	 * <p>
+	 * If events from multiple devices are being sent from a service, this function
+	 * prevents receiving further events from the specified device that had
+	 * previously been enabled using a call to {@link #LeapSubscribeEvents(Pointer, Pointer)}.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.4.0)
+	 */
+	public eLeapRS LeapUnsubscribeEvents(Pointer hConnection, Pointer hDevice);
+	
 	
 	/**
 	 *

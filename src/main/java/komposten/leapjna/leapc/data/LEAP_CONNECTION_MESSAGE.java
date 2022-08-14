@@ -43,7 +43,7 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
  *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_n_e_c_t_i_o_n___m_e_s_s_a_g_e">LeapC
  *      API - LEAP_CONNECTION_MESSAGE</a>
  */
-@FieldOrder({ "size", "type", "pEvent" })
+@FieldOrder({ "size", "type", "pEvent", "device_id" })
 public class LEAP_CONNECTION_MESSAGE extends Structure
 {
 	/** The size of this message struct. */
@@ -65,6 +65,14 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * </p>
 	 */
 	public Pointer pEvent;
+	
+	/**
+	 * <p> 
+	 * A unique ID for the attached device that sent this message. A value of 0 indicates that it was
+	 * a system-wide message, and not device specific. Use this ID to distinguish messages sent from
+	 * multiple attached devices.
+	 */
+	public int device_id;
 
 	private LEAP_EVENT event;
 

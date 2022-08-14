@@ -11,6 +11,7 @@ package komposten.leapjna.leapc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -746,15 +747,32 @@ class LeapCTest
 		assertThat(info.v_fov).isEqualTo(90);
 		assertThat(info.range).isEqualTo(100);
 	}
-	
-	
+
+
 	@Test
 	void LeapDevicePIDToString_dragonfly_dragonfly()
 	{
 		String pid = LeapC.INSTANCE.LeapDevicePIDToString(eLeapDevicePID.Dragonfly.value);
 		assertThat(pid).isEqualTo("dragonfly");
 	}
-	
+
+
+	@Test
+	void LeapSubscribeEvents_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSubscribeEvents(getConnectionHandle(), getDeviceHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapUnsubscribeEvents_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapUnsubscribeEvents(getConnectionHandle(), getDeviceHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
 	@ParameterizedTest
 	@EnumSource(eLeapVersionPart.class)
 	void LeapGetVersion_correctVersionReceived(eLeapVersionPart versionPart)
@@ -762,14 +780,14 @@ class LeapCTest
 		LEAP_VERSION pVersion = new LEAP_VERSION();
 		eLeapRS result = LeapC.INSTANCE.LeapGetVersion(getConnectionHandle(),
 				versionPart.value, pVersion);
-		
+
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pVersion.major).isEqualTo(1 + versionPart.value);
 		assertThat(pVersion.minor).isEqualTo(2 + versionPart.value);
 		assertThat(pVersion.patch).isEqualTo(3 + versionPart.value);
 	}
-	
-	
+
+
 	@Test
 	void LeapGetFrameSize_correctSizeReceived()
 	{
