@@ -496,6 +496,8 @@ class LeapCTest
 		assertThat(event.timestamp).isEqualTo(12345);
 		assertThat(event.head_position.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
 		assertThat(event.head_orientation.asArray()).containsExactly(new float[] { 0.4f, 0.3f, 0.2f, 0.1f }, PRECISION);
+		assertThat(event.head_linear_velocity.asArray()).containsExactly(new float[] { 0.5f, 0.6f, 0.7f }, PRECISION);
+		assertThat(event.head_angular_velocity.asArray()).containsExactly(new float[] { 0.7f, 0.6f, 0.5f }, PRECISION);
 	}
 
 
@@ -635,6 +637,7 @@ class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(getConnectionHandle(), 0, message);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(message.type).isEqualTo(eventType.value);
+		assertThat(message.device_id).isEqualTo(3);
 		
 		return message;
 	}

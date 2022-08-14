@@ -19,10 +19,11 @@ import komposten.leapjna.leapc.data.LEAP_VECTOR;
 
 
 /**
- * A snapshot, or frame of data, containing the head pose data for a single
- * moment in time.
+ * A snapshot, or frame of data, containing the head pose data for a single moment in
+ * time.
  */
-@FieldOrder({ "timestamp", "head_position", "head_orientation" })
+@FieldOrder({ "timestamp", "head_position", "head_orientation", "head_linear_velocity",
+		"head_angular_velocity" })
 public class LEAP_HEAD_POSE_EVENT extends Structure implements LEAP_EVENT
 {
 	/**
@@ -40,6 +41,16 @@ public class LEAP_HEAD_POSE_EVENT extends Structure implements LEAP_EVENT
 	 * The orientation of the user's head. Positional tracking must be enabled.
 	 */
 	public LEAP_QUATERNION head_orientation;
+
+	/**
+	 * The linear velocity of the user's head. Positional tracking must be enabled.
+	 */
+	public LEAP_VECTOR head_linear_velocity;
+
+	/**
+	 * The angular velocity of the user's head. Positional tracking must be enabled.
+	 */
+	public LEAP_VECTOR head_angular_velocity;
 
 	public LEAP_HEAD_POSE_EVENT()
 	{

@@ -16,8 +16,7 @@ import com.sun.jna.Structure.FieldOrder;
 
 /**
  * <p>
- * Holds an image from one of the Leap Motion Controller's cameras and related
- * information.
+ * Holds an image and related information from one of the UltraLeap Tracking device's cameras.
  * </p>
  */
 @FieldOrder({ "properties", "matrix_version", "distortion_matrix", "data", "offset" })

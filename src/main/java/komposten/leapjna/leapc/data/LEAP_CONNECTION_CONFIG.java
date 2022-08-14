@@ -12,12 +12,11 @@ package komposten.leapjna.leapc.data;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+import komposten.leapjna.leapc.enums.eLeapConnectionConfig;
+
 /**
  * <p>
  * Specifies the configuration for a connection.
- * </p>
- * <p>
- * Currently, there are no externally useful configuration options.
  * </p>
  * 
  * @see <a href=
@@ -30,7 +29,7 @@ public class LEAP_CONNECTION_CONFIG extends Structure
 	/** Set to the final size of this structure. */
 	public int size;
 
-	/** The connection configuration flags. */
+	/** A combination of {@link eLeapConnectionConfig} flags. Set to 0 to indicate no special flags.*/
 	public int flags;
 
 	/** For internal use. */
