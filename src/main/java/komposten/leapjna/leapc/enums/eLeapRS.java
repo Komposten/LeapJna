@@ -45,7 +45,8 @@ public enum eLeapRS implements IntEnum
 	ConcurrentPoll(0xE201000F),
 	NotAvailable(0xE7010002),
 	NotStreaming(0xE7010004),
-	CannotOpenDevice(0xE7010005);
+	CannotOpenDevice(0xE7010005),
+	Unsupported(0xE7010006);
 
 	private final int value;
 

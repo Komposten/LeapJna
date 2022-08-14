@@ -21,10 +21,10 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  */
 public enum eLeapDevicePID implements IntEnum
 {
-	/** An unknown device. */
+	/** An unknown device that is compatible with the tracking software. */
 	Unknown(0x0000),
 
-	/** The Leap Motion consumer peripheral. */
+	/** The Leap Motion Controller (the first consumer peripheral). */
 	Peripheral(0x0003),
 
 	/** Internal research product codename "Dragonfly". */
@@ -35,8 +35,14 @@ public enum eLeapDevicePID implements IntEnum
 
 	/** Research product codename "Rigel". */
 	Rigel(0x1202),
+	
+	/** The Ultraleap Stereo IR 170 (SIR170) hand tracking module. */
+	SIR170(0x1203),
+	
+	/** The Ultraleap 3Di hand tracking camera. */
+	_3Di(0x1204),
 
-	/** An invalid device type value. */
+	/** An invalid device type. Not currently in use. */
 	Invalid(0xFFFFFFFF);
 
 	public final int value;

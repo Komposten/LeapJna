@@ -37,8 +37,13 @@ public enum eLeapServiceDisposition implements IntEnum
 	 */
 	PoorPerformancePause(2),
 
+  /**
+   * The service has failed to start tracking due to unknown reasons.
+   */
+  TrackingErrorUnknown(4),
+
 	/** The combination of all valid flags in this enumeration. */
-	All(1 | 2);
+	All(LowFpsDetected.value | PoorPerformancePause.value | TrackingErrorUnknown.value);
 
 	public final int value;
 

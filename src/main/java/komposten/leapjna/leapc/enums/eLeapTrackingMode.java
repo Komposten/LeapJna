@@ -10,6 +10,7 @@
 package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.leapc.enums.Enums.IntEnum;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 
 
 /**
@@ -20,8 +21,6 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  */
 public enum eLeapTrackingMode implements IntEnum
 {
-	Unknown(-1),
-	
 	/** The tracking mode optimised for desktop devices */
 	Desktop(0),
 
@@ -29,7 +28,10 @@ public enum eLeapTrackingMode implements IntEnum
 	HMD(1),
 
 	/** The tracking mode optimised for screen top-mounted devices */
-	ScreenTop(2);
+	ScreenTop(2),
+
+	/** Tracking mode is not known (allows triggering of a new {@link LEAP_TRACKING_MODE_EVENT}) */
+	Unknown(3);
 
 	public final int value;
 

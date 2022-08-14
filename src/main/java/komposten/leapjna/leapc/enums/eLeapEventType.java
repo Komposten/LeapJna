@@ -163,8 +163,14 @@ public enum eLeapEventType implements IntEnum
 	/** An array of system messages. */
 	LogEvents(0x10C),
 
-	/** */
-	HeadPose(0x10D);
+	/** A head pose. The message contains the timestamped head position and orientation. */
+	HeadPose(0x10D),
+	
+	/** Tracked eye positions. */
+	Eyes(0x10E),
+	
+	/** An IMU reading. */
+	IMU(0x10F);
 
 	public final int value;
 
