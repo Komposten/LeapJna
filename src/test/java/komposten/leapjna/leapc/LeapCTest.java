@@ -698,6 +698,15 @@ class LeapCTest
 		assertThat(hDevice.getByte(0)).isEqualTo((byte)3);
 	}
 	
+
+	@Test
+	void LeapSetPrimaryDevice_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetPrimaryDevice(getConnectionHandle(), getDeviceHandle(),
+				1);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
 	
 	@Test
 	void LeapGetDeviceInfo_serialNull_setSerialLength()

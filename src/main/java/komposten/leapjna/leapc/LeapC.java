@@ -31,6 +31,7 @@ import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
+import komposten.leapjna.leapc.enums.eLeapConnectionConfig;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPerspectiveType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
@@ -291,6 +292,50 @@ public interface LeapC extends Library
 	 *      API - LeapCloseDevice</a>
 	 */
 	public void LeapCloseDevice(Pointer hDevice);
+	
+
+	/**
+	 * <p>
+	 * For a multi-device aware client, sets the device to use in the context of non-"Ex"
+	 * API functions which are logically device-specific but don't provide a device
+	 * parameter.
+	 * </p>
+	 * <p>
+	 * Automatically subscribes to the specified device (see
+	 * {@link #LeapSubscribeEvents(Pointer, Pointer)}), and if
+	 * <code>unsubscribeOthers</code> is '<code>1</code>', then unsubscribes from all other
+	 * devices as well (see {@link #LeapUnsubscribeEvents(Pointer, Pointer)}).
+	 * </p>
+	 * <p>
+	 * Affects future invocations of the following functions:
+	 * <ul>
+	 * <li>LeapCameraMatrix()
+	 * <li>LeapDistortionCoeffs()
+	 * <li>LeapGetFrameSize()
+	 * <li>LeapInterpolateFrame()
+	 * <li>LeapInterpolateFrameFromTime()
+	 * <li>LeapPixelToRectilinear()
+	 * <li>LeapRectilinearToPixel()
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * It is not necessary to call this function from a client that does not claim to be
+	 * multi-device-aware (see {@link eLeapConnectionConfig} and
+	 * {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)}).
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice A handle to the device to be queried. Use {@link LEAP_DEVICE#handle}
+	 *          to obtain the handle from the device object.
+	 * @param unsubscribeOthers Set to '<code>1</code>' to unsubscribe from all other
+	 *          devices, or <code>0</code> to keep all subscriptions.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.6.1)
+	 */
+	public eLeapRS LeapSetPrimaryDevice(Pointer hConnection, Pointer hDevice, int unsubscribeOthers);
 
 
 	/**
