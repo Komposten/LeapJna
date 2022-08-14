@@ -1481,6 +1481,43 @@ class LeapCTest
 	}
 	
 	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapScaleOffsetMatrix_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
+		LeapC.INSTANCE.LeapScaleOffsetMatrix(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+	}
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapScaleOffsetMatrixEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
+		LeapC.INSTANCE.LeapScaleOffsetMatrixEx(getConnectionHandle(), getDeviceHandle(),
+				camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+	}
+	
+	
 	/**
 	 * LeapTelemetryProfiling() cannot change the data in <code>telemetryData</code>
 	 * due to it being passed with a <code>const</code> constraint, so instead we

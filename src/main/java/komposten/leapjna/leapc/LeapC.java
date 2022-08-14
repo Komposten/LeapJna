@@ -24,6 +24,7 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
+import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
@@ -1421,7 +1422,7 @@ public interface LeapC extends Library
 	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
 	 *          enumeration
 	 * @param dest A pointer to a single-precision float array of size 8
-	 * @since 1.2.0 (Gemini 3.2.1)
+	 * @since 1.2.0 (3.2.1)
 	 */
 	public void LeapDistortionCoeffs(Pointer hConnection, int camera,
 			PrimitiveArrayPointer dest);
@@ -1444,10 +1445,80 @@ public interface LeapC extends Library
 	 *          the handle from the device object.
 	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
 	 *          enumeration
-	 * @param dest A pointer to a single-precision float array of size 9
+	 * @param dest A pointer to a single-precision float array of size 8
 	 * @since 1.2.0 (Gemini 5.4.0)
 	 */
 	public void LeapDistortionCoeffsEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * This finds the default device and returns the result of
+	 * {@link #LeapScaleOffsetMatrixEx(Pointer, Pointer, int, PrimitiveArrayPointer)}
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
+	 * @since 1.2.0 (Gemini 5.x.x)
+	 */
+	public void LeapScaleOffsetMatrix(Pointer hConnection, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns the appropriate scale and offset coefficients required to project normalised
+	 * Rectilinear coordinates to image-scale coordinates.
+	 * </p>
+	 * <p>
+	 * This is composed of a 4 x 4 matrix of the form:
+	 * 
+	 * <pre>
+	 * scale_x, 0, 0, offset_x, 0, 1, 0, 0, 0, 0, scale_z, offset_z 0, 0, 0, 1
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * This matrix is specific to the size of the current image as contained within
+	 * {@link LEAP_IMAGE}.
+	 * </p>
+	 * <p>
+	 * In practical terms, use this matrix in combination with normalised rays to project 3D
+	 * points into a rectilinear image space (i.e. to visualise hands on an undistorted
+	 * image).
+	 * </p>
+	 * <p>
+	 * The pipeline would be:
+	 * <ol>
+	 * <li>Take 3D points from hand tracking.
+	 * <li>Apply an extrinsic transformation to a specific camera's coordinate system (@sa
+	 * LeapExtrinsicCameraMatrixEx)
+	 * <li>Apply a perspective division to transform 3D points to rays.
+	 * <li>Apply the ScaleOffset matrix to these points.
+	 * </ol>
+	 * </p>
+	 * <p>
+	 * These points will now be in the correct coordinate system consistent with the
+	 * undistorted rectilinear image provided by {@link LEAP_IMAGE#distortion_matrix}.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
+	 * @since 1.2.0 (Gemini 5.x.x)
+	 */
+	public void LeapScaleOffsetMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
 			PrimitiveArrayPointer dest);
 
 
