@@ -872,6 +872,32 @@ class LeapCTest
 	}
 
 
+	@Test
+	void LeapSetTrackingModeEx_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetTrackingModeEx(getConnectionHandle(),
+				getDeviceHandle(), eLeapTrackingMode.HMD.getValue());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapGetTrackingMode_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapGetTrackingMode(getConnectionHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapGetTrackingModeEx_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapGetTrackingModeEx(getConnectionHandle(),
+				getDeviceHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
 	/**
 	 * LeapSetPause will return <code>eLeapRS.Success</code> if <code>pause</code>
 	 * is 1 (true).

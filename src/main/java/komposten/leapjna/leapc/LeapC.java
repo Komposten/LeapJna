@@ -44,6 +44,7 @@ import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_VERSION;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
@@ -548,6 +549,87 @@ public interface LeapC extends Library
 	 * @since 1.1.0 (Gemini 5.0.0)
 	 */
 	public eLeapRS LeapSetTrackingMode(Pointer hConnection, int mode);
+	
+	
+	/**
+	 * <p>
+	 * Requests a tracking mode for a particular device.
+	 * </p>
+	 * <p>
+	 * Changing tracking modes is asynchronous. After you call this function, a subsequent
+	 * call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param mode The enum value specifying the requested tracking mode.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.6.1)
+	 */
+	public eLeapRS LeapSetTrackingModeEx(Pointer hConnection, Pointer hDevice, int mode);
+
+	
+	/**
+	 * <p>
+	 * Requests the currently set tracking mode.
+	 * </p>
+	 *
+	 * <p>
+	 * Requesting the current tracking mode is asynchronous. After you call this function, a
+	 * subsequent call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}
+	 * provides a {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode,
+	 * reflecting any changes.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.6.1)
+	 */
+	public eLeapRS LeapGetTrackingMode(Pointer hConnection);
+
+	
+	/**
+	 * <p>
+	 * Requests the currently set tracking mode.
+	 * </p>
+	 *
+	 * <p>
+	 * Requesting the current tracking mode is asynchronous. After you call this function, a
+	 * subsequent call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}
+	 * provides a {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode,
+	 * reflecting any changes.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.6.1)
+	 */
+	public eLeapRS LeapGetTrackingModeEx(Pointer hConnection, Pointer hDevice);
 
 
 	/**
