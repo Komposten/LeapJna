@@ -364,6 +364,51 @@ public interface LeapC extends Library
 	 *      API - LeapGetDeviceInfo</a>
 	 */
 	public eLeapRS LeapGetDeviceInfo(Pointer hDevice, LEAP_DEVICE_INFO info);
+	
+	/**
+	 * <p>
+	 * Get the transform to world coordinates from 3D Leap coordinates.
+	 * </p>
+	 * <p>
+	 * To get the transform, you must supply an array of 16 elements.
+	 * </p>
+	 * <p>
+	 * The function will return a an array representing a 4 x 4 matrix of the form:
+	 * <pre>
+	 * R, t
+	 * 0, 1
+	 *
+	 * where:
+	 * R is a 3 x 3 rotation matrix
+	 * t is a 3 x 1 translation vector
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * Note that the matrix is in column major, e.g. transform[12] corresponds to the x coordinate of the
+	 * translation vector t.
+	 * </p>
+	 * <p>
+	 * A possible pipeline would be, for example:
+	 * <ol>
+	 * <li>Get "palm_pos" the position of the center of the palm (as a 3x1 vector)
+	 * <li>Construct a 4x1 vector using the palm_position: palm_pos_4 = (palm_pos.x; palm_pos.y; palm_pos.z; 1.0f)
+	 * <li>Create a 4x4 matrix "trans_mat" as illustrated above using the returned transform
+	 * <li>Get the position of the center of the palm in world coordinates by multiplying trans_mat and palm_pos_4:
+	 *    center_world_4 = trans_mat * palm_pos_4
+	 * </ol>
+	 * </p>
+	 * <p>
+	 * This function returns eLeapRS_Unsupported in the case where this functionality is not yet supported.
+	 * </p>
+	 * 
+	 * @param hDevice A handle to the device to be queried. Use {@link LEAP_DEVICE#handle}
+	 *          to obtain the handle from the device object.
+	 * @param transform A pointer to a single-precision float array of size 16, containing
+	 *  the coefficients of the 4x4 matrix in Column Major order.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.4.0)
+	 */
+	public eLeapRS LeapGetDeviceTransform(Pointer hDevice, Pointer transform);
 
 
 	/**
@@ -474,7 +519,34 @@ public interface LeapC extends Library
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gae680ca44ccf77a25c4a61f9ae1a311bc">LeapC
 	 *      API - LeapGetFrameSize</a>
 	 */
-	public eLeapRS LeapGetFrameSize(Pointer hConnection, long timestamp,
+	public eLeapRS LeapGetFrameSize(Pointer hConnection, long timestamp, LongByReference pncbEvent);
+
+
+	/**
+	 * <p>
+	 * Retrieves the number of bytes required to allocate an interpolated frame at the
+	 * specified time for a particular device.
+	 * </p>
+	 * <p>
+	 * Use this function to determine the size of the buffer to allocate when calling
+	 * {@link #LeapInterpolateFrameEx(Pointer, long, LEAP_TRACKING_EVENT, long)}.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param timestamp The timestamp of the frame whose size is to be queried.
+	 * @param pncbEvent A pointer that receives the number of bytes required to store the
+	 *          specified frame.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gae680ca44ccf77a25c4a61f9ae1a311bc">LeapC
+	 *      API - LeapGetFrameSize</a>
+	 */
+	public eLeapRS LeapGetFrameSizeEx(Pointer hConnection, Pointer hDevice, long timestamp,
 			LongByReference pncbEvent);
 
 
@@ -519,6 +591,48 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
+	 * Constructs a frame at the specified timestamp for a particular device by
+	 * interpolating between a frame near the timestamp and a frame near the
+	 * sourceTimestamp.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapGetFrameSize(Pointer, long, LongByReference)} to calculate the
+	 * minimum size of this buffer.
+	 * </p>
+	 * <p>
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Leap Motion service.
+	 * This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param timestamp The timestamp to which to interpolate the frame data.
+	 * @param sourceTimestamp The timestamp of the beginning frame from which to interpolate
+	 *          the data.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapGetFrameSize</code> to get the required size,
+	 *          and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to create the
+	 *          struct and allocate memory.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gabb48588b94c0d66bd9291f3052170a89">LeapC
+	 *      API - LeapInterpolateFrameFromTime</a>
+	 */
+	public eLeapRS LeapInterpolateFrameFromTimeEx(Pointer hConnection, Pointer hDevice,
+			long timestamp, long sourceTimestamp, LEAP_TRACKING_EVENT pEvent, long ncbEvent);
+
+
+	/**
+	 * <p>
 	 * Constructs a frame at the specified timestamp by interpolating between measured
 	 * frames.
 	 * </p>
@@ -554,6 +668,44 @@ public interface LeapC extends Library
 			LEAP_TRACKING_EVENT pEvent, long ncbEvent);
 
 
+	/**
+	 * <p>
+	 * Constructs a frame at the specified timestamp for a particular device by
+	 * interpolating between measured frames. frames.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapGetFrameSizeEx(Pointer, Pointer, long, LongByReference)} to
+	 * calculate the minimum size of this buffer.
+	 * </p>
+	 * <p>
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Leap Motion service.
+	 * This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param timestamp The timestamp at which to interpolate the frame data.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapGetFrameSize</code> to get the required size,
+	 *          and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to create the
+	 *          struct and allocate memory.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga7cbdc29069fbcd6aca1a16989722e85c">LeapC
+	 *      API - LeapInterpolateFrame</a>
+	 */
+	public eLeapRS LeapInterpolateFrameEx(Pointer hConnection, Pointer hDevice, long timestamp,
+			LEAP_TRACKING_EVENT pEvent, long ncbEvent);
+	
 	/**
 	 * <p>
 	 * Gets the head tracking pose at the specified timestamp by interpolating between
