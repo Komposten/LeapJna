@@ -527,7 +527,7 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param mode The enum value specifying the requested tracking mode.
-	 * @returns The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @since 1.1.0 (Gemini 5.0.0)
 	 */
 	public eLeapRS LeapSetTrackingMode(Pointer hConnection, int mode);
