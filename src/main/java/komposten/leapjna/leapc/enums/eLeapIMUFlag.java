@@ -9,21 +9,24 @@
  */
 package komposten.leapjna.leapc.enums;
 
-import komposten.leapjna.leapc.enums.Enums.IntEnum;
+import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
 
 
 /**
  * @since 1.2.0 (Gemini 5.6.0)
  */
-public enum eLeapIMUFlag implements IntEnum
+public enum eLeapIMUFlag implements IntFlagEnum<eLeapIMUFlag>
 {
-  /** Has accelerometer measurements. */
+	/** No active flags */
+	None(0),
+
+	/** Has accelerometer measurements. */
 	HasAccelerometer(1),
 
-  /** Has gyroscope measurements. */
+	/** Has gyroscope measurements. */
 	HasGyroscope(2),
 
-  /** Has a temperature measurement. */
+	/** Has a temperature measurement. */
 	HasTemperature(4);
 
 	public final int value;
@@ -38,5 +41,18 @@ public enum eLeapIMUFlag implements IntEnum
 	public int getValue()
 	{
 		return value;
+	}
+
+
+	@Override
+	public eLeapIMUFlag getEmptyMaskConstant()
+	{
+		return None;
+	}
+
+
+	public static int createMask(eLeapIMUFlag... flags)
+	{
+		return Enums.createMask(flags);
 	}
 }

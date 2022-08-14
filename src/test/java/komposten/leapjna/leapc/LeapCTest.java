@@ -11,7 +11,6 @@ package komposten.leapjna.leapc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +57,7 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
+import komposten.leapjna.leapc.enums.eLeapIMUFlag;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapImageType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
@@ -76,8 +76,10 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
+import komposten.leapjna.leapc.events.LEAP_EYE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMU_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -534,6 +536,37 @@ class LeapCTest
 		assertThatImageCorrect(event.image[1], 1);
 		
 		// Can't test the calibration handle since it is an opaque type.
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeEyeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Eyes);
+		LEAP_EYE_EVENT event = message.getEyeEvent();
+
+		assertThat(event.frame_id).isEqualTo(1);
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.left_eye_position.asArray()).containsExactly(0.1f, 0.2f, 0.3f);
+		assertThat(event.right_eye_position.asArray()).containsExactly(0.4f, 0.5f, 0.6f);
+		assertThat(event.left_eye_estimated_error).isEqualTo(0.25f);
+		assertThat(event.right_eye_estimated_error).isEqualTo(0.75f);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeImuEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.IMU);
+		LEAP_IMU_EVENT event = message.getIMUEvent();
+
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.timestamp_hw).isEqualTo(23456);
+		assertThat(event.getFlags()).containsExactly(eLeapIMUFlag.HasAccelerometer,
+				eLeapIMUFlag.HasGyroscope);
+		assertThat(event.accelerometer.asArray()).containsExactly(0.1f, 0.2f, 0.3f);
+		assertThat(event.gyroscope.asArray()).containsExactly(0.4f, 0.5f, 0.6f);
+		assertThat(event.temperature).isEqualTo(1);
 	}
 
 

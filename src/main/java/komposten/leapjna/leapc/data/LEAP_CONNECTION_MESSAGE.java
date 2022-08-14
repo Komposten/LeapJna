@@ -26,8 +26,10 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
 import komposten.leapjna.leapc.events.LEAP_EVENT;
+import komposten.leapjna.leapc.events.LEAP_EYE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMU_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -284,6 +286,28 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	{
 		checkType(eLeapEventType.HeadPose);
 		return getOrCreateEvent(LEAP_HEAD_POSE_EVENT::new);
+	}
+	
+	/**
+	 * @return The event data as an eye event.
+	 * @throws IllegalStateException If this event message is not an
+	 *           {@link eLeapEventType#Eyes} event;
+	 */
+	public LEAP_EYE_EVENT getEyeEvent()
+	{
+		checkType(eLeapEventType.Eyes);
+		return getOrCreateEvent(LEAP_EYE_EVENT::new);
+	}
+	
+	/**
+	 * @return The event data as an IMU event.
+	 * @throws IllegalStateException If this event message is not an
+	 *           {@link eLeapEventType#IMU} event;
+	 */
+	public LEAP_IMU_EVENT getIMUEvent()
+	{
+		checkType(eLeapEventType.IMU);
+		return getOrCreateEvent(LEAP_IMU_EVENT::new);
 	}
 
 
