@@ -3,7 +3,11 @@ package komposten.leapjna.leapc.util;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 
-
+/**
+ * <p>
+ * A pointer to a memory block containing one or more values of a primitive type.
+ * </p>
+ */
 public class PrimitiveArrayPointer extends Memory
 {
 	public enum Primitive
@@ -68,7 +72,7 @@ public class PrimitiveArrayPointer extends Memory
 
 	public PrimitiveArrayPointer(Primitive primitive, int elementSize, int arraySize)
 	{
-		super(elementSize * arraySize);
+		super((long)elementSize * arraySize);
 		this.primitive = primitive;
 		this.elementSize = Native.getNativeSize(primitive.clazz);
 		this.arraySize = arraySize;
@@ -97,7 +101,7 @@ public class PrimitiveArrayPointer extends Memory
 			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		
-		return getInt(index * elementSize);
+		return getInt((long)index * elementSize);
 	}
 	
 	public float getFloatAt(int index)
@@ -110,7 +114,7 @@ public class PrimitiveArrayPointer extends Memory
 			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		
-		return getFloat(index * elementSize);
+		return getFloat((long)index * elementSize);
 	}
 	
 	/**
@@ -130,7 +134,7 @@ public class PrimitiveArrayPointer extends Memory
 		
 		for (int i = 0; i < arraySize; i++)
 		{
-			array[i] = getInt(i * elementSize);
+			array[i] = getInt((long)i * elementSize);
 		}
 		
 		return array;
@@ -153,7 +157,7 @@ public class PrimitiveArrayPointer extends Memory
 		
 		for (int i = 0; i < arraySize; i++)
 		{
-			array[i] = getFloat(i * elementSize);
+			array[i] = getFloat((long)i * elementSize);
 		}
 		
 		return array;

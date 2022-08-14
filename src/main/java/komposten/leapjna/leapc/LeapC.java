@@ -733,6 +733,7 @@ public interface LeapC extends Library
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab756331205d6ee0cd61708d77d968536">LeapC
 	 *      API - LeapInterpolateHeadPose</a>
 	 */
+	@Deprecated
 	public eLeapRS LeapInterpolateHeadPose(Pointer hConnection, long timestamp,
 			LEAP_HEAD_POSE_EVENT pEvent);
 
@@ -1005,6 +1006,7 @@ public interface LeapC extends Library
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
+	@Deprecated
 	public eLeapRS LeapGetPointMappingSize(Pointer hConnection, LongByReference pSize);
 
 
@@ -1022,6 +1024,7 @@ public interface LeapC extends Library
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
+	@Deprecated
 	public eLeapRS LeapGetPointMapping(Pointer hConnection, LEAP_POINT_MAPPING pointMapping,
 			LongByReference pSize);
 
@@ -1536,6 +1539,7 @@ public interface LeapC extends Library
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
+	@Deprecated
 	public eLeapRS LeapTelemetryProfiling(Pointer hConnection,
 			LEAP_TELEMETRY_DATA telemetryData);
 
@@ -1543,6 +1547,7 @@ public interface LeapC extends Library
 	/**
 	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
+	@Deprecated
 	public long LeapTelemetryGetNow();
 
 
