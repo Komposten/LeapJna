@@ -1368,7 +1368,8 @@ public interface LeapC extends Library
 	 *          handle from the connection object.
 	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
 	 *          enumeration
-	 * @param dest A pointer to a single-precision float array of size 9
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
 	 * @since 1.2.0 (Gemini 5.1.0)
 	 */
 	public void LeapExtrinsicCameraMatrix(Pointer hConnection, int camera,
@@ -1397,10 +1398,56 @@ public interface LeapC extends Library
 	 *          the handle from the device object.
 	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
 	 *          enumeration
-	 * @param dest A pointer to a single-precision float array of size 9
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
 	 * @since 1.2.0 (Gemini 5.1.0)
 	 */
 	public void LeapExtrinsicCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns an OpenCV-compatible lens distortion using the 8-parameter rational model.
+	 * </p>
+	 * <p>
+	 * The order of the returned array is: [k1, k2, p1, p2, k3, k4, k5, k6]
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 8
+	 * @since 1.2.0 (Gemini 3.2.1)
+	 */
+	public void LeapDistortionCoeffs(Pointer hConnection, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns an OpenCV-compatible lens distortion for a particular device, using the
+	 * 8-parameter rational model.
+	 * </p>
+	 * <p>
+	 * The order of the returned array is: [k1, k2, p1, p2, k3, k4, k5, k6]
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @since 1.2.0 (Gemini 5.4.0)
+	 */
+	public void LeapDistortionCoeffsEx(Pointer hConnection, Pointer hDevice, int camera,
 			PrimitiveArrayPointer dest);
 
 

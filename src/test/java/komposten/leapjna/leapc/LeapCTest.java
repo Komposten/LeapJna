@@ -1409,7 +1409,7 @@ class LeapCTest
 	@EnumSource(eLeapPerspectiveType.class)
 	void LeapExtrinsicCameraMatrix_correctValues(eLeapPerspectiveType camera)
 	{
-		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
 		LeapC.INSTANCE.LeapExtrinsicCameraMatrix(getConnectionHandle(), camera.value, dest);
 
 		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
@@ -1428,7 +1428,7 @@ class LeapCTest
 	@EnumSource(eLeapPerspectiveType.class)
 	void LeapExtrinsicCameraMatrixEx_correctValues(eLeapPerspectiveType camera)
 	{
-		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
 		LeapC.INSTANCE.LeapExtrinsicCameraMatrixEx(getConnectionHandle(), getDeviceHandle(),
 				camera.value, dest);
 
@@ -1441,6 +1441,43 @@ class LeapCTest
 		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
 		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
 		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapDistortionCoeffs_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(8);
+		LeapC.INSTANCE.LeapDistortionCoeffs(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+	}
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapDistortionCoeffsEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(8);
+		LeapC.INSTANCE.LeapDistortionCoeffsEx(getConnectionHandle(), getDeviceHandle(),
+				camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
 	}
 	
 	
