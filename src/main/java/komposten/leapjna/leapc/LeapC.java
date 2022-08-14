@@ -37,12 +37,14 @@ import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapTrackingMode;
+import komposten.leapjna.leapc.enums.eLeapVersionPart;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
+import komposten.leapjna.leapc.events.LEAP_VERSION;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
@@ -337,6 +339,26 @@ public interface LeapC extends Library
 	 *      API - LeapDevicePIDToString</a>
 	 */
 	public String LeapDevicePIDToString(int pid);
+	
+	
+	/**
+	 *
+	 * Returns the version of a specified part of the system.
+	 *
+	 * If an invalid connection handle is provided only the version details of the client
+	 * will be available.
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param versionPart The version part to return, this will reference one part of the
+	 *          system. A member of the {@link eLeapVersionPart} enumeration.
+	 * @param pVersion A pointer to a struct used to store the version number.
+	 * @returns The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since 1.2.0 (Gemini 5.6.1)
+	 */
+	public eLeapRS LeapGetVersion(Pointer hConnection, int versionPart, LEAP_VERSION pVersion);
 
 
 	/**

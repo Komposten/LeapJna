@@ -18,6 +18,8 @@ import java.util.List;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -64,6 +66,7 @@ import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 import komposten.leapjna.leapc.enums.eLeapTrackingMode;
 import komposten.leapjna.leapc.enums.eLeapValueType;
+import komposten.leapjna.leapc.enums.eLeapVersionPart;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
@@ -80,6 +83,7 @@ import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_VERSION;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
@@ -740,6 +744,20 @@ class LeapCTest
 	{
 		String pid = LeapC.INSTANCE.LeapDevicePIDToString(eLeapDevicePID.Dragonfly.value);
 		assertThat(pid).isEqualTo("dragonfly");
+	}
+	
+	@ParameterizedTest
+	@EnumSource(eLeapVersionPart.class)
+	void LeapGetVersion_correctVersionReceived(eLeapVersionPart versionPart)
+	{
+		LEAP_VERSION pVersion = new LEAP_VERSION();
+		eLeapRS result = LeapC.INSTANCE.LeapGetVersion(getConnectionHandle(),
+				versionPart.value, pVersion);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pVersion.major).isEqualTo(1 + versionPart.value);
+		assertThat(pVersion.minor).isEqualTo(2 + versionPart.value);
+		assertThat(pVersion.patch).isEqualTo(3 + versionPart.value);
 	}
 	
 	
