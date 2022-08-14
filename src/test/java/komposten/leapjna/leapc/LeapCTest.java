@@ -870,6 +870,24 @@ class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(getConnectionHandle(), set, clear);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
+	
+	
+	/**
+	 * LeapSetPolicyFlagsEx will return <code>eLeapRS.Success</code> if <code>set</code> is
+	 * a mask containing <code>BackgroundFrames</code> and <code>OptimiseHMD</code> and
+	 * <code>clear</code> contains <code>MapPoints</code> and <code>Images</code>.
+	 */
+	@Test
+	void LeapSetPolicyFlagsEx_success()
+	{
+		long set = eLeapPolicyFlag.createMask(eLeapPolicyFlag.BackgroundFrames,
+				eLeapPolicyFlag.OptimiseHMD);
+		long clear = eLeapPolicyFlag.createMask(eLeapPolicyFlag.MapPoints, eLeapPolicyFlag.Images);
+
+		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlagsEx(getConnectionHandle(), getDeviceHandle(),
+				set, clear);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
 
 
 	@Test

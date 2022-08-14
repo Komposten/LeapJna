@@ -569,6 +569,42 @@ public interface LeapC extends Library
 	 *      API - LeapSetPolicyFlags</a>
 	 */
 	public eLeapRS LeapSetPolicyFlags(Pointer hConnection, long set, long clear);
+
+
+	/**
+	 * <p>
+	 * Sets or clears one or more policy flags for a particular device.
+	 * </p>
+	 * <p>
+	 * Changing policies is asynchronous. After you call this function, a subsequent call to
+	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
+	 * </p>
+	 * To get the current policies without changes, specify zero for both the set and clear
+	 * parameters. When ready, <code>LeapPollConnection()</code> provides the a
+	 * <code>LEAP_POLICY_EVENT</code> containing the current settings.
+	 * <p>
+	 * The {@link eLeapPolicyFlag} enumeration defines the policy flags.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param set A bitwise combination of flags to be set. Set to 0 if not setting any
+	 *          flags.
+	 * @param clear A bitwise combination of flags to be cleared. Set to 0 if not clearing
+	 *          any flags.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see eLeapPolicyFlag#createMask(eLeapPolicyFlag...)
+	 * @see <a href=
+	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab57050814a0763ec07ed088e3d2de7f2">LeapC
+	 *      API - LeapSetPolicyFlags</a>
+	 * @since 1.2.0 (Gemini 5.6.1)
+	 */
+	public eLeapRS LeapSetPolicyFlagsEx(Pointer hConnection, Pointer hDevice, long set, long clear);
 	
 	
 	/**
