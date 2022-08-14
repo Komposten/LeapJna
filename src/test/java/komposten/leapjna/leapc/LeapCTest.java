@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -62,6 +61,7 @@ import komposten.leapjna.leapc.enums.eLeapIMUFlag;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapImageType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
+import komposten.leapjna.leapc.enums.eLeapPerspectiveType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
@@ -89,6 +89,7 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_VERSION;
 import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.leapc.util.PrimitiveArrayPointer;
 import komposten.leapjna.util.Configurations;
 
 
@@ -786,8 +787,7 @@ class LeapCTest
 	@Test
 	void LeapGetDeviceTransform_success()
 	{
-		int arraySize = Native.getNativeSize(float.class) * 16;
-		Memory transform = new Memory(arraySize);
+		PrimitiveArrayPointer transform = PrimitiveArrayPointer.floats(16);
 		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceTransform(getDeviceHandle(), transform);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(transform.getFloatArray(0, 16)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -1364,6 +1364,44 @@ class LeapCTest
 		float[] expected = { -2, -3, -4 };
 		
 		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapCameraMatrix_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
+		LeapC.INSTANCE.LeapCameraMatrix(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapCameraMatrixEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
+		LeapC.INSTANCE.LeapCameraMatrixEx(getConnectionHandle(), getDeviceHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value);
 	}
 	
 	

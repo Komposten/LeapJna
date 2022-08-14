@@ -48,6 +48,7 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_VERSION;
 import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.leapc.util.PrimitiveArrayPointer;
 import komposten.leapjna.util.Configurations;
 
 
@@ -408,7 +409,7 @@ public interface LeapC extends Library
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @since 1.2.0 (Gemini 5.4.0)
 	 */
-	public eLeapRS LeapGetDeviceTransform(Pointer hDevice, Pointer transform);
+	public eLeapRS LeapGetDeviceTransform(Pointer hDevice, PrimitiveArrayPointer transform);
 
 
 	/**
@@ -1232,6 +1233,7 @@ public interface LeapC extends Library
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gacc6a5c80f87a60c63889407a45a3344b">LeapC
 	 *      API - LeapPixelToRectilinear</a>
+	 * @since 1.2.0 (Gemini 5.4.0)
 	 */
 	public LEAP_VECTOR.ByValue LeapPixelToRectilinearEx(Pointer hConnection, Pointer hDevice,
 			int camera, LEAP_VECTOR.ByValue pixel);
@@ -1294,8 +1296,8 @@ public interface LeapC extends Library
 	 * tangent of the "vertical" view angle.
 	 * </p>
 	 * <p>
-	 * The <code>LeapRectilinearToPixelEx()</code> function returns pixel coordinates outside
-	 * of the image bounds if you project a ray toward a point for which there is no
+	 * The <code>LeapRectilinearToPixelEx()</code> function returns pixel coordinates
+	 * outside of the image bounds if you project a ray toward a point for which there is no
 	 * recorded data.
 	 * </p>
 	 * <p>
@@ -1317,9 +1319,36 @@ public interface LeapC extends Library
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga0f8c7bb9c7d46fed78efe183244f9812">LeapC
 	 *      API - LeapRectilinearToPixel</a>
+	 * @since 1.2.0 (Gemini 5.4.0)
 	 */
 	public LEAP_VECTOR.ByValue LeapRectilinearToPixelEx(Pointer hConnection, Pointer hDevice,
 			int camera, LEAP_VECTOR.ByValue rectilinear);
+	
+	/**
+	 * Returns an OpenCV-compatible camera matrix.
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType} enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @since 1.2.0
+	 */
+	public void LeapCameraMatrix(Pointer hConnection, int camera, PrimitiveArrayPointer dest);
+	
+	/**
+	 * Returns an OpenCV-compatible camera matrix for a particular device.
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType} enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @since 1.2.0 (Gemini 5.4.0)
+	 */
+	public void LeapCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera, Pointer dest);
 
 
 	/**
