@@ -43,7 +43,6 @@ import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
-import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.util.Configurations;
 
@@ -77,7 +76,7 @@ public interface LeapC extends Library
 	 * 
 	 * @param pConfig The configuration to be used with the newly created connection. If
 	 *          pConfig is null, a connection is created with a default configuration.
-	 * @param phConnection Receives a pointer to the connection object.
+	 * @param phConnection Receives a pointer to the connection object, set to invalid on failure.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga5bcc831cf503136f45dde040f29973b5">LeapC
@@ -462,6 +461,7 @@ public interface LeapC extends Library
 	 * @param timestamp The timestamp at which to interpolate the frame data.
 	 * @param pEvent A pointer to a flat buffer which is filled with an interpolated frame.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab756331205d6ee0cd61708d77d968536">LeapC
 	 *      API - LeapInterpolateHeadPose</a>
@@ -510,12 +510,7 @@ public interface LeapC extends Library
 	 * <p>
 	 * Changing tracking modes is asynchronous. After you call this function, a subsequent
 	 * call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
-	 * {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode. Note that,
-	 * after you call this function, a subsequent call to
-	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
-	 * {@link LEAP_POLICY_EVENT} containing the current tracking mode related policies,
-	 * reflecting any changes. Note that the relevant <code>LEAP_POLICY_EVENT</code> is
-	 * guaranteed to precede the <code>LEAP_TRACKING_MODE_EVENT</code>.
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
 	 * </p>
 	 * 
 	 * <p>
@@ -624,6 +619,7 @@ public interface LeapC extends Library
 	 * @param pSize A pointer that receives the number of bytes required to store the point
 	 *          mapping.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
 	public eLeapRS LeapGetPointMappingSize(Pointer hConnection, LongByReference pSize);
 
@@ -640,6 +636,7 @@ public interface LeapC extends Library
 	 *          to create the struct and allocate memory.
 	 * @param pSize A pointer to the size of <code>pointMapping</code>.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
 	public eLeapRS LeapGetPointMapping(Pointer hConnection, LEAP_POINT_MAPPING pointMapping,
 			LongByReference pSize);
@@ -874,11 +871,15 @@ public interface LeapC extends Library
 	 *          handle from the connection object.
 	 * @param telemetryData A {@link LEAP_TELEMETRY_DATA} instance.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 */
 	public eLeapRS LeapTelemetryProfiling(Pointer hConnection,
 			LEAP_TELEMETRY_DATA telemetryData);
 
 
+	/**
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
+	 */
 	public long LeapTelemetryGetNow();
 
 
