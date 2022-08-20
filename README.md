@@ -23,6 +23,8 @@ Ultraleap SDK | LeapJna version
 LeapJna's bindings for some of the API features have not been tested with an actual UltraLeap Tracking device. Those are as follows:
 * Device failure events (I don't have a failing device to test this)
 * Point mappings (I'm not sure what they are and how to enable them; deprecated in LeapJna 1.2.0)
+* Eye events (I don't think the Leap Motion Controller peripheral device supports this)
+* IMU events (I don't think the Leap Motion Controller peripheral device supports this)
 
 These _should_ still work, as I have tested the bindings using a mock Leap C API, but I can't guarantee it.
 
