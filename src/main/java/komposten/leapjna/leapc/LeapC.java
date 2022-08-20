@@ -339,7 +339,6 @@ public interface LeapC extends Library
 	 * <li>LeapPixelToRectilinear()
 	 * <li>LeapRectilinearToPixel()
 	 * </ul>
-	 * </p>
 	 * <p>
 	 * It is not necessary to call this function from a client that does not claim to be
 	 * multi-device-aware (see {@link eLeapConnectionConfig} and
@@ -407,7 +406,6 @@ public interface LeapC extends Library
 	 * R is a 3 x 3 rotation matrix
 	 * t is a 3 x 1 translation vector
 	 * </pre>
-	 * </p>
 	 * <p>
 	 * Note that the matrix is in column major, e.g. transform[12] corresponds to the x coordinate of the
 	 * translation vector t.
@@ -421,7 +419,6 @@ public interface LeapC extends Library
 	 * <li>Get the position of the center of the palm in world coordinates by multiplying trans_mat and palm_pos_4:
 	 *    center_world_4 = trans_mat * palm_pos_4
 	 * </ol>
-	 * </p>
 	 * <p>
 	 * This function returns eLeapRS_Unsupported in the case where this functionality is not yet supported.
 	 * </p>
@@ -520,7 +517,7 @@ public interface LeapC extends Library
 	 * @param versionPart The version part to return, this will reference one part of the
 	 *          system. A member of the {@link eLeapVersionPart} enumeration.
 	 * @param pVersion A pointer to a struct used to store the version number.
-	 * @returns The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
 	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv414LeapGetVersion15LEAP_CONNECTION16eLeapVersionPartP12LEAP_VERSION">LeapC
 	 *      API - LeapGetVersion</a>
@@ -564,7 +561,7 @@ public interface LeapC extends Library
 	 * </p>
 	 * <p>
 	 * Use this function to determine the size of the buffer to allocate when calling
-	 * {@link #LeapInterpolateFrameEx(Pointer, long, LEAP_TRACKING_EVENT, long)}.
+	 * {@link #LeapInterpolateFrameEx(Pointer, Pointer, long, LEAP_TRACKING_EVENT, long)}.
 	 * </p>
 	 * 
 	 * @param hConnection The connection handle created by
@@ -1452,7 +1449,7 @@ public interface LeapC extends Library
 
 	/**
 	 * This finds the default device and returns the result
-	 * {@link #LeapExtrinsicCameraMatrixEx(Pointer, Pointer, int, Pointer)}.
+	 * {@link #LeapExtrinsicCameraMatrixEx(Pointer, Pointer, int, PrimitiveArrayPointer)}.
 	 * 
 	 * @param hConnection The connection handle created by
 	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
@@ -1591,7 +1588,6 @@ public interface LeapC extends Library
 	 * <pre>
 	 * scale_x, 0, 0, offset_x, 0, 1, 0, 0, 0, 0, scale_z, offset_z 0, 0, 0, 1
 	 * </pre>
-	 * </p>
 	 * <p>
 	 * This matrix is specific to the size of the current image as contained within
 	 * {@link LEAP_IMAGE}.
@@ -1610,7 +1606,6 @@ public interface LeapC extends Library
 	 * <li>Apply a perspective division to transform 3D points to rays.
 	 * <li>Apply the ScaleOffset matrix to these points.
 	 * </ol>
-	 * </p>
 	 * <p>
 	 * These points will now be in the correct coordinate system consistent with the
 	 * undistorted rectilinear image provided by {@link LEAP_IMAGE#distortion_matrix}.
@@ -1657,6 +1652,7 @@ public interface LeapC extends Library
 
 
 	/**
+	 * @return 
 	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 * @since LeapJna 1.0.0
 	 */

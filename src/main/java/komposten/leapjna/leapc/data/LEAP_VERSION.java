@@ -26,7 +26,6 @@ import komposten.leapjna.leapc.events.LEAP_EVENT;
  * <pre>
  * major.minor.patch.build
  * </pre>
- * </p>
  * 
  * @see <a href=
  *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv412LEAP_VERSION">LeapC
