@@ -77,4 +77,4 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         CD LeapJna
-        mvn -B verify sonar:sonar --file pom.xml
+        mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar --file pom.xml

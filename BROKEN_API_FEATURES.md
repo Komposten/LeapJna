@@ -1,4 +1,4 @@
-Some of the features specified in the LeapC API reference are broken or non-existent in the current Leap SDK (v. 4.0.0+52173). These things are not issues with LeapJNA, but the Leap SDK itself. A list of these features can be found below.
+Some of the features specified in the LeapC API reference are broken or non-existent in the current Leap SDK (v. 5.6.1). These things are probably not issues with LeapJNA, but the Leap SDK itself. A list of these features can be found below.
 
 ## Broken features
 These are features in the API which do not seem to work in the expected way.

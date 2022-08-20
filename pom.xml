@@ -25,9 +25,9 @@
 		<java.version>11</java.version>
 
 		<!-- Unit testing -->
-		<junit.jupiter.version>5.6.2</junit.jupiter.version>
+		<junit.jupiter.version>5.9.0</junit.jupiter.version>
 		<junit.platform.version>1.1.0</junit.platform.version>
-		<assertj.version>3.11.1</assertj.version>
+		<assertj.version>3.23.1</assertj.version>
 
 		<!-- Sonar cloud settings -->
 		<sonar.projectKey>Komposten_LeapJna</sonar.projectKey>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>5.5.0</version>
+			<version>5.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -127,7 +127,7 @@
 					<additionalOptions>-html5</additionalOptions>
 					<excludePackageNames>komposten.leapjna.example:komposten.leapjna.example.*</excludePackageNames>
 					<links>
-						<link>http://java-native-access.github.io/jna/5.5.0/javadoc/</link>
+						<link>http://java-native-access.github.io/jna/5.12.1/javadoc/</link>
 					</links>
 				</configuration>
 			</plugin>
