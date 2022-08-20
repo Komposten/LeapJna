@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import com.sun.jna.Structure.FieldOrder;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___d_i_g_i_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv410LEAP_DIGIT">LeapC
  *      API - LEAP_DIGIT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "finger_id", "metacarpal", "proximal", "intermediate", "distal",
 		"is_extended" })
@@ -40,7 +42,7 @@ public class LEAP_DIGIT extends Structure
 	 * For thumbs, this bone is set to have zero length and width, an identity basis matrix,
 	 * and its joint positions are equal. Note that this is anatomically incorrect; in
 	 * anatomical terms, the intermediate phalange is absent in a real thumb, rather than
-	 * the metacarpal bone. In the Leap Motion model, however, we use a "zero" metacarpal
+	 * the metacarpal bone. In the Ultraleap Tracking model, however, we use a "zero" metacarpal
 	 * bone instead for ease of programming.
 	 * </p>
 	 */

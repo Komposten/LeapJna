@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *

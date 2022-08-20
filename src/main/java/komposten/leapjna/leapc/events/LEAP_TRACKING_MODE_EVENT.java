@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Jakob Hjelm (Komposten)
+ * Copyright 2021-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -29,9 +29,10 @@ import komposten.leapjna.leapc.enums.eLeapTrackingMode;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___p_o_l_i_c_y___e_v_e_n_t">LeapC
- *      API - LEAP_POLICY_EVENT</a>
- * @since 1.1.0 (Gemini 5.0.0)
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv424LEAP_TRACKING_MODE_EVENT">LeapC
+ *      API - LEAP_TRACKING_MODE_EVENT</a>
+ * @since LeapJna 1.1.0
+ * @since Ultraleap Gemini SDK 5.0.0
  */
 @FieldOrder({ "reserved", "current_tracking_mode" })
 public class LEAP_TRACKING_MODE_EVENT extends Structure implements LEAP_EVENT

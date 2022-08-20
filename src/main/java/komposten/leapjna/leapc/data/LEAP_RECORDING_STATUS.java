@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -29,8 +29,10 @@ import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___r_e_c_o_r_d_i_n_g___s_t_a_t_u_s">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv421LEAP_RECORDING_STATUS">LeapC
  *      API - LEAP_RECORDING_STATUS</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.2.0
  */
 @FieldOrder({ "mode" })
 public class LEAP_RECORDING_STATUS extends Structure

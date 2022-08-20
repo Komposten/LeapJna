@@ -15,7 +15,12 @@ import com.sun.jna.Structure.FieldOrder;
 
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
 
-
+/**
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/struct/struct_l_e_a_p___e_y_e___e_v_e_n_t.html#_CPPv414LEAP_EYE_EVENT">LeapC
+ *      API - LEAP_EYE_EVENT</a>
+ * @since LeapJna 1.2.0
+ */
 @FieldOrder({ "frame_id", "timestamp", "left_eye_position", "right_eye_position",
 		"left_eye_estimated_error", "right_eye_estimated_error" })
 public class LEAP_EYE_EVENT extends Structure implements LEAP_EVENT

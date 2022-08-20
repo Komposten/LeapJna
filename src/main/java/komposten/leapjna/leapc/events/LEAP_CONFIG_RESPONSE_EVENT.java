@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -32,8 +32,10 @@ import komposten.leapjna.leapc.data.LEAP_VARIANT;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_f_i_g___r_e_s_p_o_n_s_e___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv426LEAP_CONFIG_RESPONSE_EVENT">LeapC
  *      API - LEAP_CONFIG_RESPONSE_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "requestID", "value" })
 public class LEAP_CONFIG_RESPONSE_EVENT extends Structure implements LEAP_EVENT

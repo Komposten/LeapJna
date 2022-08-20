@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -95,13 +95,13 @@ class VisualiserBackend
 			else
 			{
 				listener.onLogMessage(LogType.ERROR,
-						"Failed to open a connection to the Leap Motion service: %s", result);
+						"Failed to open a connection to the Ultraleap Tracking Service: %s", result);
 			}
 		}
 		else
 		{
 			listener.onLogMessage(LogType.ERROR,
-					"Failed to create a connection to the Leap Motion service: %s", result);
+					"Failed to create a connection to the Ultraleap Tracking Service: %s", result);
 		}
 
 		listener.onStateChanged(State.ERROR);
@@ -302,7 +302,7 @@ class VisualiserBackend
 		listener.onLogMessage(LogType.SEPARATOR, "");
 
 		// Request the current images_mode setting to check if images were activated
-		// through the Leap Motion control panel.
+		// through the Ultraleap Tracking control panel.
 		LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle,
 				Configurations.Tracking.IMAGES_MODE, imagesRequestId);
 	}

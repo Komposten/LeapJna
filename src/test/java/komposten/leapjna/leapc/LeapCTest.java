@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -48,6 +48,7 @@ import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
+import komposten.leapjna.leapc.data.LEAP_VERSION;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapAllocatorType;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
@@ -87,7 +88,6 @@ import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
-import komposten.leapjna.leapc.events.LEAP_VERSION;
 import komposten.leapjna.leapc.util.ArrayPointer;
 import komposten.leapjna.leapc.util.PrimitiveArrayPointer;
 import komposten.leapjna.util.Configurations;

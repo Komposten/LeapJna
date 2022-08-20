@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -20,18 +20,20 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 /**
  * <p>
  * Received from {@link LeapC#LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}
- * when a connection to the Leap Motion service is lost.
+ * when a connection to the Ultraleap Tracking Service is lost.
  * </p>
  * <p>
- * If a LeapC function that performs a transaction with the Leap Motion service is called
- * after the connection is lost, the next call to LeapPollConnection() will return this
- * event. Otherwise, it can take up to 5 seconds of polling the connection to receive this
- * event.
+ * If a LeapC function that performs a transaction with the Ultraleap Tracking Service is
+ * called after the connection is lost, the next call to LeapPollConnection() will return
+ * this event. Otherwise, it can take up to 5 seconds of polling the connection to receive
+ * this event.
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_n_e_c_t_i_o_n___l_o_s_t___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv426LEAP_CONNECTION_LOST_EVENT">LeapC
  *      API - LEAP_CONNECTION_LOST_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "flags" })
 public class LEAP_CONNECTION_LOST_EVENT extends Structure implements LEAP_EVENT

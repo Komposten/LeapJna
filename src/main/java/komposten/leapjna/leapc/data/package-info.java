@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -9,7 +9,6 @@
  */
 
 /**
- * Provides Java mappings of all non-event structs used by the Leap Motion C
- * API.
+ * Provides Java mappings of all non-event structs used by the Ultraleap C API.
  */
 package komposten.leapjna.leapc.data;

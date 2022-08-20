@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -15,7 +15,7 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * Image formats.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga88575674641d03abef07b3a6712c0e95">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv416eLeapImageFormat">LeapC
  *      API - eLeapImageFormat</a>
  */
 public enum eLeapImageFormat implements IntEnum

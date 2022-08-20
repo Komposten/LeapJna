@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -28,8 +28,10 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___d_e_v_i_c_e___s_t_a_t_u_s___c_h_a_n_g_e___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv431LEAP_DEVICE_STATUS_CHANGE_EVENT">LeapC
  *      API - LEAP_DEVICE_STATUS_CHANGE_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.1.3
  */
 @FieldOrder({ "device", "last_status", "status" })
 public class LEAP_DEVICE_STATUS_CHANGE_EVENT extends Structure implements LEAP_EVENT

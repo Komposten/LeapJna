@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -16,6 +16,12 @@ import com.sun.jna.Structure.FieldOrder;
 
 /**
  * A group of system log messages.
+ * 
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/struct/struct_l_e_a_p___l_o_g___e_v_e_n_t_s.html#_CPPv415LEAP_LOG_EVENTS">LeapC
+ *      API - LEAP_LOG_EVENTS</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 4.0.0
  */
 @FieldOrder({ "nEvents", "events" })
 public class LEAP_LOG_EVENTS extends Structure implements LEAP_EVENT

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga6d751aedb178355c21ec1cac4706e044">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv413eLeapHandType">LeapC
  *      API - eLeapHandType</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapHandType implements IntEnum
 {

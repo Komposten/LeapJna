@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -120,7 +120,7 @@ class VisualiserExample
 		}
 		else
 		{
-			logPanel.pushError("Images are not enabled in the Leap Motion control panel.");
+			logPanel.pushError("Images are not enabled in the Ultraleap Tracking control panel.");
 			logPanel.pushSeparator();
 		}
 	}
@@ -166,7 +166,7 @@ class VisualiserExample
 			switch (state)
 			{
 				case CONNECTING :
-					onLogMessage(LogType.HEADER, "Connecting to the Leap Motion Service");
+					onLogMessage(LogType.HEADER, "Connecting to the Ultraleap Tracking Service");
 					renderPanel.setState(state);
 					break;
 				case POLLING :

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -15,8 +15,10 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * Functional image types (not data formats).
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#gab85c92adbf1b49d95cf472defadbaf50">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv414eLeapImageType">LeapC
  *      API - eLeapImageType</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapImageType implements IntEnum
 {

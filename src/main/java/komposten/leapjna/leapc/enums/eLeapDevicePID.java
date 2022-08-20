@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -16,8 +16,10 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * Device hardware types.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga5ed369865afe29bdadc65c450eb44c75">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv414eLeapDevicePID">LeapC
  *      API - eLeapDevicePID</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapDevicePID implements IntEnum
 {

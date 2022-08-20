@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -28,8 +28,10 @@ import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga7f321cfd29f8d1b74589cde5dfb3a1ed">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv419eLeapRecordingFlags">LeapC
  *      API - eLeapRecordingFlags</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.2.0
  */
 public enum eLeapRecordingFlags implements IntFlagEnum<eLeapRecordingFlags>
 {

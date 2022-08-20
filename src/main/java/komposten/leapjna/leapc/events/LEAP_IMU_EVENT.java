@@ -17,7 +17,12 @@ import komposten.leapjna.leapc.data.LEAP_VECTOR;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapIMUFlag;
 
-
+/**
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/struct/struct_l_e_a_p___i_m_u___e_v_e_n_t.html#_CPPv414LEAP_IMU_EVENT">LeapC
+ *      API - LEAP_IMU_EVENT</a>
+ * @since LeapJna 1.2.0
+ */
 @FieldOrder({ "timestamp", "timestamp_hw", "flags",
 		"accelerometer", "gyroscope", "temperature" })
 public class LEAP_IMU_EVENT extends Structure implements LEAP_EVENT

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -13,7 +13,8 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 
 /**
- * @since 1.2.0 (Gemini 5.6.0)
+ * @since LeapJna 1.2.0
+ * @since Ultraleap Gemini SDK 5.6.0
  */
 public enum eLeapConnectionConfig implements IntEnum
 {

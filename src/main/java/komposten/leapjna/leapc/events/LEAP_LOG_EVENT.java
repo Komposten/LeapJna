@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import komposten.leapjna.leapc.enums.eLeapLogSeverity;
  * A system log message.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___l_o_g___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv414LEAP_LOG_EVENT">LeapC
  *      API - LEAP_LOG_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "severity", "timestamp", "message" })
 public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
@@ -31,6 +33,8 @@ public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
 	/**
 	 * The type of message. Use {@link #getSeverity()} to get the severity as an
 	 * {@link eLeapLogSeverity} value.
+	 * 
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public int severity;
 
@@ -42,11 +46,15 @@ public class LEAP_LOG_EVENT extends Structure implements LEAP_EVENT
 	 * Compare with the current value of {@link LeapC#LeapGetNow()} and the system clock to
 	 * calculate the absolute time of the message.
 	 * </p>
+	 * 
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public long timestamp;
 
 	/**
 	 * The log message.
+	 * 
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public String message;
 

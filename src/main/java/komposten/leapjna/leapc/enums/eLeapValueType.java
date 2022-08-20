@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -21,6 +21,11 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * Used by {@link LEAP_VARIANT} to keep track of the type of value the variant
  * stores.
  * </p>
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv414eLeapValueType">LeapC
+ *      API - eLeapValueType</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapValueType implements IntEnum
 {

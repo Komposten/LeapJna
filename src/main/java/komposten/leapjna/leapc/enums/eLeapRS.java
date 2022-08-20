@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -16,8 +16,10 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * Codes returned by all LeapC functions.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga10647f52cdf6742a654aab0054ce3d3e">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv47eLeapRS">LeapC
  *      API - eLeapRS</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapRS implements IntEnum
 {
@@ -40,8 +42,11 @@ public enum eLeapRS implements IntEnum
 	UnexpectedClosed(0xE201000A),
 	UnknownImageFrameRequest(0xE201000B),
 	UnknownTrackingFrameID(0xE201000C),
+	/** @since Ultraleap Orion SDK 3.1.2 */
 	RoutineIsNotSeer(0xE201000D),
+	/** @since Ultraleap Orion SDK 3.1.2 */
 	TimestampTooEarly(0xE201000E),
+	/** @since Ultraleap Orion SDK 3.1.2 */
 	ConcurrentPoll(0xE201000F),
 	NotAvailable(0xE7010002),
 	NotStreaming(0xE7010004),

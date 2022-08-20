@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Jakob Hjelm (Komposten)
+ * Copyright 2021-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -17,7 +17,11 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
  * <p>
  * Enumerates values for the tracking mode.
  * </p>
- * @since 1.1.0 (Gemini 5.0.0)
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv417eLeapTrackingMode">LeapC
+ *      API - eLeapTrackingMode</a>
+ * @since LeapJna 1.1.0
+ * @since Ultraleap Gemini SDK 5.0.0
  */
 public enum eLeapTrackingMode implements IntEnum
 {

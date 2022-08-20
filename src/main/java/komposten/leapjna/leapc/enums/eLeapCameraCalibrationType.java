@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -14,7 +14,12 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 /**
  * Camera calibration types.
- * @since 1.2.0 (Gemini 5.6.0)
+ * 
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv426eLeapCameraCalibrationType">LeapC
+ *      API - eLeapCameraCalibrationType</a>
+ * @since LeapJna 1.2.0
+ * @since Ultraleap Gemini SDK 5.6.0
  */
 public enum eLeapCameraCalibrationType implements IntEnum
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -19,6 +19,7 @@ import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 
 /**
  * A dropped frame event.
+ * @since LeapJna 1.0.0
  */
 @FieldOrder({ "frame_id", "type" })
 public class LEAP_DROPPED_FRAME_EVENT extends Structure implements LEAP_EVENT

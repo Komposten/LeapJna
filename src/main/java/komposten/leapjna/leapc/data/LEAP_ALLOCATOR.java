@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import komposten.leapjna.leapc.enums.eLeapAllocatorType;
  * dynamically manage memory.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___a_l_l_o_c_a_t_o_r">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv414LEAP_ALLOCATOR">LeapC
  *      API - LEAP_ALLOCATOR</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 4.0.0
  */
 @FieldOrder({ "allocate", "deallocate", "state" })
 public class LEAP_ALLOCATOR extends Structure

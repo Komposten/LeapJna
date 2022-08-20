@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -14,6 +14,8 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 /**
  * The service status codes/flags.
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.1.3
  */
 public enum eLeapServiceDisposition implements IntEnum
 {
@@ -37,10 +39,12 @@ public enum eLeapServiceDisposition implements IntEnum
 	 */
 	PoorPerformancePause(2),
 
-  /**
-   * The service has failed to start tracking due to unknown reasons.
-   */
-  TrackingErrorUnknown(4),
+	/**
+	 * The service has failed to start tracking due to unknown reasons.
+	 * 
+	 * @since Ultraleap Gemini SDK 5.1.16
+	 */
+	TrackingErrorUnknown(4),
 
 	/** The combination of all valid flags in this enumeration. */
 	All(LowFpsDetected.value | PoorPerformancePause.value | TrackingErrorUnknown.value);
