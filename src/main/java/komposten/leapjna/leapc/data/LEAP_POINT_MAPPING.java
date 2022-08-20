@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -24,10 +24,11 @@ import komposten.leapjna.leapc.LeapC;
  * It contains the entire set of points being mapped.
  * </p>
  * 
- * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___p_o_i_n_t___m_a_p_p_i_n_g">LeapC
- *      API - LEAP_POINT_MAPPING</a>
+ * @deprecated
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 4.0.0
  */
+@Deprecated
 @FieldOrder({ "frame_id", "timestamp", "nPoints", "pPoints", "pIDs" })
 public class LEAP_POINT_MAPPING extends Structure
 {

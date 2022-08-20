@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -26,8 +26,10 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
 import komposten.leapjna.leapc.events.LEAP_EVENT;
+import komposten.leapjna.leapc.events.LEAP_EYE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMU_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -40,10 +42,13 @@ import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
  * Defines a basic message from the LeapC message queue.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_n_e_c_t_i_o_n___m_e_s_s_a_g_e">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv423LEAP_CONNECTION_MESSAGE">LeapC
  *      API - LEAP_CONNECTION_MESSAGE</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
-@FieldOrder({ "size", "type", "pEvent" })
+@SuppressWarnings("deprecation")
+@FieldOrder({ "size", "type", "pEvent", "device_id" })
 public class LEAP_CONNECTION_MESSAGE extends Structure
 {
 	/** The size of this message struct. */
@@ -65,6 +70,16 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * </p>
 	 */
 	public Pointer pEvent;
+	
+	/**
+	 * <p> 
+	 * A unique ID for the attached device that sent this message. A value of 0 indicates that it was
+	 * a system-wide message, and not device specific. Use this ID to distinguish messages sent from
+	 * multiple attached devices.
+	 * </p>
+	 * @since LeapJna 1.2.0
+	 */
+	public int device_id;
 
 	private LEAP_EVENT event;
 
@@ -150,6 +165,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * @return The event data as a device status change event.
 	 * @throws IllegalStateException If this event message is not an
 	 *           {@link eLeapEventType#DeviceStatusChange} event.
+	 * @since Ultraleap Orion SDK 3.1.3
 	 */
 	public LEAP_DEVICE_STATUS_CHANGE_EVENT getDeviceStatusChangeEvent()
 	{
@@ -198,7 +214,8 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * @return The event data as a tracking mode event.
 	 * @throws IllegalStateException If this event message is not an
 	 *           {@link eLeapEventType#TrackingMode} event.
-	 * @since 1.1.0 (Gemini 5.0.0)
+	 * @since LeapJna 1.1.0
+	 * @since Ultraleap Gemini SDK 5.0.0
 	 */
 	public LEAP_TRACKING_MODE_EVENT getTrackingModeEvent()
 	{
@@ -223,6 +240,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * @return The event data as multiple log events.
 	 * @throws IllegalStateException If this event message is not an
 	 *           {@link eLeapEventType#LogEvents} event.
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public LEAP_LOG_EVENTS getLogEvents()
 	{
@@ -271,6 +289,7 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	 * @return The event data as a head pose event.
 	 * @throws IllegalStateException If this event message is not an
 	 *           {@link eLeapEventType#HeadPose} event;
+	 * @since Ultraleap Orion SDK 4.1.0
 	 */
 	public LEAP_HEAD_POSE_EVENT getHeadPoseEvent()
 	{
@@ -280,9 +299,36 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 
 
 	/**
+	 * @return The event data as an eye event.
+	 * @throws IllegalStateException If this event message is not an
+	 *           {@link eLeapEventType#Eyes} event;
+	 * @since LeapJna 1.2.0
+	 */
+	public LEAP_EYE_EVENT getEyeEvent()
+	{
+		checkType(eLeapEventType.Eyes);
+		return getOrCreateEvent(LEAP_EYE_EVENT::new);
+	}
+	
+	
+	/**
+	 * @return The event data as an IMU event.
+	 * @throws IllegalStateException If this event message is not an
+	 *           {@link eLeapEventType#IMU} event;
+	 * @since LeapJna 1.2.0
+	 */
+	public LEAP_IMU_EVENT getIMUEvent()
+	{
+		checkType(eLeapEventType.IMU);
+		return getOrCreateEvent(LEAP_IMU_EVENT::new);
+	}
+
+
+	/**
 	 * @return The event data as a point mapping change event.
 	 * @throws IllegalStateException If this event message is not an
 	 *           {@link eLeapEventType#PointMappingChange} event;
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public LEAP_POINT_MAPPING_CHANGE_EVENT getPointMappingChangeEvent()
 	{
@@ -291,6 +337,12 @@ public class LEAP_CONNECTION_MESSAGE extends Structure
 	}
 
 
+	/**
+	 * @return The event data as an image event.
+	 * @throws IllegalStateException If this event message is not an
+	 * 				   {@link eLeapEventType#Image} event;
+	 * @since Ultraleap Orion SDK 4.0.0
+	 */
 	public LEAP_IMAGE_EVENT getImageEvent()
 	{
 		checkType(eLeapEventType.Image);

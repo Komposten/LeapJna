@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,14 +22,16 @@ import com.sun.jna.Structure.FieldOrder;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___p_a_l_m">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv49LEAP_PALM">LeapC
  *      API - LEAP_PALM</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "position", "stabilized_position", "velocity", "normal", "width",
 		"direction", "orientation" })
 public class LEAP_PALM extends Structure
 {
-	/** The centre position of the palm in millimetres from the Leap Motion origin. */
+	/** The centre position of the palm in millimetres from the Ultraleap Tracking camera device origin. */
 	public LEAP_VECTOR position;
 
 	/**
@@ -67,6 +69,8 @@ public class LEAP_PALM extends Structure
 	/**
 	 * The quaternion representing the palm's orientation corresponding to the basis
 	 * <code>{normal x direction, -normal, -direction}</code>.
+	 * 
+	 * @since Ultraleap Orion SDK 3.1.3
 	 */
 	public LEAP_QUATERNION orientation;
 	

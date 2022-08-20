@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -18,6 +18,8 @@ import java.util.List;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -46,6 +48,7 @@ import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
+import komposten.leapjna.leapc.data.LEAP_VERSION;
 import komposten.leapjna.leapc.enums.Enums;
 import komposten.leapjna.leapc.enums.eLeapAllocatorType;
 import komposten.leapjna.leapc.enums.eLeapConnectionStatus;
@@ -55,15 +58,18 @@ import komposten.leapjna.leapc.enums.eLeapDeviceStatus;
 import komposten.leapjna.leapc.enums.eLeapDroppedFrameType;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapHandType;
+import komposten.leapjna.leapc.enums.eLeapIMUFlag;
 import komposten.leapjna.leapc.enums.eLeapImageFormat;
 import komposten.leapjna.leapc.enums.eLeapImageType;
 import komposten.leapjna.leapc.enums.eLeapLogSeverity;
+import komposten.leapjna.leapc.enums.eLeapPerspectiveType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 import komposten.leapjna.leapc.enums.eLeapTrackingMode;
 import komposten.leapjna.leapc.enums.eLeapValueType;
+import komposten.leapjna.leapc.enums.eLeapVersionPart;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
@@ -72,8 +78,10 @@ import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_FAILURE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_STATUS_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DROPPED_FRAME_EVENT;
+import komposten.leapjna.leapc.events.LEAP_EYE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_IMAGE_EVENT;
+import komposten.leapjna.leapc.events.LEAP_IMU_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POINT_MAPPING_CHANGE_EVENT;
@@ -81,6 +89,7 @@ import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.leapc.util.PrimitiveArrayPointer;
 import komposten.leapjna.util.Configurations;
 
 
@@ -487,6 +496,8 @@ class LeapCTest
 		assertThat(event.timestamp).isEqualTo(12345);
 		assertThat(event.head_position.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
 		assertThat(event.head_orientation.asArray()).containsExactly(new float[] { 0.4f, 0.3f, 0.2f, 0.1f }, PRECISION);
+		assertThat(event.head_linear_velocity.asArray()).containsExactly(new float[] { 0.5f, 0.6f, 0.7f }, PRECISION);
+		assertThat(event.head_angular_velocity.asArray()).containsExactly(new float[] { 0.7f, 0.6f, 0.5f }, PRECISION);
 	}
 
 
@@ -529,6 +540,37 @@ class LeapCTest
 		assertThatImageCorrect(event.image[1], 1);
 		
 		// Can't test the calibration handle since it is an opaque type.
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeEyeEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.Eyes);
+		LEAP_EYE_EVENT event = message.getEyeEvent();
+
+		assertThat(event.frame_id).isEqualTo(1);
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.left_eye_position.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
+		assertThat(event.right_eye_position.asArray()).containsExactly(new float[] { 0.4f, 0.5f, 0.6f }, PRECISION);
+		assertThat(event.left_eye_estimated_error).isEqualTo(0.25f, PRECISION);
+		assertThat(event.right_eye_estimated_error).isEqualTo(0.75f, PRECISION);
+	}
+
+
+	@Test
+	void LeapPollConnection_eventTypeImuEvent_mapsProperly()
+	{
+		LEAP_CONNECTION_MESSAGE message = assertLeapPollConnection(eLeapEventType.IMU);
+		LEAP_IMU_EVENT event = message.getIMUEvent();
+
+		assertThat(event.timestamp).isEqualTo(12345);
+		assertThat(event.timestamp_hw).isEqualTo(23456);
+		assertThat(event.getFlags()).containsExactly(eLeapIMUFlag.HasAccelerometer,
+				eLeapIMUFlag.HasGyroscope);
+		assertThat(event.accelerometer.asArray()).containsExactly(new float[] { 0.1f, 0.2f, 0.3f }, PRECISION);
+		assertThat(event.gyroscope.asArray()).containsExactly(new float[] { 0.4f, 0.5f, 0.6f }, PRECISION);
+		assertThat(event.temperature).isEqualTo(1);
 	}
 
 
@@ -595,6 +637,7 @@ class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapPollConnection(getConnectionHandle(), 0, message);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(message.type).isEqualTo(eventType.value);
+		assertThat(message.device_id).isEqualTo(3);
 		
 		return message;
 	}
@@ -694,6 +737,15 @@ class LeapCTest
 		assertThat(hDevice.getByte(0)).isEqualTo((byte)3);
 	}
 	
+
+	@Test
+	void LeapSetPrimaryDevice_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetPrimaryDevice(getConnectionHandle(), getDeviceHandle(),
+				1);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
 	
 	@Test
 	void LeapGetDeviceInfo_serialNull_setSerialLength()
@@ -736,13 +788,55 @@ class LeapCTest
 	
 	
 	@Test
+	void LeapGetDeviceTransform_success()
+	{
+		PrimitiveArrayPointer transform = PrimitiveArrayPointer.floats(16);
+		eLeapRS result = LeapC.INSTANCE.LeapGetDeviceTransform(getDeviceHandle(), transform);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(transform.getFloatArray(0, 16)).containsExactly(
+				new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, PRECISION);
+	}
+
+
+	@Test
 	void LeapDevicePIDToString_dragonfly_dragonfly()
 	{
 		String pid = LeapC.INSTANCE.LeapDevicePIDToString(eLeapDevicePID.Dragonfly.value);
 		assertThat(pid).isEqualTo("dragonfly");
 	}
-	
-	
+
+
+	@Test
+	void LeapSubscribeEvents_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSubscribeEvents(getConnectionHandle(), getDeviceHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapUnsubscribeEvents_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapUnsubscribeEvents(getConnectionHandle(), getDeviceHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapVersionPart.class)
+	void LeapGetVersion_correctVersionReceived(eLeapVersionPart versionPart)
+	{
+		LEAP_VERSION pVersion = new LEAP_VERSION();
+		eLeapRS result = LeapC.INSTANCE.LeapGetVersion(getConnectionHandle(),
+				versionPart.value, pVersion);
+
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pVersion.major).isEqualTo(1 + versionPart.value);
+		assertThat(pVersion.minor).isEqualTo(2 + versionPart.value);
+		assertThat(pVersion.patch).isEqualTo(3 + versionPart.value);
+	}
+
+
 	@Test
 	void LeapGetFrameSize_correctSizeReceived()
 	{
@@ -750,6 +844,19 @@ class LeapCTest
 		long timestamp = 123;
 		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSize(getConnectionHandle(), timestamp,
 				pSize);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pSize.getValue()).isEqualTo(246);
+	}
+
+
+	@Test
+	void LeapGetFrameSizeEx_correctSizeReceived()
+	{
+		LongByReference pSize = new LongByReference();
+		long timestamp = 123;
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSizeEx(getConnectionHandle(), getDeviceHandle(), 
+				timestamp, pSize);
 		
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		assertThat(pSize.getValue()).isEqualTo(246);
@@ -772,6 +879,32 @@ class LeapCTest
 
 		result = LeapC.INSTANCE.LeapInterpolateFrame(getConnectionHandle(), timestamp, pEvent,
 				pncbEvent.getValue());
+		
+		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
+		// tests, so just check a couple of values here.
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pEvent.info.timestamp).isEqualTo(timestamp);
+		assertThat(pEvent.info.frame_id).isEqualTo(1);
+		assertThat(pEvent.tracking_frame_id).isEqualTo(2);
+	}
+	
+	
+	@Test
+	void LeapInterpolateFrameEx_correctDataReceived()
+	{
+		// Get a frame size from MockLeapC.
+		LongByReference pncbEvent = new LongByReference();
+		long timestamp = 123;
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSizeEx(getConnectionHandle(), getDeviceHandle(), 
+				timestamp, pncbEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+
+		// Create the tracking event and interpolate.
+		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT((int) pncbEvent.getValue());
+
+		result = LeapC.INSTANCE.LeapInterpolateFrameEx(getConnectionHandle(), getDeviceHandle(),
+				timestamp, pEvent, pncbEvent.getValue());
 		
 		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
 		// tests, so just check a couple of values here.
@@ -810,6 +943,33 @@ class LeapCTest
 	
 	
 	@Test
+	void LeapInterpolateFrameFromTimeEx_correctDataReceived()
+	{
+		// Get a frame size from MockLeapC.
+		LongByReference pncbEvent = new LongByReference();
+		long timestamp = 123;
+		long sourceTimestamp = 101;
+		eLeapRS result = LeapC.INSTANCE.LeapGetFrameSizeEx(getConnectionHandle(), getDeviceHandle(), 
+				timestamp, pncbEvent);
+		
+		assertThat(result).isEqualTo(eLeapRS.Success);
+
+		// Create the tracking event and interpolate.
+		LEAP_TRACKING_EVENT pEvent = new LEAP_TRACKING_EVENT((int) pncbEvent.getValue());
+
+		result = LeapC.INSTANCE.LeapInterpolateFrameFromTimeEx(getConnectionHandle(),
+				getDeviceHandle(), sourceTimestamp, timestamp, pEvent, pncbEvent.getValue());
+		
+		// We already test the full LEAP_TRACKING_EVENT mapping in the LeapPollConnection
+		// tests, so just check a couple of values here.
+		assertThat(result).isEqualTo(eLeapRS.Success);
+		assertThat(pEvent.info.timestamp).isEqualTo((timestamp + sourceTimestamp) / 2);
+		assertThat(pEvent.info.frame_id).isEqualTo(1);
+		assertThat(pEvent.tracking_frame_id).isEqualTo(2);
+	}
+	
+	
+	@Test
 	void LeapInterpolateHeadPose_correctDataReceived()
 	{
 		LEAP_HEAD_POSE_EVENT pEvent = new LEAP_HEAD_POSE_EVENT();
@@ -821,7 +981,7 @@ class LeapCTest
 		assertThat(result).isEqualTo(eLeapRS.Success);
 		
 		float[] expectedHeadPosition = new float[] { 1f, 2f, 3f };
-		float[] expectedHeadOrientation = new float[] {2f, 4f, 6f, 8f };
+		float[] expectedHeadOrientation = new float[] { 2f, 4f, 6f, 8f };
 		assertThat(pEvent.timestamp).isEqualTo(timestamp);
 		assertThat(pEvent.head_position.asArray()).containsExactly(expectedHeadPosition, PRECISION);
 		assertThat(pEvent.head_orientation.asArray()).containsExactly(expectedHeadOrientation, PRECISION);
@@ -843,6 +1003,24 @@ class LeapCTest
 		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlags(getConnectionHandle(), set, clear);
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
+	
+	
+	/**
+	 * LeapSetPolicyFlagsEx will return <code>eLeapRS.Success</code> if <code>set</code> is
+	 * a mask containing <code>BackgroundFrames</code> and <code>OptimiseHMD</code> and
+	 * <code>clear</code> contains <code>MapPoints</code> and <code>Images</code>.
+	 */
+	@Test
+	void LeapSetPolicyFlagsEx_success()
+	{
+		long set = eLeapPolicyFlag.createMask(eLeapPolicyFlag.BackgroundFrames,
+				eLeapPolicyFlag.OptimiseHMD);
+		long clear = eLeapPolicyFlag.createMask(eLeapPolicyFlag.MapPoints, eLeapPolicyFlag.Images);
+
+		eLeapRS result = LeapC.INSTANCE.LeapSetPolicyFlagsEx(getConnectionHandle(), getDeviceHandle(),
+				set, clear);
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
 
 
 	@Test
@@ -850,6 +1028,32 @@ class LeapCTest
 	{
 		eLeapRS result = LeapC.INSTANCE.LeapSetTrackingMode(getConnectionHandle(),
 				eLeapTrackingMode.HMD.getValue());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapSetTrackingModeEx_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapSetTrackingModeEx(getConnectionHandle(),
+				getDeviceHandle(), eLeapTrackingMode.HMD.getValue());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapGetTrackingMode_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapGetTrackingMode(getConnectionHandle());
+		assertThat(result).isEqualTo(eLeapRS.Success);
+	}
+
+
+	@Test
+	void LeapGetTrackingModeEx_success()
+	{
+		eLeapRS result = LeapC.INSTANCE.LeapGetTrackingModeEx(getConnectionHandle(),
+				getDeviceHandle());
 		assertThat(result).isEqualTo(eLeapRS.Success);
 	}
 
@@ -1105,6 +1309,27 @@ class LeapCTest
 	
 	
 	/**
+	 * LeapPixelToRectilinear will return a <code>LEAP_VECTOR</code> equal to
+	 * <code>-(pixel + camera)</code>.
+	 * 
+	 * If the provided connection handle is invalid, an exception is thrown. JNA
+	 * will mask this as an "Invalid memory access" error.
+	 */
+	@Test
+	void LeapPixelToRectilinearEx_correctValues()
+	{
+		int camera = 1;
+		LEAP_VECTOR.ByValue pixel = new LEAP_VECTOR.ByValue(1, 2, 3);
+		
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapPixelToRectilinearEx(getConnectionHandle(),
+				getDeviceHandle(), camera, pixel);
+		float[] expected = { -2, -3, -4 };
+		
+		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	/**
 	 * LeapRectilinearToPixel will return a <code>LEAP_VECTOR</code> equal to
 	 * <code>-(rectilinear + camera)</code>.
 	 * 
@@ -1126,10 +1351,182 @@ class LeapCTest
 	
 	
 	/**
-	 * LeapTelemetryProfiling() cannot change the data in <code>telemetryData</code>
-	 * due to it being passed with a <code>const</code> constraint, so instead we
-	 * set up the parameters here and rely on MockLeapC to validate the data
-	 * and only return <code>eLeapRS.Success</code> if the data is correct.
+	 * LeapRectilinearToPixel will return a <code>LEAP_VECTOR</code> equal to
+	 * <code>-(rectilinear + camera)</code>.
+	 * 
+	 * If the provided connection handle is invalid, an exception is thrown. JNA
+	 * will mask this as an "Invalid memory access" error.
+	 */
+	@Test
+	void LeapRectilinearToPixelEx_correctValues()
+	{
+		int camera = 1;
+		LEAP_VECTOR.ByValue rectilinear = new LEAP_VECTOR.ByValue(1, 2, 3);
+		
+		LEAP_VECTOR actual = LeapC.INSTANCE.LeapRectilinearToPixelEx(getConnectionHandle(),
+				getDeviceHandle(), camera, rectilinear);
+		float[] expected = { -2, -3, -4 };
+		
+		assertThat(actual.asArray()).containsExactly(expected, PRECISION);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapCameraMatrix_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
+		LeapC.INSTANCE.LeapCameraMatrix(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapCameraMatrixEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(9);
+		LeapC.INSTANCE.LeapCameraMatrixEx(getConnectionHandle(), getDeviceHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapExtrinsicCameraMatrix_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
+		LeapC.INSTANCE.LeapExtrinsicCameraMatrix(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
+	}
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapExtrinsicCameraMatrixEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
+		LeapC.INSTANCE.LeapExtrinsicCameraMatrixEx(getConnectionHandle(), getDeviceHandle(),
+				camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(8)).isEqualTo(8 + camera.value, PRECISION);
+	}
+	
+	
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapDistortionCoeffs_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(8);
+		LeapC.INSTANCE.LeapDistortionCoeffs(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+	}                                                         
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapDistortionCoeffsEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(8);
+		LeapC.INSTANCE.LeapDistortionCoeffsEx(getConnectionHandle(), getDeviceHandle(),
+				camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+	}
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapScaleOffsetMatrix_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
+		LeapC.INSTANCE.LeapScaleOffsetMatrix(getConnectionHandle(), camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+	}
+
+
+	@ParameterizedTest
+	@EnumSource(eLeapPerspectiveType.class)
+	void LeapScaleOffsetMatrixEx_correctValues(eLeapPerspectiveType camera)
+	{
+		PrimitiveArrayPointer dest = PrimitiveArrayPointer.floats(16);
+		LeapC.INSTANCE.LeapScaleOffsetMatrixEx(getConnectionHandle(), getDeviceHandle(),
+				camera.value, dest);
+
+		assertThat(dest.getFloatAt(0)).isEqualTo(0 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(1)).isEqualTo(1 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(2)).isEqualTo(2 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(3)).isEqualTo(3 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(4)).isEqualTo(4 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(5)).isEqualTo(5 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(6)).isEqualTo(6 + camera.value, PRECISION);
+		assertThat(dest.getFloatAt(7)).isEqualTo(7 + camera.value, PRECISION);
+	}
+
+
+	/**
+	 * LeapTelemetryProfiling() cannot change the data in <code>telemetryData</code> due to
+	 * it being passed with a <code>const</code> constraint, so instead we set up the
+	 * parameters here and rely on MockLeapC to validate the data and only return
+	 * <code>eLeapRS.Success</code> if the data is correct.
 	 */
 	@Test
 	void LeapTelemetryProfiling_mappedCorrectly()

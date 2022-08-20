@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import com.sun.jna.Structure.FieldOrder;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___b_o_n_e">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv49LEAP_BONE">LeapC
  *      API - LEAP_BONE</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "prev_joint", "next_joint", "width", "rotation" })
 public class LEAP_BONE extends Structure
@@ -44,6 +46,8 @@ public class LEAP_BONE extends Structure
 	 * <p>
 	 * Convert the quaternion to a matrix to derive the basis vectors.
 	 * </p>
+	 * 
+	 * @since Ultraleap Orion SDK 3.1.2
 	 */
 	public LEAP_QUATERNION rotation;
 

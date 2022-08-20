@@ -11,32 +11,32 @@ package komposten.leapjna.leapc.enums;
 
 import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
+
 /**
- * Image formats.
+ * Camera calibration types.
  * 
  * @see <a href=
- *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv416eLeapImageFormat">LeapC
- *      API - eLeapImageFormat</a>
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv426eLeapCameraCalibrationType">LeapC
+ *      API - eLeapCameraCalibrationType</a>
+ * @since LeapJna 1.2.0
+ * @since Ultraleap Gemini SDK 5.6.0
  */
-public enum eLeapImageFormat implements IntEnum
+public enum eLeapCameraCalibrationType implements IntEnum
 {
-	/** An invalid or unknown format. */
-	Unknown(0),
-
-	/** An infrared image. */
-	IR(0x317249),
-
-	/** A Bayer RGBIr image with uncorrected RGB channels. */
-	RGBIr(0x49425247);
+  /** Infrared calibration (default). */
+	Infrared(0),
+	
+	/** Visual calibration. */
+	Visual(1);
 
 	public final int value;
 
-	private eLeapImageFormat(int value)
+	private eLeapCameraCalibrationType(int value)
 	{
 		this.value = value;
 	}
-	
-	
+
+
 	@Override
 	public int getValue()
 	{

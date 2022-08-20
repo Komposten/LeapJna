@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -23,8 +23,10 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * {@link LeapC#LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga04f93b375f7c8040178ec5be2bf658ec">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv414eLeapEventType">LeapC
  *      API - eLeapEventType</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapEventType implements IntEnum
 {
@@ -40,10 +42,10 @@ public enum eLeapEventType implements IntEnum
 	 */
 	None(0x000),
 
-	/** A connection to the Leap Motion service has been established. */
+	/** A connection to the Ultraleap Tracking Service has been established. */
 	Connection(0x001),
 
-	/** The connection to the Leap Motion service has been lost. */
+	/** The connection to the Ultraleap Tracking Service has been lost. */
 	ConnectionLost(0x002),
 
 	/**
@@ -78,7 +80,7 @@ public enum eLeapEventType implements IntEnum
 	 * This can be due to setting a policy with
 	 * {@link LeapC#LeapSetPolicyFlags(Pointer, long, long)} or due to changing
 	 * policy-related config settings, including images_mode. (A user can also change these
-	 * policies using the Leap Motion Control Panel.)
+	 * policies using the Ultraleap Tracking Control Panel.)
 	 * </p>
 	 */
 	Policy(0x005),
@@ -163,8 +165,14 @@ public enum eLeapEventType implements IntEnum
 	/** An array of system messages. */
 	LogEvents(0x10C),
 
-	/** */
-	HeadPose(0x10D);
+	/** A head pose. The message contains the timestamped head position and orientation. */
+	HeadPose(0x10D),
+	
+	/** Tracked eye positions. */
+	Eyes(0x10E),
+	
+	/** An IMU reading. */
+	IMU(0x10F);
 
 	public final int value;
 

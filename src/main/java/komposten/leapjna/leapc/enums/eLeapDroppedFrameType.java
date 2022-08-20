@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -14,6 +14,7 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 /**
  * Types of dropped frames.
+ * @since LeapJna 1.0.0
  */
 public enum eLeapDroppedFrameType implements IntEnum
 {

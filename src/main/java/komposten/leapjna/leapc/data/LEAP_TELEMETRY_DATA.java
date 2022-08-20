@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -15,7 +15,11 @@ import com.sun.jna.Structure.FieldOrder;
 
 /**
  * Holds telemetry configuration information.
+ * 
+ * @deprecated
+ * @since LeapJna 1.0.0
  */
+@Deprecated
 @FieldOrder({ "thread_id", "start_time", "end_time", "zone_depth", "file_name",
 		"line_number", "zone_name" })
 public class LEAP_TELEMETRY_DATA extends Structure

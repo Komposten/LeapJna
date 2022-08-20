@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -26,6 +26,7 @@ import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
+import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONNECTION_EVENT;
 import komposten.leapjna.leapc.events.LEAP_DEVICE_EVENT;
@@ -36,7 +37,6 @@ import komposten.leapjna.leapc.events.LEAP_LOG_EVENT;
 import komposten.leapjna.leapc.events.LEAP_LOG_EVENTS;
 import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
-import komposten.leapjna.util.Configurations;
 
 
 class VisualiserBackend
@@ -95,13 +95,13 @@ class VisualiserBackend
 			else
 			{
 				listener.onLogMessage(LogType.ERROR,
-						"Failed to open a connection to the Leap Motion service: %s", result);
+						"Failed to open a connection to the Ultraleap Tracking Service: %s", result);
 			}
 		}
 		else
 		{
 			listener.onLogMessage(LogType.ERROR,
-					"Failed to create a connection to the Leap Motion service: %s", result);
+					"Failed to create a connection to the Ultraleap Tracking Service: %s", result);
 		}
 
 		listener.onStateChanged(State.ERROR);
@@ -112,6 +112,7 @@ class VisualiserBackend
 	{
 		boolean firstIteration = true;
 
+		eLeapRS previousResult = null;
 		while (true)
 		{
 			LEAP_CONNECTION_MESSAGE message = new LEAP_CONNECTION_MESSAGE();
@@ -126,8 +127,17 @@ class VisualiserBackend
 
 				firstIteration = false;
 			}
-
-			if (result != eLeapRS.Success)
+			
+			if (result == eLeapRS.Timeout)
+			{
+				if (previousResult != eLeapRS.Timeout)
+				{
+					listener.onLogMessage(LogType.ERROR,
+							"Timed out while polling for events! The tracking service might be paused.");
+					listener.onLogMessage(LogType.SEPARATOR, "");
+				}
+			}
+			else if (result != eLeapRS.Success)
 			{
 				listener.onLogMessage(LogType.ERROR,
 						"Polling failed with result %s for event type %s", result, message.getType());
@@ -147,7 +157,8 @@ class VisualiserBackend
 					handleImage(message.getImageEvent());
 				}
 			}
-
+			
+			previousResult = result;
 
 			if (Thread.interrupted())
 			{
@@ -192,6 +203,9 @@ class VisualiserBackend
 				break;
 			case Policy :
 				handlePolicyEvent(message.getPolicyEvent(), leapConnection);
+				break;
+			case ConfigChange :
+				handleConfigChangeEvent(message.getConfigChangeEvent());
 				break;
 			case ConfigResponse :
 				handleConfigResponseEvent(message);
@@ -295,16 +309,21 @@ class VisualiserBackend
 	}
 
 
-	private void handlePolicyEvent(LEAP_POLICY_EVENT event, LEAP_CONNECTION leapConnection)
+	private void handlePolicyEvent(LEAP_POLICY_EVENT event,
+			@SuppressWarnings("unused") LEAP_CONNECTION leapConnection)
 	{
 		listener.onLogMessage(LogType.NORMAL, "Active policies: %s",
 				Arrays.toString(event.getCurrentPolicy()));
 		listener.onLogMessage(LogType.SEPARATOR, "");
 
 		// Request the current images_mode setting to check if images were activated
-		// through the Leap Motion control panel.
-		LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle,
-				Configurations.Tracking.IMAGES_MODE, imagesRequestId);
+		// through the Ultraleap Tracking control panel.
+		// LeapC.INSTANCE.LeapRequestConfigValue(leapConnection.handle,
+		// Configurations.Tracking.IMAGES_MODE, imagesRequestId);
+		if (Arrays.stream(event.getCurrentPolicy()).anyMatch(p -> p == eLeapPolicyFlag.Images))
+		{
+			imagesAllowed = true;
+		}
 	}
 
 
@@ -340,6 +359,13 @@ class VisualiserBackend
 		listener.onLogMessage(LogType.NORMAL, "  Status: %d",
 				Arrays.toString(event.getStatus()));
 		listener.onLogMessage(LogType.SEPARATOR, "");
+	}
+	
+	
+	private void handleConfigChangeEvent(LEAP_CONFIG_CHANGE_EVENT event)
+	{
+		listener.onLogMessage(LogType.NORMAL, "Result of config change request %d: %s", event.requestID,
+				event.status);
 	}
 
 

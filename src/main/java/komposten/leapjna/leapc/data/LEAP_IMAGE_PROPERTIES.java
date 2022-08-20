@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -21,8 +21,10 @@ import komposten.leapjna.leapc.enums.eLeapImageType;
  * Properties of a sensor image.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___i_m_a_g_e___p_r_o_p_e_r_t_i_e_s">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv421LEAP_IMAGE_PROPERTIES">LeapC
  *      API - LEAP_IMAGE_PROPERTIES</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "type", "format", "bpp", "width", "height", "x_scale", "y_scale",
 		"x_offset", "y_offset" })

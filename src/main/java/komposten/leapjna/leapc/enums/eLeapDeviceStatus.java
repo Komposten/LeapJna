@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -19,8 +19,10 @@ import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
  * The device status codes.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga1d2b70b83923751202242cbfcf56072b">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv417eLeapDeviceStatus">LeapC
  *      API - eLeapDeviceStatus</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapDeviceStatus implements IntFlagEnum<eLeapDeviceStatus>
 {

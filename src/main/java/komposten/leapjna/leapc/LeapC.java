@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -24,6 +24,7 @@ import komposten.leapjna.leapc.data.LEAP_CONNECTION_MESSAGE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_INFO;
 import komposten.leapjna.leapc.data.LEAP_DEVICE_REF;
+import komposten.leapjna.leapc.data.LEAP_IMAGE;
 import komposten.leapjna.leapc.data.LEAP_POINT_MAPPING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING;
 import komposten.leapjna.leapc.data.LEAP_RECORDING_PARAMETERS;
@@ -31,12 +32,15 @@ import komposten.leapjna.leapc.data.LEAP_RECORDING_STATUS;
 import komposten.leapjna.leapc.data.LEAP_TELEMETRY_DATA;
 import komposten.leapjna.leapc.data.LEAP_VARIANT;
 import komposten.leapjna.leapc.data.LEAP_VECTOR;
+import komposten.leapjna.leapc.data.LEAP_VERSION;
+import komposten.leapjna.leapc.enums.eLeapConnectionConfig;
 import komposten.leapjna.leapc.enums.eLeapEventType;
 import komposten.leapjna.leapc.enums.eLeapPerspectiveType;
 import komposten.leapjna.leapc.enums.eLeapPolicyFlag;
 import komposten.leapjna.leapc.enums.eLeapRS;
 import komposten.leapjna.leapc.enums.eLeapRecordingFlags;
 import komposten.leapjna.leapc.enums.eLeapTrackingMode;
+import komposten.leapjna.leapc.enums.eLeapVersionPart;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_CHANGE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_CONFIG_RESPONSE_EVENT;
 import komposten.leapjna.leapc.events.LEAP_HEAD_POSE_EVENT;
@@ -45,12 +49,13 @@ import komposten.leapjna.leapc.events.LEAP_POLICY_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_EVENT;
 import komposten.leapjna.leapc.events.LEAP_TRACKING_MODE_EVENT;
 import komposten.leapjna.leapc.util.ArrayPointer;
+import komposten.leapjna.leapc.util.PrimitiveArrayPointer;
 import komposten.leapjna.util.Configurations;
 
 
 /**
  * <p>
- * The main interface for interacting with the Leap Motion C API.
+ * The main interface for interacting with the UltraLeap C API.
  * </p>
  * <p>
  * Use {@link #INSTANCE LeapC.INSTANCE} to obtain an instance of this interface
@@ -58,6 +63,7 @@ import komposten.leapjna.util.Configurations;
  * called on that instance in a similar way to how the C API is used.
  * </p>
  */
+@SuppressWarnings("deprecation")
 public interface LeapC extends Library
 {
 	final LeapC INSTANCE = (LeapC) Native.synchronizedLibrary(Native
@@ -66,22 +72,25 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
-	 * Creates a new connection to the Leap Motion service and stores a handle for the
+	 * Creates a new connection to the Ultraleap Tracking Service and stores a handle for the
 	 * connection in the provided {@link LEAP_CONNECTION}.
 	 * </p>
 	 * <p>
 	 * Pass the LEAP_CONNECTION pointer to {@link #LeapOpenConnection(Pointer)} to establish
-	 * a connection to the Leap Motion service; and to subsequent operations on the same
+	 * a connection to the Ultraleap Tracking Service; and to subsequent operations on the same
 	 * connection.
 	 * </p>
 	 * 
 	 * @param pConfig The configuration to be used with the newly created connection. If
 	 *          pConfig is null, a connection is created with a default configuration.
-	 * @param phConnection Receives a pointer to the connection object.
+	 * @param phConnection Receives a pointer to the connection object, set to invalid on
+	 *          failure.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga5bcc831cf503136f45dde040f29973b5">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv420LeapCreateConnectionPK22LEAP_CONNECTION_CONFIGP15LEAP_CONNECTION">LeapC
 	 *      API - LeapCreateConnection</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapCreateConnection(LEAP_CONNECTION_CONFIG pConfig,
 			LEAP_CONNECTION phConnection);
@@ -108,15 +117,17 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga06fc1079537dde473bf37cc2fb0220ee">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv421LeapDestroyConnection15LEAP_CONNECTION">LeapC
 	 *      API - LeapDestroyConnection</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public void LeapDestroyConnection(Pointer hConnection);
 
 
 	/**
 	 * <p>
-	 * Opens a connection to the Leap Motion service.
+	 * Opens a connection to the Ultraleap Tracking Service.
 	 * </p>
 	 * <p>
 	 * This routine will not block. A connection to the service will not be established
@@ -130,8 +141,10 @@ public interface LeapC extends Library
 	 *          handle from the connection object.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga49a90e9ca6d880d59fa3f1813689f7fd">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapOpenConnection15LEAP_CONNECTION">LeapC
 	 *      API - LeapOpenConnection</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapOpenConnection(Pointer hConnection);
 
@@ -152,8 +165,10 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga1d71e3d5a42c884bcfa981c7ccf11ddb">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv419LeapCloseConnection15LEAP_CONNECTION">LeapC
 	 *      API - LeapCloseConnection</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public void LeapCloseConnection(Pointer hConnection);
 
@@ -190,8 +205,10 @@ public interface LeapC extends Library
 	 *         the <code>message</code> pointer will reference a message of type
 	 *         {@link eLeapEventType#None}.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga2a8aecad339f0fd339ca22a3e7b389f6">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapPollConnection15LEAP_CONNECTION8uint32_tP23LEAP_CONNECTION_MESSAGE">LeapC
 	 *      API - LeapPollConnection</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapPollConnection(Pointer hConnection, int timeout,
 			LEAP_CONNECTION_MESSAGE message);
@@ -219,15 +236,17 @@ public interface LeapC extends Library
 	 *          hold the entire information block.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga5225116e8e8fad45d0e21e0ec7e3af76">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv421LeapGetConnectionInfo15LEAP_CONNECTIONP20LEAP_CONNECTION_INFO">LeapC
 	 *      API - LeapGetConnectionInfo</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapGetConnectionInfo(Pointer hConnection, LEAP_CONNECTION_INFO pInfo);
 
 
 	/**
 	 * <p>
-	 * Retrieves a list of Leap Motion devices currently attached to the system.
+	 * Retrieves a list of Ultraleap Tracking camera devices currently attached to the system.
 	 * </p>
 	 * <p>
 	 * To get the number of connected devices, call this function with the
@@ -251,8 +270,10 @@ public interface LeapC extends Library
 	 *          output LeapC sets this to the number of valid device handles.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga93640c45298cc4d756e4b51c890e0a68">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv417LeapGetDeviceList15LEAP_CONNECTIONP15LEAP_DEVICE_REFP8uint32_t">LeapC
 	 *      API - LeapGetDeviceList</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapGetDeviceList(Pointer hConnection,
 			ArrayPointer<LEAP_DEVICE_REF> pArray, IntByReference pnArray);
@@ -272,8 +293,10 @@ public interface LeapC extends Library
 	 * @param phDevice A pointer that receives the opened device handle.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga992f1420318c3569a6a0f3ceaac43754">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv414LeapOpenDevice15LEAP_DEVICE_REFP11LEAP_DEVICE">LeapC
 	 *      API - LeapOpenDevice</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapOpenDevice(LEAP_DEVICE_REF rDevice, LEAP_DEVICE phDevice);
 
@@ -285,10 +308,57 @@ public interface LeapC extends Library
 	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
 	 *          the handle from the device object.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab272a3771f067d7a9d34461d557a7907">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv415LeapCloseDevice11LEAP_DEVICE">LeapC
 	 *      API - LeapCloseDevice</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public void LeapCloseDevice(Pointer hDevice);
+	
+
+	/**
+	 * <p>
+	 * For a multi-device aware client, sets the device to use in the context of non-"Ex"
+	 * API functions which are logically device-specific but don't provide a device
+	 * parameter.
+	 * </p>
+	 * <p>
+	 * Automatically subscribes to the specified device (see
+	 * {@link #LeapSubscribeEvents(Pointer, Pointer)}), and if
+	 * <code>unsubscribeOthers</code> is '<code>1</code>', then unsubscribes from all other
+	 * devices as well (see {@link #LeapUnsubscribeEvents(Pointer, Pointer)}).
+	 * </p>
+	 * <p>
+	 * Affects future invocations of the following functions:
+	 * <ul>
+	 * <li>LeapCameraMatrix()
+	 * <li>LeapDistortionCoeffs()
+	 * <li>LeapGetFrameSize()
+	 * <li>LeapInterpolateFrame()
+	 * <li>LeapInterpolateFrameFromTime()
+	 * <li>LeapPixelToRectilinear()
+	 * <li>LeapRectilinearToPixel()
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * It is not necessary to call this function from a client that does not claim to be
+	 * multi-device-aware (see {@link eLeapConnectionConfig} and
+	 * {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)}).
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice A handle to the device to be queried. Use {@link LEAP_DEVICE#handle}
+	 *          to obtain the handle from the device object.
+	 * @param unsubscribeOthers Set to '<code>1</code>' to unsubscribe from all other
+	 *          devices, or <code>0</code> to keep all subscriptions.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapSetPrimaryDevice(Pointer hConnection, Pointer hDevice, int unsubscribeOthers);
 
 
 	/**
@@ -313,10 +383,58 @@ public interface LeapC extends Library
 	 * @param info The struct to receive the device property data.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gafae71b1c2b532c22cbfcf8a49df7ed3a">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv417LeapGetDeviceInfo11LEAP_DEVICEP16LEAP_DEVICE_INFO">LeapC
 	 *      API - LeapGetDeviceInfo</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapGetDeviceInfo(Pointer hDevice, LEAP_DEVICE_INFO info);
+	
+	/**
+	 * <p>
+	 * Get the transform to world coordinates from 3D Leap coordinates.
+	 * </p>
+	 * <p>
+	 * To get the transform, you must supply an array of 16 elements.
+	 * </p>
+	 * <p>
+	 * The function will return a an array representing a 4 x 4 matrix of the form:
+	 * <pre>
+	 * R, t
+	 * 0, 1
+	 *
+	 * where:
+	 * R is a 3 x 3 rotation matrix
+	 * t is a 3 x 1 translation vector
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * Note that the matrix is in column major, e.g. transform[12] corresponds to the x coordinate of the
+	 * translation vector t.
+	 * </p>
+	 * <p>
+	 * A possible pipeline would be, for example:
+	 * <ol>
+	 * <li>Get "palm_pos" the position of the center of the palm (as a 3x1 vector)
+	 * <li>Construct a 4x1 vector using the palm_position: palm_pos_4 = (palm_pos.x; palm_pos.y; palm_pos.z; 1.0f)
+	 * <li>Create a 4x4 matrix "trans_mat" as illustrated above using the returned transform
+	 * <li>Get the position of the center of the palm in world coordinates by multiplying trans_mat and palm_pos_4:
+	 *    center_world_4 = trans_mat * palm_pos_4
+	 * </ol>
+	 * </p>
+	 * <p>
+	 * This function returns eLeapRS_Unsupported in the case where this functionality is not yet supported.
+	 * </p>
+	 * 
+	 * @param hDevice A handle to the device to be queried. Use {@link LEAP_DEVICE#handle}
+	 *          to obtain the handle from the device object.
+	 * @param transform A pointer to a single-precision float array of size 16, containing
+	 *  the coefficients of the 4x4 matrix in Column Major order.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapGetDeviceTransform(Pointer hDevice, PrimitiveArrayPointer transform);
 
 
 	/**
@@ -334,10 +452,82 @@ public interface LeapC extends Library
 	 * @return The string name of the device model, or <code>null</code> if the device type
 	 *         string is invalid.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gada2b0efcd4531790617465723ed3059a">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv421LeapDevicePIDToString14eLeapDevicePID">LeapC
 	 *      API - LeapDevicePIDToString</a>
+	 * @since LeapJna 1.0.0
 	 */
 	public String LeapDevicePIDToString(int pid);
+	
+
+	/**
+	 * <p>
+	 * Subscribe to event messages based on device.
+	 * </p>
+	 * <p>
+	 * If events from multiple devices are being sent from a service, this function allows
+	 * the client to receive events from the specified device. Clients that claim to be
+	 * multi-device-aware (see {@link eLeapConnectionConfig} and
+	 * {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)}) must
+	 * subscribe to a device to receive various device-specific events.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapSubscribeEvents(Pointer hConnection, Pointer hDevice);
+	
+	/**
+	 * <p>
+	 * Unsubscribe from event messages based on device.
+	 * </p>
+	 * <p>
+	 * If events from multiple devices are being sent from a service, this function
+	 * prevents receiving further events from the specified device that had
+	 * previously been enabled using a call to {@link #LeapSubscribeEvents(Pointer, Pointer)}.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapUnsubscribeEvents(Pointer hConnection, Pointer hDevice);
+	
+	
+	/**
+	 *
+	 * Returns the version of a specified part of the system.
+	 *
+	 * If an invalid connection handle is provided only the version details of the client
+	 * will be available.
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param versionPart The version part to return, this will reference one part of the
+	 *          system. A member of the {@link eLeapVersionPart} enumeration.
+	 * @param pVersion A pointer to a struct used to store the version number.
+	 * @returns The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv414LeapGetVersion15LEAP_CONNECTION16eLeapVersionPartP12LEAP_VERSION">LeapC
+	 *      API - LeapGetVersion</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.2.0
+	 */
+	public eLeapRS LeapGetVersion(Pointer hConnection, int versionPart, LEAP_VERSION pVersion);
 
 
 	/**
@@ -359,10 +549,40 @@ public interface LeapC extends Library
 	 *          specified frame.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gae680ca44ccf77a25c4a61f9ae1a311bc">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv414LeapGetVersion15LEAP_CONNECTION16eLeapVersionPartP12LEAP_VERSION">LeapC
 	 *      API - LeapGetFrameSize</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.1
 	 */
-	public eLeapRS LeapGetFrameSize(Pointer hConnection, long timestamp,
+	public eLeapRS LeapGetFrameSize(Pointer hConnection, long timestamp, LongByReference pncbEvent);
+
+
+	/**
+	 * <p>
+	 * Retrieves the number of bytes required to allocate an interpolated frame at the
+	 * specified time for a particular device.
+	 * </p>
+	 * <p>
+	 * Use this function to determine the size of the buffer to allocate when calling
+	 * {@link #LeapInterpolateFrameEx(Pointer, long, LEAP_TRACKING_EVENT, long)}.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param timestamp The timestamp of the frame whose size is to be queried.
+	 * @param pncbEvent A pointer that receives the number of bytes required to store the
+	 *          specified frame.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapGetFrameSizeEx15LEAP_CONNECTION11LEAP_DEVICE7int64_tP8uint64_t">LeapC
+	 *      API - LeapGetFrameSizeEx</a>
+	 * @since LeapJna 1.2.0
+	 */
+	public eLeapRS LeapGetFrameSizeEx(Pointer hConnection, Pointer hDevice, long timestamp,
 			LongByReference pncbEvent);
 
 
@@ -380,7 +600,7 @@ public interface LeapC extends Library
 	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
 	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
 	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
-	 * measurements in the application with time measurements in the Leap Motion service.
+	 * measurements in the application with time measurements in the Ultraleap Tracking Service.
 	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
 	 * 
@@ -398,11 +618,56 @@ public interface LeapC extends Library
 	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gabb48588b94c0d66bd9291f3052170a89">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv428LeapInterpolateFrameFromTime15LEAP_CONNECTION7int64_t7int64_tP19LEAP_TRACKING_EVENT8uint64_t">LeapC
 	 *      API - LeapInterpolateFrameFromTime</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.1
 	 */
 	public eLeapRS LeapInterpolateFrameFromTime(Pointer hConnection, long timestamp,
 			long sourceTimestamp, LEAP_TRACKING_EVENT pEvent, long ncbEvent);
+
+
+	/**
+	 * <p>
+	 * Constructs a frame at the specified timestamp for a particular device by
+	 * interpolating between a frame near the timestamp and a frame near the
+	 * sourceTimestamp.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapGetFrameSize(Pointer, long, LongByReference)} to calculate the
+	 * minimum size of this buffer.
+	 * </p>
+	 * <p>
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Ultraleap Tracking Service.
+	 * This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param timestamp The timestamp to which to interpolate the frame data.
+	 * @param sourceTimestamp The timestamp of the beginning frame from which to interpolate
+	 *          the data.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapGetFrameSize</code> to get the required size,
+	 *          and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to create the
+	 *          struct and allocate memory.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv430LeapInterpolateFrameFromTimeEx15LEAP_CONNECTION11LEAP_DEVICE7int64_t7int64_tP19LEAP_TRACKING_EVENT8uint64_t">LeapC
+	 *      API - LeapInterpolateFrameFromTimeEx</a>
+	 * @since LeapJna 1.2.0
+	 */
+	public eLeapRS LeapInterpolateFrameFromTimeEx(Pointer hConnection, Pointer hDevice,
+			long timestamp, long sourceTimestamp, LEAP_TRACKING_EVENT pEvent, long ncbEvent);
 
 
 	/**
@@ -419,7 +684,7 @@ public interface LeapC extends Library
 	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
 	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
 	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
-	 * measurements in the application with time measurements in the Leap Motion service.
+	 * measurements in the application with time measurements in the Ultraleap Tracking Service.
 	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
 	 * 
@@ -435,13 +700,54 @@ public interface LeapC extends Library
 	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga7cbdc29069fbcd6aca1a16989722e85c">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv420LeapInterpolateFrame15LEAP_CONNECTION7int64_tP19LEAP_TRACKING_EVENT8uint64_t">LeapC
 	 *      API - LeapInterpolateFrame</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.1
 	 */
 	public eLeapRS LeapInterpolateFrame(Pointer hConnection, long timestamp,
 			LEAP_TRACKING_EVENT pEvent, long ncbEvent);
 
 
+	/**
+	 * <p>
+	 * Constructs a frame at the specified timestamp for a particular device by
+	 * interpolating between measured frames. frames.
+	 * </p>
+	 * <p>
+	 * Caller is responsible for allocating a buffer large enough to hold the data of the
+	 * frame. Use {@link #LeapGetFrameSizeEx(Pointer, Pointer, long, LongByReference)} to
+	 * calculate the minimum size of this buffer.
+	 * </p>
+	 * <p>
+	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
+	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
+	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
+	 * measurements in the application with time measurements in the Ultraleap Tracking Service.
+	 * This process is required to achieve accurate, smooth interpolation.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param timestamp The timestamp at which to interpolate the frame data.
+	 * @param pEvent A <code>LEAP_TRACKING_EVENT</code> with enough allocated memory to fit
+	 *          the frame data. Use <code>LeapGetFrameSize</code> to get the required size,
+	 *          and then {@link LEAP_TRACKING_EVENT#LEAP_TRACKING_EVENT(int)} to create the
+	 *          struct and allocate memory.
+	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapInterpolateFrameEx15LEAP_CONNECTION11LEAP_DEVICE7int64_tP19LEAP_TRACKING_EVENT8uint64_t">LeapC
+	 *      API - LeapInterpolateFrameEx</a>
+	 * @since LeapJna 1.2.0
+	 */
+	public eLeapRS LeapInterpolateFrameEx(Pointer hConnection, Pointer hDevice, long timestamp,
+			LEAP_TRACKING_EVENT pEvent, long ncbEvent);
+	
 	/**
 	 * <p>
 	 * Gets the head tracking pose at the specified timestamp by interpolating between
@@ -451,7 +757,7 @@ public interface LeapC extends Library
 	 * Use {@link #LeapCreateClockRebaser(LEAP_CLOCK_REBASER)},
 	 * {@link #LeapUpdateRebase(Pointer, long, long)}, and
 	 * {@link #LeapRebaseClock(Pointer, long, LongByReference)} to synchronize time
-	 * measurements in the application with time measurements in the Leap Motion service.
+	 * measurements in the application with time measurements in the Ultraleap Tracking Service.
 	 * This process is required to achieve accurate, smooth interpolation.
 	 * </p>
 	 * 
@@ -462,10 +768,13 @@ public interface LeapC extends Library
 	 * @param timestamp The timestamp at which to interpolate the frame data.
 	 * @param pEvent A pointer to a flat buffer which is filled with an interpolated frame.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
 	 * @see <a href=
 	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab756331205d6ee0cd61708d77d968536">LeapC
 	 *      API - LeapInterpolateHeadPose</a>
+	 * @since LeapJna 1.0.0
 	 */
+	@Deprecated
 	public eLeapRS LeapInterpolateHeadPose(Pointer hConnection, long timestamp,
 			LEAP_HEAD_POSE_EVENT pEvent);
 
@@ -497,10 +806,46 @@ public interface LeapC extends Library
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see eLeapPolicyFlag#createMask(eLeapPolicyFlag...)
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab57050814a0763ec07ed088e3d2de7f2">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapSetPolicyFlags15LEAP_CONNECTION8uint64_t8uint64_t">LeapC
 	 *      API - LeapSetPolicyFlags</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapSetPolicyFlags(Pointer hConnection, long set, long clear);
+
+
+	/**
+	 * <p>
+	 * Sets or clears one or more policy flags for a particular device.
+	 * </p>
+	 * <p>
+	 * Changing policies is asynchronous. After you call this function, a subsequent call to
+	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
+	 * </p>
+	 * To get the current policies without changes, specify zero for both the set and clear
+	 * parameters. When ready, <code>LeapPollConnection()</code> provides the a
+	 * <code>LEAP_POLICY_EVENT</code> containing the current settings.
+	 * <p>
+	 * The {@link eLeapPolicyFlag} enumeration defines the policy flags.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param set A bitwise combination of flags to be set. Set to 0 if not setting any
+	 *          flags.
+	 * @param clear A bitwise combination of flags to be cleared. Set to 0 if not clearing
+	 *          any flags.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see eLeapPolicyFlag#createMask(eLeapPolicyFlag...)
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapSetPolicyFlagsEx(Pointer hConnection, Pointer hDevice, long set, long clear);
 	
 	
 	/**
@@ -510,12 +855,7 @@ public interface LeapC extends Library
 	 * <p>
 	 * Changing tracking modes is asynchronous. After you call this function, a subsequent
 	 * call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
-	 * {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode. Note that,
-	 * after you call this function, a subsequent call to
-	 * {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
-	 * {@link LEAP_POLICY_EVENT} containing the current tracking mode related policies,
-	 * reflecting any changes. Note that the relevant <code>LEAP_POLICY_EVENT</code> is
-	 * guaranteed to precede the <code>LEAP_TRACKING_MODE_EVENT</code>.
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
 	 * </p>
 	 * 
 	 * <p>
@@ -527,10 +867,100 @@ public interface LeapC extends Library
 	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
 	 *          handle from the connection object.
 	 * @param mode The enum value specifying the requested tracking mode.
-	 * @returns The operation result code, a member of the {@link eLeapRS} enumeration.
-	 * @since 1.1.0 (Gemini 5.0.0)
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv419LeapSetTrackingMode15LEAP_CONNECTION17eLeapTrackingMode">LeapC
+	 *      API - LeapSetTrackingMode</a>
+	 * @since LeapJna 1.1.0
+	 * @since Ultraleap Gemini SDK 5.0.0
 	 */
 	public eLeapRS LeapSetTrackingMode(Pointer hConnection, int mode);
+	
+	
+	/**
+	 * <p>
+	 * Requests a tracking mode for a particular device.
+	 * </p>
+	 * <p>
+	 * Changing tracking modes is asynchronous. After you call this function, a subsequent
+	 * call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)} provides a
+	 * {@link LEAP_POLICY_EVENT} containing the current policies, reflecting any changes.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param mode The enum value specifying the requested tracking mode.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapSetTrackingModeEx(Pointer hConnection, Pointer hDevice, int mode);
+
+	
+	/**
+	 * <p>
+	 * Requests the currently set tracking mode.
+	 * </p>
+	 *
+	 * <p>
+	 * Requesting the current tracking mode is asynchronous. After you call this function, a
+	 * subsequent call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}
+	 * provides a {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode,
+	 * reflecting any changes.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv419LeapGetTrackingMode15LEAP_CONNECTION">LeapC
+	 *      API - LeapGetTrackingMode</a>
+	 * @since LeapJna 1.2.0
+	 */
+	public eLeapRS LeapGetTrackingMode(Pointer hConnection);
+
+	
+	/**
+	 * <p>
+	 * Requests the currently set tracking mode.
+	 * </p>
+	 *
+	 * <p>
+	 * Requesting the current tracking mode is asynchronous. After you call this function, a
+	 * subsequent call to {@link #LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}
+	 * provides a {@link LEAP_TRACKING_MODE_EVENT} containing the current tracking mode,
+	 * reflecting any changes.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link eLeapTrackingMode} enumeration defines the tracking mode.
+	 * </p>
+	 *
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public eLeapRS LeapGetTrackingModeEx(Pointer hConnection, Pointer hDevice);
 
 
 	/**
@@ -551,8 +981,10 @@ public interface LeapC extends Library
 	 * @param pause Set to '<code>1</code>' to pause, or '<code>0</code>' to unpause
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gab1da8139358849a062e1665e6edef2fb">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv412LeapSetPause15LEAP_CONNECTIONb">LeapC
 	 *      API - LeapSetPause</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public eLeapRS LeapSetPause(Pointer hConnection, int pause);
 
@@ -579,8 +1011,10 @@ public interface LeapC extends Library
 	 *          written.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga6fdd92015369e64bc8d09d1cbc77fb46">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapRequestConfigValue15LEAP_CONNECTIONPKcP8uint32_t">LeapC
 	 *      API - LeapRequestConfigValue</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapRequestConfigValue(Pointer hConnection, String key,
 			LongByReference pRequestID);
@@ -588,7 +1022,7 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
-	 * Causes the client to commit a configuration change to the Leap Motion service.
+	 * Causes the client to commit a configuration change to the Ultraleap Tracking Service.
 	 * </p>
 	 * <p>
 	 * The change is performed asynchronously � and may fail.
@@ -609,8 +1043,10 @@ public interface LeapC extends Library
 	 *          written, or a null pointer if this value is not needed.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga8f80709d76bd235949e295055cd3bf9d">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv419LeapSaveConfigValue15LEAP_CONNECTIONPKcPK12LEAP_VARIANTP8uint32_t">LeapC
 	 *      API - LeapSaveConfigValue</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public eLeapRS LeapSaveConfigValue(Pointer hConnection, String key, LEAP_VARIANT value,
 			LongByReference pRequestID);
@@ -624,7 +1060,10 @@ public interface LeapC extends Library
 	 * @param pSize A pointer that receives the number of bytes required to store the point
 	 *          mapping.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
+	 * @since LeapJna 1.0.0
 	 */
+	@Deprecated
 	public eLeapRS LeapGetPointMappingSize(Pointer hConnection, LongByReference pSize);
 
 
@@ -640,7 +1079,10 @@ public interface LeapC extends Library
 	 *          to create the struct and allocate memory.
 	 * @param pSize A pointer to the size of <code>pointMapping</code>.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
+	 * @since LeapJna 1.0.0
 	 */
+	@Deprecated
 	public eLeapRS LeapGetPointMapping(Pointer hConnection, LEAP_POINT_MAPPING pointMapping,
 			LongByReference pSize);
 
@@ -659,8 +1101,10 @@ public interface LeapC extends Library
 	 * 
 	 * @return microseconds since an unspecified epoch
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga4ef33708af974ecd618ad9784aa38161">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv410LeapGetNowv">LeapC
 	 *      API - LeapGetNow</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.0.0
 	 */
 	public long LeapGetNow();
 
@@ -674,7 +1118,7 @@ public interface LeapC extends Library
 	 * dynamic memory allocation will not be available.
 	 * </p>
 	 * <p>
-	 * <b>Note:</b> Not required for e.g. {@link LEAP_IMAGE_EVENT}s even though their
+	 * <b>Note:</b> Not required for e.g. {@link LEAP_IMAGE_EVENT}s even though its
 	 * documentation says otherwise.
 	 * </p>
 	 * 
@@ -685,6 +1129,11 @@ public interface LeapC extends Library
 	 * @param allocator A {@link LEAP_ALLOCATOR} structure containing the allocator
 	 *          functions to be called as needed by the library.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv416LeapSetAllocator15LEAP_CONNECTIONPK14LEAP_ALLOCATOR">LeapC
+	 *      API - LeapSetAllocator</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 4.0.0
 	 */
 	public eLeapRS LeapSetAllocator(Pointer hConnection, LEAP_ALLOCATOR allocator);
 
@@ -703,8 +1152,10 @@ public interface LeapC extends Library
 	 * @param phClockRebaser A pointer to the clock-rebaser object to be initialized.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga95c0d7e31b8337021c41f13d4ef6849b">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapCreateClockRebaserP18LEAP_CLOCK_REBASER">LeapC
 	 *      API - LeapCreateClockRebaser</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.2
 	 */
 	public eLeapRS LeapCreateClockRebaser(LEAP_CLOCK_REBASER phClockRebaser);
 
@@ -722,21 +1173,24 @@ public interface LeapC extends Library
 	 *          {@link LEAP_CLOCK_REBASER#handle} to obtain the handle from the clock
 	 *          rebaser object.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga4335f1588e9c1a3277f4c0815521956c">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv423LeapDestroyClockRebaser18LEAP_CLOCK_REBASER">LeapC
 	 *      API - LeapDestroyClockRebaser</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.2
 	 */
 	public void LeapDestroyClockRebaser(Pointer hClockRebaser);
 
 
 	/**
 	 * <p>
-	 * Computes the Leap Motion clock corresponding to a specified application clock value.
+	 * Computes the Ultraleap Tracking Service clock corresponding to a specified
+	 * application clock value.
 	 * </p>
 	 * <p>
-	 * Use this function to translate your application clock to the Leap Motion clock when
-	 * interpolating frames. {@link #LeapUpdateRebase(Pointer, long, long)} must
-	 * be called for every rendered frame for the relationship between the two clocks to
-	 * remain synchronised.
+	 * Use this function to translate your application clock to the Ultraleap Tracking
+	 * Service clock when interpolating frames.
+	 * {@link #LeapUpdateRebase(Pointer, long, long)} must be called for every rendered
+	 * frame for the relationship between the two clocks to remain synchronised.
 	 * </p>
 	 * 
 	 * @param hClockRebaser The handle to a rebaser object created by
@@ -744,11 +1198,13 @@ public interface LeapC extends Library
 	 *          {@link LEAP_CLOCK_REBASER#handle} to obtain the handle from the clock
 	 *          rebaser object.
 	 * @param userClock The clock in microseconds referenced to the application clock.
-	 * @param pLeapClock The corresponding Leap Motion clock value.
+	 * @param pLeapClock The corresponding Ultraleap Tracking Service clock value.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gadd9e1af6480d7948b77ccf40fbca337a">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv415LeapRebaseClock18LEAP_CLOCK_REBASER7int64_tP7int64_t">LeapC
 	 *      API - LeapRebaseClock</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.2
 	 */
 	public eLeapRS LeapRebaseClock(Pointer hClockRebaser, long userClock,
 			LongByReference pLeapClock);
@@ -756,7 +1212,8 @@ public interface LeapC extends Library
 
 	/**
 	 * <p>
-	 * Updates the relationship between the Leap Motion clock and the user clock.
+	 * Updates the relationship between the Ultraleap Tracking Service clock and the user
+	 * clock.
 	 * </p>
 	 * <p>
 	 * When using {@link #LeapInterpolateFrame(Pointer, long, LEAP_TRACKING_EVENT, long)},
@@ -764,10 +1221,10 @@ public interface LeapC extends Library
 	 * function should be called as close to the actual point of rendering as possible.
 	 * </p>
 	 * <p>
-	 * The relationship between the application clock and the Leap Motion clock is neither
-	 * fixed nor stable. Simulation restarts can cause user clock values to change
-	 * instantaneously. Certain systems simulate slow motion, or respond to heavy load, by
-	 * reducing the tick rate of the user clock. As a result, the
+	 * The relationship between the application clock and the Ultraleap Tracking Service
+	 * clock is neither fixed nor stable. Simulation restarts can cause user clock values to
+	 * change instantaneously. Certain systems simulate slow motion, or respond to heavy
+	 * load, by reducing the tick rate of the user clock. As a result, the
 	 * <code>LeapUpdateRebase()</code> function must be called for every rendered frame.
 	 * </p>
 	 * 
@@ -777,12 +1234,14 @@ public interface LeapC extends Library
 	 *          rebaser object.
 	 * @param userClock A clock value supplied by the application, in microseconds, sampled
 	 *          at about the same time as {@link #LeapGetNow()} was sampled.
-	 * @param leapClock The Leap Motion clock value sampled by a call to
+	 * @param leapClock The Ultraleap Tracking Service clock value sampled by a call to
 	 *          {@link #LeapGetNow()}.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gac111f105a4b418e1f7ed08a1b74c8bca">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv416LeapUpdateRebase18LEAP_CLOCK_REBASER7int64_t7int64_t">LeapC
 	 *      API - LeapUpdateRebase</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.2
 	 */
 	public eLeapRS LeapUpdateRebase(Pointer hClockRebaser, long userClock, long leapClock);
 
@@ -794,14 +1253,14 @@ public interface LeapC extends Library
 	 * <p>
 	 * Given a point on the image, <code>LeapPixelToRectilinear()</code> corrects for camera
 	 * distortion and returns the true direction from the camera to the source of that image
-	 * point within the Leap Motion field of view.
+	 * point within the Ultraleap Tracking camera field of view.
 	 * </p>
 	 * <p>
 	 * This direction vector has an x and y component [x, y, 1], with the third element
 	 * always 1. Note that this vector uses the 2D camera coordinate system where the x-axis
 	 * parallels the longer (typically horizontal) dimension and the y-axis parallels the
 	 * shorter (vertical) dimension. The camera coordinate system does not correlate to the
-	 * 3D Leap Motion coordinate system.
+	 * 3D Ultraleap Tracking coordinate system.
 	 * </p>
 	 * 
 	 * @param hConnection The connection handle created by
@@ -814,11 +1273,52 @@ public interface LeapC extends Library
 	 * @return A vector containing the ray direction (the z-component of the vector is
 	 *         always 1).
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gacc6a5c80f87a60c63889407a45a3344b">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapPixelToRectilinear15LEAP_CONNECTION20eLeapPerspectiveType11LEAP_VECTOR">LeapC
 	 *      API - LeapPixelToRectilinear</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.3
 	 */
 	public LEAP_VECTOR.ByValue LeapPixelToRectilinear(Pointer hConnection, int camera,
 			LEAP_VECTOR.ByValue pixel);
+
+
+	/**
+	 * <p>
+	 * Provides the corrected camera ray intercepting the specified point on the image for a
+	 * particular device.
+	 * </p>
+	 * <p>
+	 * Given a point on the image, <code>LeapPixelToRectilinearEx()</code> corrects for
+	 * camera distortion and returns the true direction from the camera to the source of
+	 * that image point within the Ultraleap Tracking camera field of view.
+	 * </p>
+	 * <p>
+	 * This direction vector has an x and y component [x, y, 1], with the third element
+	 * always 1. Note that this vector uses the 2D camera coordinate system where the x-axis
+	 * parallels the longer (typically horizontal) dimension and the y-axis parallels the
+	 * shorter (vertical) dimension. The camera coordinate system does not correlate to the
+	 * 3D Ultraleap Tracking coordinate system.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration.
+	 * @param pixel A vector containing the position of a pixel in the image.
+	 * @return A vector containing the ray direction (the z-component of the vector is
+	 *         always 1).
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv424LeapPixelToRectilinearEx15LEAP_CONNECTION11LEAP_DEVICE20eLeapPerspectiveType26eLeapCameraCalibrationType11LEAP_VECTOR">LeapC
+	 *      API - LeapPixelToRectilinearEx</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public LEAP_VECTOR.ByValue LeapPixelToRectilinearEx(Pointer hConnection, Pointer hDevice,
+			int camera, LEAP_VECTOR.ByValue pixel);
 
 
 	/**
@@ -855,11 +1355,285 @@ public interface LeapC extends Library
 	 * @param rectilinear A vector containing the ray direction.
 	 * @return A vector containing the pixel coordinates [x, y, 1] (with z always 1).
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga0f8c7bb9c7d46fed78efe183244f9812">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapRectilinearToPixel15LEAP_CONNECTION20eLeapPerspectiveType11LEAP_VECTOR">LeapC
 	 *      API - LeapRectilinearToPixel</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.1.3
 	 */
 	public LEAP_VECTOR.ByValue LeapRectilinearToPixel(Pointer hConnection, int camera,
 			LEAP_VECTOR.ByValue rectilinear);
+
+
+	/**
+	 * <p>
+	 * Provides the point in the image corresponding to a ray projecting from the camera for
+	 * a particular device.
+	 * </p>
+	 * <p>
+	 * Given a ray projected from the camera in the specified direction,
+	 * <code>LeapRectilinearToPixelEx()</code> corrects for camera distortion and returns
+	 * the corresponding pixel coordinates in the image.
+	 * </p>
+	 * <p>
+	 * The ray direction is specified in relationship to the camera. The first vector
+	 * element is the tangent of the "horizontal" view angle; the second element is the
+	 * tangent of the "vertical" view angle.
+	 * </p>
+	 * <p>
+	 * The <code>LeapRectilinearToPixelEx()</code> function returns pixel coordinates
+	 * outside of the image bounds if you project a ray toward a point for which there is no
+	 * recorded data.
+	 * </p>
+	 * <p>
+	 * <code>LeapRectilinearToPixelEx()</code> is typically not fast enough for realtime
+	 * distortion correction. For better performance, use a shader program executed on a
+	 * GPU.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration.
+	 * @param rectilinear A vector containing the ray direction.
+	 * @return A vector containing the pixel coordinates [x, y, 1] (with z always 1).
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv424LeapRectilinearToPixelEx15LEAP_CONNECTION11LEAP_DEVICE20eLeapPerspectiveType26eLeapCameraCalibrationType11LEAP_VECTOR">LeapC
+	 *      API - LeapRectilinearToPixelEx</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public LEAP_VECTOR.ByValue LeapRectilinearToPixelEx(Pointer hConnection, Pointer hDevice,
+			int camera, LEAP_VECTOR.ByValue rectilinear);
+
+
+	/**
+	 * Returns an OpenCV-compatible camera matrix.
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv416LeapCameraMatrix15LEAP_CONNECTION20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapCameraMatrix</a>
+	 * @since LeapJna 1.2.0
+	 */
+	public void LeapCameraMatrix(Pointer hConnection, int camera, PrimitiveArrayPointer dest);
+
+
+	/**
+	 * Returns an OpenCV-compatible camera matrix for a particular device.
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 9
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapCameraMatrixEx15LEAP_CONNECTION11LEAP_DEVICE20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapCameraMatrixEx</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public void LeapCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * This finds the default device and returns the result
+	 * {@link #LeapExtrinsicCameraMatrixEx(Pointer, Pointer, int, Pointer)}.
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv425LeapExtrinsicCameraMatrix15LEAP_CONNECTION20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapExtrinsicCameraMatrix</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.1.0
+	 */
+	public void LeapExtrinsicCameraMatrix(Pointer hConnection, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns a transformation matrix from 3D Leap coordinate space to the coordinate
+	 * system of the requested camera This is composed of a 4 x 4 matrix of the form:
+	 * </p>
+	 * 
+	 * <pre>
+	 * R, t
+	 * 0, 1
+	 *
+	 * R is a 3 x 3 rotation matrix
+	 * t is a 3 x 1 translation vector
+	 * </pre>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv427LeapExtrinsicCameraMatrixEx15LEAP_CONNECTION11LEAP_DEVICE20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapExtrinsicCameraMatrixEx</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.1.0
+	 */
+	public void LeapExtrinsicCameraMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns an OpenCV-compatible lens distortion using the 8-parameter rational model.
+	 * </p>
+	 * <p>
+	 * The order of the returned array is: [k1, k2, p1, p2, k3, k4, k5, k6]
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 8
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv420LeapDistortionCoeffs15LEAP_CONNECTION20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapDistortionCoeffs</a>
+	 * @since LeapJna 1.2.0
+	 */
+	public void LeapDistortionCoeffs(Pointer hConnection, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns an OpenCV-compatible lens distortion for a particular device, using the
+	 * 8-parameter rational model.
+	 * </p>
+	 * <p>
+	 * The order of the returned array is: [k1, k2, p1, p2, k3, k4, k5, k6]
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 8
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapDistortionCoeffsEx15LEAP_CONNECTION11LEAP_DEVICE20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapDistortionCoeffsEx</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.4.0
+	 */
+	public void LeapDistortionCoeffsEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * This finds the default device and returns the result of
+	 * {@link #LeapScaleOffsetMatrixEx(Pointer, Pointer, int, PrimitiveArrayPointer)}
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv421LeapScaleOffsetMatrix15LEAP_CONNECTION20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapScaleOffsetMatrix</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.x.x
+	 */
+	public void LeapScaleOffsetMatrix(Pointer hConnection, int camera,
+			PrimitiveArrayPointer dest);
+
+
+	/**
+	 * <p>
+	 * Returns the appropriate scale and offset coefficients required to project normalised
+	 * Rectilinear coordinates to image-scale coordinates.
+	 * </p>
+	 * <p>
+	 * This is composed of a 4 x 4 matrix of the form:
+	 * 
+	 * <pre>
+	 * scale_x, 0, 0, offset_x, 0, 1, 0, 0, 0, 0, scale_z, offset_z 0, 0, 0, 1
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * This matrix is specific to the size of the current image as contained within
+	 * {@link LEAP_IMAGE}.
+	 * </p>
+	 * <p>
+	 * In practical terms, use this matrix in combination with normalised rays to project 3D
+	 * points into a rectilinear image space (i.e. to visualise hands on an undistorted
+	 * image).
+	 * </p>
+	 * <p>
+	 * The pipeline would be:
+	 * <ol>
+	 * <li>Take 3D points from hand tracking.
+	 * <li>Apply an extrinsic transformation to a specific camera's coordinate system (@sa
+	 * LeapExtrinsicCameraMatrixEx)
+	 * <li>Apply a perspective division to transform 3D points to rays.
+	 * <li>Apply the ScaleOffset matrix to these points.
+	 * </ol>
+	 * </p>
+	 * <p>
+	 * These points will now be in the correct coordinate system consistent with the
+	 * undistorted rectilinear image provided by {@link LEAP_IMAGE#distortion_matrix}.
+	 * </p>
+	 * 
+	 * @param hConnection The connection handle created by
+	 *          {@link #LeapCreateConnection(LEAP_CONNECTION_CONFIG, LEAP_CONNECTION)
+	 *          LeapCreateConnection()}. Use {@link LEAP_CONNECTION#handle} to obtain the
+	 *          handle from the connection object.
+	 * @param hDevice The device handle to close. Use {@link LEAP_DEVICE#handle} to obtain
+	 *          the handle from the device object.
+	 * @param camera The camera to use, a member of the {@link eLeapPerspectiveType}
+	 *          enumeration
+	 * @param dest A pointer to a single-precision float array of size 16, containing the
+	 *          coefficients of the 4x4 matrix in Column Major order
+	 * @see <a href=
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv423LeapScaleOffsetMatrixEx15LEAP_CONNECTION11LEAP_DEVICE20eLeapPerspectiveTypePf">LeapC
+	 *      API - LeapScaleOffsetMatrixEx</a>
+	 * @since LeapJna 1.2.0
+	 * @since Ultraleap Gemini SDK 5.x.x
+	 */
+	public void LeapScaleOffsetMatrixEx(Pointer hConnection, Pointer hDevice, int camera,
+			PrimitiveArrayPointer dest);
 
 
 	/**
@@ -874,11 +1648,19 @@ public interface LeapC extends Library
 	 *          handle from the connection object.
 	 * @param telemetryData A {@link LEAP_TELEMETRY_DATA} instance.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
+	 * @since LeapJna 1.0.0
 	 */
+	@Deprecated
 	public eLeapRS LeapTelemetryProfiling(Pointer hConnection,
 			LEAP_TELEMETRY_DATA telemetryData);
 
 
+	/**
+	 * @deprecated This function is no longer supported. Calling it will have no effect.
+	 * @since LeapJna 1.0.0
+	 */
+	@Deprecated
 	public long LeapTelemetryGetNow();
 
 
@@ -899,8 +1681,10 @@ public interface LeapC extends Library
 	 *          requested.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga483c11c1bc9a91467f14d188e7055cb9">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv417LeapRecordingOpenP14LEAP_RECORDINGPKc25LEAP_RECORDING_PARAMETERS">LeapC
 	 *      API - LeapRecordingOpen</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.2.0
 	 */
 	public eLeapRS LeapRecordingOpen(LEAP_RECORDING ppRecording, String filePath,
 			LEAP_RECORDING_PARAMETERS params);
@@ -915,8 +1699,10 @@ public interface LeapC extends Library
 	 * @param pnBytesWritten If non-null the number of bytes written.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gadeddce2276e9e01bae39ac30df910083">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapRecordingWrite14LEAP_RECORDINGP19LEAP_TRACKING_EVENTP8uint64_t">LeapC
 	 *      API - LeapRecordingWrite</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.2.0
 	 */
 	public eLeapRS LeapRecordingWrite(Pointer pRecording, LEAP_TRACKING_EVENT pEvent,
 			LongByReference pnBytesWritten);
@@ -936,8 +1722,10 @@ public interface LeapC extends Library
 	 *          status.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga2065c14a97c2dc184904f14fe2dee39e">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv422LeapRecordingGetStatus14LEAP_RECORDINGP21LEAP_RECORDING_STATUS">LeapC
 	 *      API - LeapRecordingGetStatus</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.2.0
 	 */
 	public eLeapRS LeapRecordingGetStatus(Pointer pRecording,
 			LEAP_RECORDING_STATUS pStatus);
@@ -962,8 +1750,10 @@ public interface LeapC extends Library
 	 * @param ncbEvent The size of the <code>pEvent</code> struct in bytes.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gae199628d40e996fc6586559b74e8aeb4">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv417LeapRecordingRead14LEAP_RECORDINGP19LEAP_TRACKING_EVENT8uint64_t">LeapC
 	 *      API - LeapRecordingRead</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.2.0
 	 */
 	public eLeapRS LeapRecordingRead(Pointer pRecording, LEAP_TRACKING_EVENT pEvent,
 			long ncbEvent);
@@ -984,8 +1774,10 @@ public interface LeapC extends Library
 	 *          next frame.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#ga73bde2a17dd2d8714546a2a41e18fe01">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv421LeapRecordingReadSize14LEAP_RECORDINGP8uint64_t">LeapC
 	 *      API - LeapRecordingReadSize</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.2.0
 	 */
 	public eLeapRS LeapRecordingReadSize(Pointer pRecording, LongByReference pncbEvent);
 
@@ -996,8 +1788,10 @@ public interface LeapC extends Library
 	 * @param ppRecording The recording being closed. Will modify *ppRecording to be null.
 	 * @return The operation result code, a member of the {@link eLeapRS} enumeration.
 	 * @see <a href=
-	 *      "https://developer.leapmotion.com/documentation/v4/group___functions.html#gaba62f3b921e087f034dc7b44cd3f2939">LeapC
+	 *      "https://docs.ultraleap.com/tracking-api/group/group___functions.html#_CPPv418LeapRecordingCloseP14LEAP_RECORDING">LeapC
 	 *      API - LeapRecordingClose</a>
+	 * @since LeapJna 1.0.0
+	 * @since Ultraleap Orion SDK 3.2.0
 	 */
 	public eLeapRS LeapRecordingClose(LEAP_RECORDING ppRecording);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -19,10 +19,14 @@ import komposten.leapjna.leapc.LeapC;
 /**
  * A notification that a device's point mapping has changed.
  * 
+ * @deprecated
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___p_o_i_n_t___m_a_p_p_i_n_g___c_h_a_n_g_e___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/struct/struct_l_e_a_p___p_o_i_n_t___m_a_p_p_i_n_g___c_h_a_n_g_e___e_v_e_n_t.html#_CPPv431LEAP_POINT_MAPPING_CHANGE_EVENT">LeapC
  *      API - LEAP_POINT_MAPPING_CHANGE_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 4.0.0
  */
+@Deprecated
 @FieldOrder({ "frame_id", "timestamp", "nPoints" })
 public class LEAP_POINT_MAPPING_CHANGE_EVENT extends Structure implements LEAP_EVENT
 {

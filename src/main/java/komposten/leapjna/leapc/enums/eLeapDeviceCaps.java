@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -16,8 +16,10 @@ import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
  * Flags enumerating Leap device capabilities.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga5d5cfae19b88160a1a5c14cc46faf435">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv415eLeapDeviceCaps">LeapC
  *      API - eLeapDeviceCaps</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapDeviceCaps implements IntFlagEnum<eLeapDeviceCaps>
 {

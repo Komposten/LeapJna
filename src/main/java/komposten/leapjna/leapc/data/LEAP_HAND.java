@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -23,8 +23,10 @@ import komposten.leapjna.leapc.enums.eLeapHandType;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___h_a_n_d">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv49LEAP_HAND">LeapC
  *      API - LEAP_HAND</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "id", "flags", "type", "confidence", "visible_time", "pinch_distance",
 		"grab_angle", "pinch_strength", "grab_strength", "palm", "digits", "arm" })

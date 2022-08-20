@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -16,9 +16,13 @@ import com.sun.jna.Structure.FieldOrder;
 
 /**
  * <p>
- * Holds an image from one of the Leap Motion Controller's cameras and related
- * information.
+ * Holds an image and related information from one of the Ultraleap Tracking device's cameras.
  * </p>
+ * @see <a href=
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv410LEAP_IMAGE">LeapC
+ *      API - LEAP_IMAGE</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 4.0.0
  */
 @FieldOrder({ "properties", "matrix_version", "distortion_matrix", "data", "offset" })
 public class LEAP_IMAGE extends Structure

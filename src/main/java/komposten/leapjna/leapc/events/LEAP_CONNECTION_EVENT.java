@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -21,11 +21,13 @@ import komposten.leapjna.leapc.enums.eLeapServiceDisposition;
 
 /**
  * Received from {@link LeapC#LeapPollConnection(Pointer, int, LEAP_CONNECTION_MESSAGE)}
- * when a connection to the Leap Motion service is established.
+ * when a connection to the Ultraleap Tracking Service is established.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_o_n_n_e_c_t_i_o_n___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv421LEAP_CONNECTION_EVENT">LeapC
  *      API - LEAP_CONNECTION_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "flags" })
 public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
@@ -33,6 +35,8 @@ public class LEAP_CONNECTION_EVENT extends Structure implements LEAP_EVENT
 	/**
 	 * A combination of {@link eLeapServiceDisposition} flags. Use {@link #getFlags()} to
 	 * get the type as a {@link eLeapServiceDisposition} value.
+	 * 
+	 * @since Ultraleap Orion SDK 3.1.3
 	 */
 	public int flags;
 

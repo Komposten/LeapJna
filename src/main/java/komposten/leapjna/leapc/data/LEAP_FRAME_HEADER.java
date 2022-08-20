@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import komposten.leapjna.leapc.LeapC;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___f_r_a_m_e___h_e_a_d_e_r">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv417LEAP_FRAME_HEADER">LeapC
  *      API - LEAP_FRAME_HEADER</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "reserved", "frame_id", "timestamp" })
 public class LEAP_FRAME_HEADER extends Structure

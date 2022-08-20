@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -15,8 +15,10 @@ import komposten.leapjna.leapc.enums.Enums.IntFlagEnum;
  * The service policy flags.
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#gaf9b8fb0f14bd75188519ab4eaedd6a47">LeapC
- *      API - eLeapDeviceStatus</a>
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv415eLeapPolicyFlag">LeapC
+ *      API - eLeapPolicyFlag</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapPolicyFlag implements IntFlagEnum<eLeapPolicyFlag>
 {
@@ -26,7 +28,11 @@ public enum eLeapPolicyFlag implements IntFlagEnum<eLeapPolicyFlag>
 	/** The policy allowing an application to receive frames in the background. */
 	BackgroundFrames(0x00000001),
 
-	/** The policy specifying whether to automatically stream images from the device. */
+	/**
+	 * The policy specifying whether to automatically stream images from the device.
+	 * 
+	 * @since Ultraleap Gemini SDK 4.0.0
+	 */
 	Images(0x00000002),
 
 	/** The policy specifying whether to optimise tracking for head-mounted device. */
@@ -35,13 +41,18 @@ public enum eLeapPolicyFlag implements IntFlagEnum<eLeapPolicyFlag>
 	/** The policy allowing an application to pause or resume service tracking. */
 	AllowPauseResume(0x00000008),
 
-	/** The policy allowing an application to receive per-frame map points. */
+	/**
+	 * The policy allowing an application to receive per-frame map points.
+	 * 
+	 * @since Ultraleap Orion SDK 4.0.0
+	 */
 	MapPoints(0x00000080),
 
 	/**
 	 * The policy specifying whether to optimize tracking for screen-top device.
 	 * 
-	 * @since 1.1.0 (Gemini 5.0.0)
+	 * @since LeapJna 1.1.0
+	 * @since Ultraleap Gemini SDK 5.0.0
 	 */
 	OptimizeScreenTop(0x00000100);
 

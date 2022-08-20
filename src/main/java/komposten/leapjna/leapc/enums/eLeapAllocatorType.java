@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -14,10 +14,12 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
 
 /**
  * Defines the various types of data that may be allocated using the allocator.
- * 
+ *
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___enum.html#ga4ef8bec6852369fbf3dcd97906d0a9fa">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___enum.html#_CPPv418eLeapAllocatorType">LeapC
  *      API - eLeapAllocatorType</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 4.0.0
  */
 public enum eLeapAllocatorType implements IntEnum
 {

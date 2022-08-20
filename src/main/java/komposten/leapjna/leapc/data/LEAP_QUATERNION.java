@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -19,8 +19,10 @@ import com.sun.jna.Structure.FieldOrder;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___q_u_a_t_e_r_n_i_o_n">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv415LEAP_QUATERNION">LeapC
  *      API - LEAP_QUATERNION</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.1.2
  */
 @FieldOrder({ "w", "x", "y", "z" })
 public class LEAP_QUATERNION extends Structure

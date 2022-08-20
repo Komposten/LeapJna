@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -22,8 +22,10 @@ import komposten.leapjna.leapc.data.LEAP_HAND;
  * moment in time.
  *
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___t_r_a_c_k_i_n_g___e_v_e_n_t">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv419LEAP_TRACKING_EVENT">LeapC
  *      API - LEAP_TRACKING_EVENT</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "info", "tracking_frame_id", "nHands", "pHands", "framerate" })
 public class LEAP_TRACKING_EVENT extends Structure implements LEAP_EVENT

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -23,8 +23,10 @@ import com.sun.jna.Structure.FieldOrder;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#ga555686ca5178769989951edd14b69582">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv416LEAP_CALIBRATION">LeapC
  *      API - LEAP_CALIBRATION</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 @FieldOrder({ "handle" })
 public class LEAP_CALIBRATION extends Structure

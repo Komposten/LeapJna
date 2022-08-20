@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -23,8 +23,10 @@ import com.sun.jna.Structure.FieldOrder;
  * </p>
  * 
  * @see <a href=
- *      "https://developer.leapmotion.com/documentation/v4/group___structs.html#struct_l_e_a_p___c_l_o_c_k___r_e_b_a_s_e_r">LeapC
+ *      "https://docs.ultraleap.com/tracking-api/group/group___structs.html#_CPPv416LEAP_CALIBRATION">LeapC
  *      API - LEAP_CLOCK_REBASER</a>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.1.2
  */
 @FieldOrder({ "handle" })
 public class LEAP_CLOCK_REBASER extends Structure

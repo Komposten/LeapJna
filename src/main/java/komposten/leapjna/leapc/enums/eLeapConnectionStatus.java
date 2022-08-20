@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jakob Hjelm (Komposten)
+ * Copyright 2020-2022 Jakob Hjelm (Komposten)
  *
  * This file is part of LeapJna.
  *
@@ -24,6 +24,8 @@ import komposten.leapjna.leapc.enums.Enums.IntEnum;
  * These codes can be read from the {@link LEAP_CONNECTION_INFO} struct created by a call
  * to {@link LeapC#LeapGetConnectionInfo(Pointer, LEAP_CONNECTION_INFO)}
  * </p>
+ * @since LeapJna 1.0.0
+ * @since Ultraleap Orion SDK 3.0.0
  */
 public enum eLeapConnectionStatus implements IntEnum
 {
