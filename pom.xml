@@ -27,7 +27,7 @@
 		<!-- Unit testing -->
 		<junit.jupiter.version>5.9.0</junit.jupiter.version>
 		<junit.platform.version>1.1.0</junit.platform.version>
-		<assertj.version>3.23.1</assertj.version>
+		<assertj.version>3.27.7</assertj.version>
 
 		<!-- Sonar cloud settings -->
 		<sonar.projectKey>Komposten_LeapJna</sonar.projectKey>
